@@ -3,11 +3,12 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const bodyParser = require('body-parser');
-
 
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const bodyParser = require('body-parser');
+const socketio = require('socket.io');
+const http = require('http');
 
 const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
@@ -19,6 +20,15 @@ mongoose.connect(
 );
 
 var app = express();
+const server = http.createServer(app);
+const io = socketio(server);
+io.on('connection', (socket) => {
+  console.log('New connection');
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+});
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
