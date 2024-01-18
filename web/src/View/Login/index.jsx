@@ -4,11 +4,48 @@ import Style from "./login.module.scss";
 import { Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import { FaArrowLeftLong } from "react-icons/fa6";
+import { getAPiNoneToken, postApiNoneToken } from "../../API";
+import Swal from "sweetalert2";
+import { checkEmailValid } from "../../Utils";
 
 export default function Login() {
   const navigate = useNavigate();
+
   const [isLoginEmail, setIsLoginEmail] = useState(false);
   const [isLoginPhone, setIsLoginPhone] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async () => {
+    if (checkEmailValid(email)) {
+      let data = {
+        email: email,
+        password: password,
+      };
+      try {
+        const result = await postApiNoneToken("/auth/login", data);
+        if (result.data.error) {
+          Swal.fire({
+            icon: "error",
+            text: result.data.error,
+          });
+        } else {
+          navigate("/chat-app/chat");
+        }
+      } catch (error) {
+        console.log(error);
+        Swal.fire({
+          icon: "error",
+          text: error.response.data.error,
+        });
+      }
+    } else {
+      Swal.fire({
+        icon: "error",
+        text: "Invalid email. Please re-enter!!!",
+      });
+    }
+  };
 
   return (
     <div className={clsx(Style.wrapLogin)}>
@@ -42,12 +79,28 @@ export default function Login() {
           size={35}
           className={clsx(Style.iconArrow)}
           onClick={() => {
-            setIsLoginEmail(!isLoginEmail)
+            setIsLoginEmail(!isLoginEmail);
           }}
         />
-        <Form.Control id="inputText-01" placeholder="Email" />
-        <Form.Control id="inputText-01" placeholder="Password" />
-        <Button id="buttonStyle1">Login</Button>
+        <Form.Control
+          id="inputText-01"
+          type="text"
+          onChange={(e) => {
+            setEmail(e.target.value);
+          }}
+          placeholder="Email"
+        />
+        <Form.Control
+          id="inputText-01"
+          type="password"
+          onChange={(e) => {
+            setPassword(e.target.value);
+          }}
+          placeholder="Password"
+        />
+        <Button id="buttonStyle1" onClick={() => handleLogin()}>
+          Login
+        </Button>
       </div>
     </div>
   );

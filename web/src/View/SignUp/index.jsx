@@ -15,24 +15,26 @@ export default function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [messageErr, setMessageErr] = useState("");
 
   const handleSignUp = async () => {
     if (checkEmailValid(email)) {
       let data = {
-        name: name,
         email: email,
+        name: name,
         password: password,
       };
-      const result = await postApiNoneToken(data)
-      if(result.status===400){
-        Swal.fire({
-          icon: "error",
-          text: result.data.error,
-        });
-      }else if(result.data!==null){
-        navigate('/chat-app/login')
+      try {
+        const result = await postApiNoneToken("/auth/register", data);
+        if (result.data.error) {
+          Swal.fire({
+            icon: "error",
+            text: result.data.error,
+          });
+        } else {
+          navigate("/chat-app/login");
+        }
+      } catch (error) {
+        console.log(error);
       }
     } else {
       Swal.fire({
