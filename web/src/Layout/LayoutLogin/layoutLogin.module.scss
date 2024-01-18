@@ -1,0 +1,13 @@
+.container{
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .wrap{
+        width: 90vw;
+        height: 90vh;
+        background: #DCDCFF;
+        border-radius: 20px;
+    }
+}
