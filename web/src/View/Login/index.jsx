@@ -6,7 +6,7 @@ import { useNavigate } from "react-router";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { getAPiNoneToken, postApiNoneToken } from "../../API";
 import Swal from "sweetalert2";
-import { checkEmailValid } from "../../Utils";
+import { checkEmailValid, setUserStorage } from "../../Utils";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -30,6 +30,7 @@ export default function Login() {
             text: result.data.error,
           });
         } else {
+          setUserStorage(result.data)
           navigate("/chat-app/chat");
         }
       } catch (error) {
