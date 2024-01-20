@@ -9,6 +9,7 @@ const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const socketio = require('socket.io');
 const http = require('http');
+const cors = require('cors');
 
 const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
@@ -40,6 +41,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
+app.use(cors());
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter); 
