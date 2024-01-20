@@ -1,0 +1,65 @@
+.modalHeader {
+  background: #7679ee;
+  height: 150px !important;
+}
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #F9FAFC;
+  span {
+    text-align: center;
+    position: relative !important;
+    margin-bottom: 10%;
+    .modalImg {
+      width: 120px;
+      height: 120px;
+      background: #d1d4e3;
+      border-radius: 5px;
+      margin-top: -80px;
+    }
+    :nth-child(2){
+        background: #d1d4e3;
+        border-radius: 20px;
+        border: 2px solid white;
+        position: absolute;
+        bottom: -10px;
+        left: 80%;
+        padding: 5px;
+        cursor: pointer;
+        color: black;
+    }
+  }
+  input{
+    margin-bottom: 5%;
+  }
+}
+.modalBody{
+    border: none !important;
+    Button{
+        background: none ;
+        border: none;
+        color: black;
+        font-weight: bold;
+    }
+    Button:hover{
+        background: #7679ee;
+    }
+    .btnGroup{
+        width: 100%;;
+        Button{
+            width: 30%;
+            float: right;
+            color: black;
+        }
+        :nth-child(2){
+            background: #D9D9D9;
+        }
+        :nth-child(1){
+            background: #7679ee;
+            margin-left: 5%;
+            color: white;
+        }
+    }
+}

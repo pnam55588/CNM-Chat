@@ -14,7 +14,7 @@ function App() {
           <Route path='/chat-app/login' element={<Login/>}/>
           <Route path='/chat-app/sign-up' element={<SignUp/>}/>
           <Route path='/chat-app/chat' element={<LayoutChat/>}>
-
+              
           </Route>
         </Route>
       </Routes>

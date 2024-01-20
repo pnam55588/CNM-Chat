@@ -6,9 +6,7 @@ import { Outlet } from 'react-router'
 export default function LayoutLogin() {
   return (
     <div className={clsx(Style.container)}>
-      <div className={clsx(Style.wrap)}>
-        <Outlet></Outlet>
-      </div>
+      <Outlet></Outlet>
     </div>
   )
 }

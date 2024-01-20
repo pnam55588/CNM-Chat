@@ -37,7 +37,7 @@
   }
 }
 *{
-  font-size: 20px;
+  font-size: 18px;
 }
 
 #buttonStyle1{
@@ -54,6 +54,11 @@
 #inputText-01{
   width: 25%;
   height: 60px;
+}
+#inputText-02{
+  width: 90%;
+  height: 60px;
+  background-color: #eeeef8;
 }
 #inputText-01::placeholder{
   color: rgba(0, 0, 0, 0.35);
