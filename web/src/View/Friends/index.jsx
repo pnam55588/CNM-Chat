@@ -4,7 +4,6 @@ import style from "./friends.module.scss";
 import { PiUserList } from "react-icons/pi";
 import { Form, Image, InputGroup } from "react-bootstrap";
 import { CiSearch } from "react-icons/ci";
-import { FaSortAlphaDown } from "react-icons/fa";
 
 export default function Friends() {
   return (

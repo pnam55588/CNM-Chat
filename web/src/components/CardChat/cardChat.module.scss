@@ -18,14 +18,14 @@
         .cardTitle{
             display: flex;
             justify-content: space-between;
-            p{
+            span{
                 color: #B6B5B5;
             }
         }
         .cardText{
             display: flex;
             justify-content: space-between;
-            span{
+            :nth-child(2){
             width: 20px;
             height: 20px;
             background: #FF7A55;

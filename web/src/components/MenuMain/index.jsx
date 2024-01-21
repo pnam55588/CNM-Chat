@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router";
 import { IoLogoSnapchat } from "react-icons/io";
 import { BsChatSquareText } from "react-icons/bs";
 import { RiFolderUserLine } from "react-icons/ri";
@@ -8,10 +9,12 @@ import style from "./menuMain.module.scss";
 import { useSelector, useDispatch } from "react-redux";
 import { selectMenu } from "../../features/Menu/menuSlice";
 import Profile from "../Profile";
+import { RiLogoutCircleLine } from "react-icons/ri";
 
 export default function MenuMain() {
   const menuActive = useSelector((state) => state.menuActive.active);
   const dispatch = useDispatch();
+  const navigate = useNavigate()
 
   const [modalShow, setModalShow] = useState(false);
   return (
@@ -36,13 +39,24 @@ export default function MenuMain() {
           <RiFolderUserLine size={35} color="white" />
           Friends
         </span>
-        <span onClick={()=>{setModalShow(!modalShow)}}>
+        <span
+          onClick={() => {
+            setModalShow(!modalShow);
+          }}
+        >
           <FaRegUser size={35} color="white" />
           Profile
         </span>
+        <span
+          onClick={() => {
+            localStorage.removeItem("user");
+            navigate('/chat-app/login')
+          }}
+        >
+          <RiLogoutCircleLine size={40} />
+        </span>
       </div>
-      <Profile show={modalShow}
-        onHide={() => setModalShow(false)}/>
+      <Profile show={modalShow} onHide={() => setModalShow(false)} />
     </>
   );
 }

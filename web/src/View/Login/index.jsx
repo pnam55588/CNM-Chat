@@ -4,7 +4,7 @@ import Style from "./login.module.scss";
 import { Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import { getAPiNoneToken, postApiNoneToken } from "../../API";
+import {postApiNoneToken } from "../../API";
 import Swal from "sweetalert2";
 import { checkEmailValid, setUserStorage } from "../../Utils";
 

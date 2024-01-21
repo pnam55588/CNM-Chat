@@ -6,7 +6,6 @@ import { FaSnapchat, FaArrowLeftLong } from "react-icons/fa6";
 import { useNavigate } from "react-router";
 import { checkEmailValid } from "../../Utils";
 import Swal from "sweetalert2";
-import ErrorNotification from "../Modal/ErrorNotification";
 import { postApiNoneToken } from "../../API";
 
 export default function SignUp() {

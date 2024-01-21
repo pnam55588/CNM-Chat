@@ -13,10 +13,10 @@ export default function CardChat() {
       <Card.Body className={clsx(style.cardBody)}>
         <Card.Title className={clsx(style.cardTitle)}>
           Recipient
-          <p>4m</p>
+          <span>4m</span>
         </Card.Title>
         <Card.Text className={clsx(style.cardText)}>
-          <p>Last Message...</p>
+          <span>Last Message...</span>
           <span>2</span>
         </Card.Text>
       </Card.Body>

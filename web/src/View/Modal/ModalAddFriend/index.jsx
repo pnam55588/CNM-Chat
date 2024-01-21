@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import React from "react";
-import { Form, Image, InputGroup } from "react-bootstrap";
+import { Form, InputGroup } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { LuUserPlus2 } from "react-icons/lu";
