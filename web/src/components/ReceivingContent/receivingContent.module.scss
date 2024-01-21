@@ -1,0 +1,24 @@
+.receivingContent {
+  width: 95%;
+  display: flex;
+  flex-direction: row;
+  margin: 1%;
+  padding: 0.5%;
+  .contentImg {
+    width: 2rem;
+    height: 2rem;
+    background: #d1d4e3;
+    border-radius: 5px;
+    margin-right: 1%;
+  }
+  .content {
+    background: #eeeef8;
+    padding: 1% 1% 0% 1%;
+    border-radius: 5px;
+    max-width: 50%;
+    :nth-child(2) {
+      font-size: 13px;
+      float: right;
+    }
+  }
+}

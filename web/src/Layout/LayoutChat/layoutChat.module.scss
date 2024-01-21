@@ -20,7 +20,8 @@
             height: 100%;
             border-right: 1px solid #EEEEF8;
             .listTab{
-                height: 90%;
+                height: 88%;
+                overflow: auto;
             }
         }
         .screenMain{

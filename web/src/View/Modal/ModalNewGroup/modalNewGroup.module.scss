@@ -1,0 +1,85 @@
+.groupWrap {
+  Button {
+    background: none;
+    color: black;
+    border-radius: 3rem;
+    border-color: black;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .image {
+      border-radius: 3rem;
+      width: 80px;
+      height: 80px;
+    }
+  }
+  input {
+    border: none;
+    box-shadow: 4px 4px 4px rgb(0, 0, 0, 0.5);
+    border-radius: 2rem;
+  }
+  .list {
+    height: 30rem;
+    padding-top: 3%;
+    .cardF {
+      padding: 1%;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      .cardImgF {
+        width: 80px;
+        height: 80px;
+        background: #d1d4e3;
+        border-radius: 5px;
+        margin: 0 2%;
+      }
+      p {
+        font-weight: bold;
+      }
+      input {
+        border: 1px solid black !important;
+        box-shadow: none !important;
+      }
+    }
+    .cardF:hover {
+      background: #eeeef8;
+    }
+    .selectWrap {
+      border: 1px solid black;
+      border-radius: 10px;
+      height: 27rem;
+      .cardF {
+        display: flex;
+        justify-content: space-between;
+        background: #eeeef8;
+        padding: 2%;
+        border-radius: 10px;
+        margin: 2% 0;
+        span {
+          display: flex;
+          align-items: center;
+        }
+      }
+    }
+  }
+}
+.modalFooter{
+    border: none;
+    Button{
+        padding: 1% 5%
+    }
+    Button:hover{
+        opacity: 0.7;
+    }
+    :nth-child(1){
+        background: #cbcbcb;
+        border: none;
+        color: black;
+    }
+    :nth-child(2){
+        background: #7679EE;
+        border: none;
+    }
+}

@@ -1,0 +1,43 @@
+.body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+  .searchWrap {
+    border: none !important;
+    background: #dcdcff !important;
+    width: 90%;
+    height: 50px;
+    border-radius: 5px;
+    .searchIcon {
+      background: none !important;
+      border: none !important;
+    }
+    .searchInput {
+      border: none !important;
+      background: none !important;
+    }
+  }
+  .list{
+    height: 25rem;
+    width: 100%;
+    padding-top: 2%;
+    overflow: auto;
+    .cardWrap{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      Button{
+        color: #7679EE;
+        border: 1px solid #7679EE;
+        background: none;
+        font-weight: bold;
+      }
+      Button:hover{
+        background: #7679EE;
+        color: white;
+      }
+    }
+  }
+}
