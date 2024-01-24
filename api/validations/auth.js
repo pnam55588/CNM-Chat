@@ -8,4 +8,14 @@ const registerValidation = (data) => {
     });
     return rule.validate(data);
 }
+
+const loginValidation = (data) => {
+    const rule = Joi.object({
+        email: Joi.string().min(6).max(30).required().email(),
+        password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,20}$')).required(),
+    });
+    return rule.validate(data);
+}
+
 module.exports.registerValidation = registerValidation;
+module.exports.loginValidation = loginValidation;

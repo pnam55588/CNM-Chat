@@ -2,6 +2,7 @@ const express = require('express');
 const User = require('../models/User');
 const router = express.Router();
 const verifyToken = require('../middlewares/verifyToken');
+const {updateValidation} = require('../validations/user');
 
 router.get('/', verifyToken, async (req, res) => {
     User.find({}).then(function (users) {
@@ -63,8 +64,103 @@ router.post('/addFriend', verifyToken, async (req, res) => {
 });
 
 router.post('/acceptFriend', verifyToken, async (req, res) => {
-    // TODO
-    
+    const { senderId, receiverId } = req.body;
+    if(!senderId || !receiverId) return res.status(400).send('Bad request');
+    if(senderId === receiverId) return res.status(400).send('Bad request');
+    try{
+        const sender = await User.findById(senderId);
+        const receiver = await User.findById(receiverId);
+        if(!sender || !receiver) return res.status(404).send('User not found');
+        if(!receiver.pendingRequests.includes(senderId)) return res.status(400).send('No request found');
+        receiver.pendingRequests = receiver.pendingRequests.filter((request) => request.toString() !== senderId);
+        receiver.contacts.push(senderId);
+        sender.contacts.push(receiverId);
+        await receiver.save(); 
+        await sender.save();
+        res.status(200).send('Request accepted');
+    }catch(error){
+        res.status(500).send('Internal server error');
+    }
+});
+
+router.post('/rejectFriend', verifyToken, async (req, res) => {
+    const { senderId, receiverId } = req.body;
+    if(!senderId || !receiverId) return res.status(400).send('Bad request');
+    if(senderId === receiverId) return res.status(400).send('Bad request');
+    try{
+        const sender = await User.findById(senderId);
+        const receiver = await User.findById(receiverId);
+        if(!sender || !receiver) return res.status(404).send('User not found');
+        if(!receiver.pendingRequests.includes(senderId)) return res.status(400).send('No request found');
+        receiver.pendingRequests = receiver.pendingRequests.filter((request) => request.toString() !== senderId);
+        await receiver.save(); 
+        res.status(200).send('Request rejected');
+    }catch(error){
+        res.status(500).send('Internal server error');
+    }
+});
+
+router.post('/block', verifyToken, async (req, res) => {
+    const { senderId, receiverId } = req.body;
+    if(!senderId || !receiverId) return res.status(400).send('Bad request');
+    if(senderId === receiverId) return res.status(400).send('Bad request');
+    try{
+        const sender = await User.findById(senderId);
+        const receiver = await User.findById(receiverId);
+        if(!sender || !receiver) return res.status(404).send('User not found');
+        if(sender.blocked.includes(receiverId)) return res.status(400).send('User already blocked');
+        if(receiver.blockedFrom.includes(senderId)) return res.status(400).send('User already blocked');
+        sender.blocked.push(receiverId);
+        receiver.blockedFrom.push(senderId);
+        await sender.save();
+        await receiver.save();
+        res.status(200).send('User blocked');
+    }catch(error){
+        res.status(500).send('Internal server error');
+    }
+});
+
+router.post('/unblock', verifyToken, async (req, res) => {
+    const { senderId, receiverId } = req.body;
+    if(!senderId || !receiverId) return res.status(400).send('Bad request');
+    if(senderId === receiverId) return res.status(400).send('Bad request');
+    try{
+        const sender = await User.findById(senderId);
+        const receiver = await User.findById(receiverId);
+        if(!sender || !receiver) return res.status(404).send('User not found');
+        if(!sender.blocked.includes(receiverId)) return res.status(400).send('User not blocked');
+        if(!receiver.blockedFrom.includes(senderId)) return res.status(400).send('User not blocked');
+        sender.blocked = sender.blocked.filter((blockedUser) => blockedUser.toString() !== receiverId);
+        receiver.blockedFrom = receiver.blockedFrom.filter((blockedUser) => blockedUser.toString() !== senderId);
+        await sender.save();
+        await receiver.save();
+        res.status(200).send('User unblocked');
+    }catch(error){
+        res.status(500).send('Internal server error');
+    }
+});
+
+router.get('/:id', verifyToken, async (req, res) => {
+    User.findById(req.params.id).then(function (user) {
+        if (!user) return res.status(404).send('User not found');
+        res.json(user);
+    })
+});
+
+router.put('/:id', verifyToken, async (req, res) => {
+    const { name, phone, password } = req.body;
+    const query = {};
+    if (name) query.name = name;
+    if (phone) query.phone = phone;
+    if (password) query.password = password;
+    const { error } = updateValidation(query);
+    if (error) return res.status(400).send(error.details[0].message);
+
+
+    User.findByIdAndUpdate(req.params.id, query, { new: true }).then(function (user) {
+        if (!user) return res.status(404).send('User not found');
+        res.json(user);
+    })
 });
 
 module.exports = router;
