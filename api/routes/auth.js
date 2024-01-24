@@ -31,6 +31,9 @@ router.post('/register', async (req, res) => {
 });   
 
 router.post('/login', async (req, res) => {
+    const { error } = loginValidation(req.body);
+    if (error) return res.status(422).json({ error: error.details[0].message });
+
     const user = await User.findOne({ email: req.body.email });
     if(!user) return res.status(422).json({ error: 'Email or password is wrong' });
 
