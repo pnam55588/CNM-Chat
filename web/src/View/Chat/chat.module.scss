@@ -23,29 +23,26 @@
   .chatFrame {
     height: 88%;
     width: 100%;
-    .conversation{
-        height: 87%;
-        overflow: auto;
+    .conversation {
+      height: 87%;
+      overflow: auto;
     }
     .inputWrap {
-        text-align: center;
-        justify-content: center;
-        display: flex;
-        padding-top: 1%;
-      .InputGroup {
-        width: 95%;
-        height: 60px;
+      text-align: center;
+      justify-content: center;
+      display: flex;
+      box-shadow: 2px 2px 2px gray;
+      background-color: #eeeef8;
+      margin: 1%;
+      border-radius: 1rem;
+      .basicaddon1 {
+        color: black !important;
+        border: none !important;
+        background: none !important;
+      }
+      .react-input-emoji--wrapper {
+        height: 50px !important;
         background: #eeeef8 !important;
-        border-radius: 10px;
-        box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
-        .basicaddon1 {
-          border: none !important;
-          background: none !important;
-        }
-        input {
-          border: none;
-          background: none;
-        }
       }
     }
   }
