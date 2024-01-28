@@ -55,25 +55,6 @@
   .list{
     height: 77%;
     overflow: auto;
-    .cardF{
-      padding: 1%;
-      display: flex;
-      align-items: center;
-      border-bottom: 1px solid black;
-      cursor: pointer;
-      .cardImgF{
-        width: 80px;
-        height: 80px;
-        background: #d1d4e3;
-        border-radius: 5px;
-      }
-      p{
-        font-weight: bold;
-        padding-left: 1%;
-      }
-    }
-    .cardF:hover{
-      background: #eeeef8;
-    }
+    
   }
 }

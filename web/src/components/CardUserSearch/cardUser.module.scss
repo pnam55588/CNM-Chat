@@ -1,0 +1,36 @@
+.cardUser {
+  padding: 1%;
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  span {
+    .cardUserImg {
+      width: 80px;
+      background: #d1d4e3;
+      border-radius: 5px;
+      margin-right: 1%;
+    }
+    .cardUserInf {
+      :nth-child(1) {
+        font-weight: bold;
+      }
+      :nth-child(2) {
+        color: #cbcbcb;
+      }
+    }
+    display: flex;
+    flex-direction: row;
+  }
+  Button {
+    color: #7679ee;
+    border: 1px solid #7679ee;
+    background: none;
+    font-weight: bold;
+  }
+  Button:hover {
+    background: #7679ee;
+    color: white;
+  }
+}

@@ -1,0 +1,23 @@
+.cardF{
+    padding: 1%;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid black;
+    cursor: pointer;
+    .cardImgF{
+      width: 80px;
+      height: 80px;
+      background: #d1d4e3;
+      border-radius: 5px;
+    }
+    span{
+        padding-left: 1%;
+        :nth-child(1){
+          font-weight: bold;
+          padding-left: 1%;
+        }
+    }
+  }
+  .cardF:hover{
+    background: #eeeef8;
+  }

@@ -1,20 +1,38 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, Form, Image, Modal } from "react-bootstrap";
 import clsx from "clsx";
 import style from "./profile.module.scss";
 import { MdCameraAlt } from "react-icons/md";
 import { CiEdit } from "react-icons/ci";
+import { getUserStorage } from "../../Utils";
+import { putApiWithToken } from "../../API";
 
 export default function Profile(props) {
   const inputFileReference = useRef(null);
   const [urlImage, setUrlImage] = useState("");
   const [isUpdate, setIsUpdate] = useState(false);
+  const [user, setUser] = useState(getUserStorage().user);
+  
+  const [inputName, setInputName] = useState('')
+  const [inputPhone,setInputPhone] = useState('')
 
   const uploadImage = async () => {
     const selectedFile = inputFileReference.current.files[0];
     const url = URL.createObjectURL(selectedFile);
     await setUrlImage(url);
   };
+
+  const handleUpdateInfo = async () => {
+    const data = {
+      name: inputName,
+      phone: inputPhone
+    }
+    const result = await putApiWithToken(`/users/${getUserStorage().user._id}`,data)
+    if(result.status===200){
+      setUser(result.data)
+    }
+  };
+
   return (
     <Modal
       {...props}
@@ -49,14 +67,25 @@ export default function Profile(props) {
         <Form.Control
           id="inputText-02"
           type="text"
-          placeholder="User Name"
-          disabled={!isUpdate}
+          placeholder="Email"
+          disabled
+          value={user.email}
         />
         <Form.Control
           id="inputText-02"
           type="text"
-          placeholder="Email"
+          placeholder="Name"
           disabled={!isUpdate}
+          value={user.name}
+          onChange={(e)=>setInputName(e.target.value)}
+        />
+        <Form.Control
+          id="inputText-02"
+          type="text"
+          placeholder="Phone"
+          disabled={!isUpdate}
+          value={user.phone}
+          onChange={(e)=>setInputPhone(e.target.value)}
         />
       </Modal.Body>
       <Modal.Footer className={clsx(style.modalBody)}>
@@ -70,7 +99,7 @@ export default function Profile(props) {
           </Button>
         ) : (
           <div className={clsx(style.btnGroup)}>
-            <Button>Update</Button>
+            <Button onClick={() => handleUpdateInfo()}>Update</Button>
             <Button
               onClick={() => {
                 setIsUpdate(!isUpdate);

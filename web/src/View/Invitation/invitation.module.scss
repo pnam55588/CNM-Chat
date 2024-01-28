@@ -50,34 +50,7 @@
     .listReceived {
       height: 99%;
       overflow: auto;
-      .receivedCard {
-        border-bottom: 1px solid black;
-        padding-bottom: 2%;
-        .btngroup {
-          text-align: center;
-          Button {
-            width: 30%;
-            border-radius: 30px;
-            margin: 0 5%;
-            font-weight: bold;
-            border: none;
-          }
-          :nth-child(1){
-            color: white;
-            background: #7679EE;
-          }
-          :nth-child(1):hover{
-            opacity: 0.7;
-          }
-          :nth-child(2){
-            color: black;
-            background: #cbcbcb;
-          }
-          :nth-child(2):hover{
-            opacity: 0.7;
-          }
-        }
-      }
+      
     }
   }
 }

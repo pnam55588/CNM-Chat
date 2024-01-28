@@ -24,20 +24,6 @@
     width: 100%;
     padding-top: 2%;
     overflow: auto;
-    .cardWrap{
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      Button{
-        color: #7679EE;
-        border: 1px solid #7679EE;
-        background: none;
-        font-weight: bold;
-      }
-      Button:hover{
-        background: #7679EE;
-        color: white;
-      }
-    }
+    
   }
 }

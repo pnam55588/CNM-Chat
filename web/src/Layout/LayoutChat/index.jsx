@@ -13,6 +13,7 @@ import Invitation from "../../View/Invitation";
 export default function LayoutChat() {
   const menuActive = useSelector((state) => state.menuActive.active);
   const tabActive = useSelector((state) => state.menuActive.tab);
+  
   return (
     <div className={clsx(style.mainWrap)}>
       <div className={clsx(style.menuWrap)}>
@@ -24,11 +25,6 @@ export default function LayoutChat() {
           <div id="scroll-style-01" className={clsx(style.listTab)}>
             {menuActive === "allChats" ? (
               <>
-                <CardChat />
-                <CardChat />
-                <CardChat />
-                <CardChat />
-                <CardChat />
                 <CardChat />
                 <CardChat />
                 <CardChat />

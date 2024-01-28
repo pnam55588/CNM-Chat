@@ -1,11 +1,23 @@
 import clsx from "clsx";
-import React from "react";
+import React, { useEffect } from "react";
 import style from "./friends.module.scss";
 import { PiUserList } from "react-icons/pi";
 import { Form, Image, InputGroup } from "react-bootstrap";
 import { CiSearch } from "react-icons/ci";
+import { useSelector, useDispatch } from "react-redux";
+import { getContacts } from "../../features/User/userSlice";
+import { getUserStorage } from "../../Utils";
+import CardFriend from "../../components/CardFriend";
 
 export default function Friends() {
+  const contacts = useSelector((state) => state.userReducer.contacts);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const fetchData = async () => {
+      await dispatch(getContacts(`/users/${getUserStorage().user._id}`));
+    };
+    fetchData()
+  }, []);
   return (
     <div className={clsx(style.friends)}>
       <div className={clsx(style.tabTop)}>
@@ -30,21 +42,14 @@ export default function Friends() {
           className={clsx(style.selectWrap)}
           aria-label="Default select example"
         >
-          <option value="2">
-            Two
-          </option>
+          <option value="2">Two</option>
           <option value="3">Three</option>
         </Form.Select>
       </div>
       <div id="scroll-style-01" className={clsx(style.list)}>
-        <div className={clsx(style.cardF)}>
-            <Image className={clsx(style.cardImgF)} src="https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"/>
-            <p>Name</p>
-        </div>
-        <div className={clsx(style.cardF)}>
-            <Image className={clsx(style.cardImgF)} src="https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"/>
-            <p>Name</p>
-        </div>
+        {contacts?.map((item, index) => (
+          <CardFriend data={item} key={index}/>
+        ))}
       </div>
     </div>
   );

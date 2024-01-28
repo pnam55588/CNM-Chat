@@ -1,14 +1,39 @@
 import clsx from "clsx";
-import React from "react";
+import React, { useState } from "react";
 import { Form, InputGroup } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { LuUserPlus2 } from "react-icons/lu";
 import style from "./modalAddFriend.module.scss";
-import CardUser from "../../../components/CardUser";
+import CardUserSearch from "../../../components/CardUserSearch";
 import { CiSearch } from "react-icons/ci";
+import { getUserStorage } from "../../../Utils";
+import { getApiWithToken, postApiWithToken } from "../../../API";
 
 export default function ModalAddFriend(props) {
+  const [inputSearch, setInputSearch] = useState("");
+  const [listSearch, setListSearch] = useState([]);
+
+  const handleSearch = () => {
+    if (inputSearch.includes("@")) {
+      getApiWithToken(`/users/search?email=${inputSearch}`)
+        .then((result) => {
+          setListSearch(result.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      getApiWithToken(`/users/search?name=${inputSearch}`)
+        .then((result) => {
+          setListSearch(result.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };
+
   return (
     <Modal
       {...props}
@@ -32,17 +57,16 @@ export default function ModalAddFriend(props) {
             placeholder="Search"
             aria-label="Search"
             aria-describedby="basic-addon1"
+            onChange={(e) => {
+              setInputSearch(e.target.value);
+              handleSearch();
+            }}
           />
         </InputGroup>
         <div id="scroll-style-01" className={clsx(style.list)}>
-          <div className={clsx(style.cardWrap)}>
-            <CardUser/>
-            <Button>Invitation</Button>
-          </div>
-          <div className={clsx(style.cardWrap)}>
-            <CardUser/>
-            <Button>Invitation</Button>
-          </div>
+          {listSearch.map((item, index) => (
+            <CardUserSearch data={item} />
+          ))}
         </div>
       </Modal.Body>
       <Modal.Footer>

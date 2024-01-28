@@ -60,6 +60,9 @@
   height: 60px;
   background-color: #eeeef8;
 }
+#inputText-02:disabled{
+  background-color: rgb(209, 209, 209);
+}
 #inputText-01::placeholder{
   color: rgba(0, 0, 0, 0.35);
   font-weight: bold;
