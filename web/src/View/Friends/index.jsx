@@ -1,23 +1,29 @@
 import clsx from "clsx";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import style from "./friends.module.scss";
 import { PiUserList } from "react-icons/pi";
-import { Form, Image, InputGroup } from "react-bootstrap";
+import { Form, InputGroup } from "react-bootstrap";
 import { CiSearch } from "react-icons/ci";
 import { useSelector, useDispatch } from "react-redux";
-import { getContacts } from "../../features/User/userSlice";
+import { getBlocks, getContacts } from "../../features/User/userSlice";
 import { getUserStorage } from "../../Utils";
 import CardFriend from "../../components/CardFriend";
 
 export default function Friends() {
   const contacts = useSelector((state) => state.userReducer.contacts);
+
+  const [tab, setTab] = useState("friends");
   const dispatch = useDispatch();
   useEffect(() => {
     const fetchData = async () => {
       await dispatch(getContacts(`/users/${getUserStorage().user._id}`));
+      await dispatch(getBlocks(`/users/${getUserStorage().user._id}`))
     };
-    fetchData()
+    fetchData();
   }, []);
+  const handleTab = (value) => {
+    setTab(value);
+  };
   return (
     <div className={clsx(style.friends)}>
       <div className={clsx(style.tabTop)}>
@@ -48,7 +54,7 @@ export default function Friends() {
       </div>
       <div id="scroll-style-01" className={clsx(style.list)}>
         {contacts?.map((item, index) => (
-          <CardFriend data={item} key={index}/>
+          <CardFriend data={item} key={index}  />
         ))}
       </div>
     </div>

@@ -1,23 +1,29 @@
-.cardF{
-    padding: 1%;
+.cardF {
+  padding: 1%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid black;
+  cursor: pointer;
+  .wrap {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid black;
-    cursor: pointer;
-    .cardImgF{
+    .cardImgF {
       width: 80px;
       height: 80px;
       background: #d1d4e3;
       border-radius: 5px;
     }
-    span{
+    span {
+      padding-left: 1%;
+      :nth-child(1) {
+        font-weight: bold;
         padding-left: 1%;
-        :nth-child(1){
-          font-weight: bold;
-          padding-left: 1%;
-        }
+      }
     }
   }
-  .cardF:hover{
-    background: #eeeef8;
-  }
+  
+}
+.cardF:hover {
+  background: #eeeef8;
+}

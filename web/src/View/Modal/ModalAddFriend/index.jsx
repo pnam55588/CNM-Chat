@@ -7,16 +7,16 @@ import { LuUserPlus2 } from "react-icons/lu";
 import style from "./modalAddFriend.module.scss";
 import CardUserSearch from "../../../components/CardUserSearch";
 import { CiSearch } from "react-icons/ci";
-import { getUserStorage } from "../../../Utils";
-import { getApiWithToken, postApiWithToken } from "../../../API";
+import { getApiWithToken } from "../../../API";
+import { checkPhoneValid } from "../../../Utils";
 
 export default function ModalAddFriend(props) {
   const [inputSearch, setInputSearch] = useState("");
   const [listSearch, setListSearch] = useState([]);
 
   const handleSearch = () => {
-    if (inputSearch.includes("@")) {
-      getApiWithToken(`/users/search?email=${inputSearch}`)
+    if (checkPhoneValid(inputSearch)) {
+      getApiWithToken(`/users/search?phone=${inputSearch}`)
         .then((result) => {
           setListSearch(result.data);
         })
@@ -59,7 +59,6 @@ export default function ModalAddFriend(props) {
             aria-describedby="basic-addon1"
             onChange={(e) => {
               setInputSearch(e.target.value);
-              handleSearch();
             }}
           />
         </InputGroup>
@@ -70,7 +69,8 @@ export default function ModalAddFriend(props) {
         </div>
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={props.onHide}>Close</Button>
+        <Button id="buttonStyle2" onClick={props.onHide}>Close</Button>
+        <Button id="buttonStyle1" onClick={()=>handleSearch()}>Search</Button>
       </Modal.Footer>
     </Modal>
   );

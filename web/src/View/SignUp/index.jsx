@@ -4,7 +4,7 @@ import Style from "./signUp.module.scss";
 import { Button, Form } from "react-bootstrap";
 import { FaSnapchat, FaArrowLeftLong } from "react-icons/fa6";
 import { useNavigate } from "react-router";
-import { checkEmailValid } from "../../Utils";
+import { checkEmailValid, checkPhoneValid } from "../../Utils";
 import Swal from "sweetalert2";
 import { postApiNoneToken } from "../../API";
 
@@ -12,13 +12,13 @@ export default function SignUp() {
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSignUp = async () => {
-    if (checkEmailValid(email)) {
+    if (checkPhoneValid(phone)) {
       let data = {
-        email: email,
+        phone: phone,
         name: name,
         password: password,
       };
@@ -63,9 +63,9 @@ export default function SignUp() {
       <Form.Control
         id="inputText-01"
         type="text"
-        placeholder="Email"
+        placeholder="Phone"
         onChange={(e) => {
-          setEmail(e.target.value);
+          setPhone(e.target.value);
         }}
       />
       <Form.Control

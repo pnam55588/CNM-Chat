@@ -51,6 +51,20 @@
 #buttonStyle1:hover{
   opacity: 0.7;
 }
+
+#buttonStyle2{
+  background-color: #D9D9D9;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  width: 25%;
+  padding: 0.3% 0%;
+  color: black;
+}
+#buttonStyle2:hover{
+  opacity: 0.7;
+}
+
 #inputText-01{
   width: 25%;
   height: 60px;

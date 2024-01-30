@@ -6,6 +6,13 @@ export const checkEmailValid = (email) => {
   return true;
 };
 
+export const checkPhoneValid = (phone) =>{
+  var filter = /((09|03|07|08|05)+([0-9]{8})\b)/g;
+  if(!filter.test(phone)){
+    return false
+  }return true
+}
+
 export const getUserStorage = () =>{
   return JSON.parse(localStorage.getItem('user'))
 }

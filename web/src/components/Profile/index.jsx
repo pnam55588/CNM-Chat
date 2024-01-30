@@ -12,9 +12,11 @@ export default function Profile(props) {
   const [urlImage, setUrlImage] = useState("");
   const [isUpdate, setIsUpdate] = useState(false);
   const [user, setUser] = useState(getUserStorage().user);
-  
-  const [inputName, setInputName] = useState('')
-  const [inputPhone,setInputPhone] = useState('')
+
+  const [inputName, setInputName] = useState("");
+  const [inputGender, setInputGender] = useState(user.gender);
+  const [inputDoB,setInputDoB] = useState("")
+  const [inputPW,setInputPW] = useState("")
 
   const uploadImage = async () => {
     const selectedFile = inputFileReference.current.files[0];
@@ -25,11 +27,16 @@ export default function Profile(props) {
   const handleUpdateInfo = async () => {
     const data = {
       name: inputName,
-      phone: inputPhone
-    }
-    const result = await putApiWithToken(`/users/${getUserStorage().user._id}`,data)
-    if(result.status===200){
-      setUser(result.data)
+      gender: inputGender,
+      dateOfBirth: inputDoB,
+      password: inputPW
+    };
+    const result = await putApiWithToken(
+      `/users/${getUserStorage().user._id}`,
+      data
+    );
+    if (result.status === 200) {
+      setUser(result.data);
     }
   };
 
@@ -59,6 +66,7 @@ export default function Profile(props) {
               inputFileReference.current.click();
             }}
             onChange={() => uploadImage()}
+            disabled={!isUpdate}
           >
             <MdCameraAlt size={25} />
             <input type="file" hidden ref={inputFileReference} />
@@ -67,25 +75,48 @@ export default function Profile(props) {
         <Form.Control
           id="inputText-02"
           type="text"
-          placeholder="Email"
-          disabled
-          value={user.email}
-        />
-        <Form.Control
-          id="inputText-02"
-          type="text"
           placeholder="Name"
           disabled={!isUpdate}
           value={user.name}
-          onChange={(e)=>setInputName(e.target.value)}
+          onChange={(e) => setInputName(e.target.value)}
         />
         <Form.Control
           id="inputText-02"
-          type="text"
-          placeholder="Phone"
+          type="date"
+          placeholder="Date of Birth"
           disabled={!isUpdate}
-          value={user.phone}
-          onChange={(e)=>setInputPhone(e.target.value)}
+          value={user.dateOfBirth}
+          onChange={(e) => setInputDoB(e.target.value)}
+        />
+        <Form.Group>
+          <Form.Check
+            inline
+            label="Female"
+            name="gender"
+            type={"radio"}
+            value={"female"}
+            disabled={!isUpdate}
+            defaultChecked={user.gender==="female"}
+            onSelect={(e)=>setInputGender(e.target.value)}
+          />
+          <Form.Check
+            inline
+            label="Male"
+            name="gender"
+            type={"radio"}
+            value={"male"}
+            disabled={!isUpdate}
+            defaultChecked={user.gender==="male"}
+            onSelect={(e)=>setInputGender(e.target.value)}
+          />
+        </Form.Group>
+        <Form.Control
+          id="inputText-02"
+          type="password"
+          placeholder="Password"
+          disabled={!isUpdate}
+          value={user.password}
+          onChange={(e) => setInputPW(e.target.value)}
         />
       </Modal.Body>
       <Modal.Footer className={clsx(style.modalBody)}>

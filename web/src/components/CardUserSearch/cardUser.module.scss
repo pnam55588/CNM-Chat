@@ -6,6 +6,8 @@
   justify-content: space-between;
   align-items: center;
   span {
+    width: 70%;
+    align-items: center;
     .cardUserImg {
       width: 80px;
       background: #d1d4e3;
@@ -28,6 +30,7 @@
     border: 1px solid #7679ee;
     background: none;
     font-weight: bold;
+    width: 30%;
   }
   Button:hover {
     background: #7679ee;

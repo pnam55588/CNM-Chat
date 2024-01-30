@@ -52,8 +52,23 @@
       background: #eeeef8;
     }
   }
+  .tabGroup{
+    display: flex;
+    width: 100%;
+    .friends,.blocks{
+      width: 50%;
+      text-align: center;
+      cursor: pointer;
+      font-weight: bold;
+      color: #d1d4e3;
+    }
+    .friends.active, .blocks.active{
+      color: black;
+      border-bottom: 2px solid black;
+    }
+  }
   .list{
-    height: 77%;
+    height: 75%;
     overflow: auto;
     
   }

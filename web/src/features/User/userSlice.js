@@ -7,7 +7,9 @@ export const getPenddingRequests = createAsyncThunk(
     try {
       const pendingRequests = await getApiWithToken(params);
       return pendingRequests.data.pendingRequests;
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 );
 export const getContacts = createAsyncThunk(
@@ -16,15 +18,26 @@ export const getContacts = createAsyncThunk(
     try {
       const pendingRequests = await getApiWithToken(params);
       return pendingRequests.data.contacts;
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 );
+export const getBlocks = createAsyncThunk("user/getBlocks", async (params) => {
+  try {
+    const pendingRequests = await getApiWithToken(params);
+    return pendingRequests.data.blocked;
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 const userSlice = createSlice({
   name: "userSlice",
   initialState: {
     pendingRequests: [],
     contacts: [],
+    blocked:[]
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -33,7 +46,10 @@ const userSlice = createSlice({
         state.pendingRequests = action.payload;
       })
       .addCase(getContacts.fulfilled, (state, action) => {
-        state.contacts = action.payload
+        state.contacts = action.payload;
+      })
+      .addCase(getBlocks.fulfilled, (state, action) => {
+        state.blocked = action.payload;
       });
   },
 });

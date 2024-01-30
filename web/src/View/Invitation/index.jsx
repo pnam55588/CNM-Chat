@@ -46,7 +46,7 @@ export default function Invitation() {
           }}
         >
           Invitation Received (
-          {pendingRequests.length>0 ? pendingRequests.length : 0})
+          {pendingRequests?.length > 0 ? pendingRequests.length : 0})
         </div>
         {/* <div
           className={clsx(
@@ -63,7 +63,7 @@ export default function Invitation() {
       <div className={clsx(style.list)}>
         {tab === "received" ? (
           <div id="scroll-style-01" className={clsx(style.listReceived)}>
-            {pendingRequests.map((item, index) => (
+            {pendingRequests?.map((item, index) => (
               <CardReceivedInvitation key={index} data={item} />
             ))}
           </div>

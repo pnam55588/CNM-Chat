@@ -6,20 +6,20 @@ import { useNavigate } from "react-router";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import {postApiNoneToken } from "../../API";
 import Swal from "sweetalert2";
-import { checkEmailValid, setUserStorage } from "../../Utils";
+import { checkEmailValid, checkPhoneValid, setUserStorage } from "../../Utils";
 
 export default function Login() {
   const navigate = useNavigate();
 
   const [isLoginEmail, setIsLoginEmail] = useState(false);
   const [isLoginPhone, setIsLoginPhone] = useState(false);
-  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    if (checkEmailValid(email)) {
+    if (checkPhoneValid(phone)) {
       let data = {
-        email: email,
+        phone: phone,
         password: password,
       };
       try {
@@ -43,7 +43,7 @@ export default function Login() {
     } else {
       Swal.fire({
         icon: "error",
-        text: "Invalid email. Please re-enter!!!",
+        text: "Invalid phone. Please re-enter!!!",
       });
     }
   };
@@ -56,14 +56,14 @@ export default function Login() {
           !isLoginEmail || isLoginPhone ? Style.action : ""
         )}
       >
-        <Button id="buttonStyle1">Login with phone</Button>
+        <Button id="buttonStyle1">Login with email</Button>
         <Button
           id="buttonStyle1"
           onClick={() => {
             setIsLoginEmail(!isLoginEmail);
           }}
         >
-          Login with email
+          Login with phone
         </Button>
         <span className={clsx(Style.or)}>Or</span>
         <Button
@@ -87,9 +87,9 @@ export default function Login() {
           id="inputText-01"
           type="text"
           onChange={(e) => {
-            setEmail(e.target.value);
+            setPhone(e.target.value);
           }}
-          placeholder="Email"
+          placeholder="Phone"
         />
         <Form.Control
           id="inputText-01"
