@@ -2,7 +2,8 @@ const express = require('express');
 const User = require('../models/User');
 const router = express.Router();
 const verifyToken = require('../middlewares/verifyToken');
-const {updateValidation} = require('../validations/user');
+const { updateValidation } = require('../validations/user');
+const bcrypt = require('bcryptjs');
 
 router.get('/', verifyToken, async (req, res) => {
     User.find({}).then(function (users) {
@@ -19,7 +20,9 @@ router.get('/:id/contacts', verifyToken, async (req, res) => {
                     avatar: contact.avatar,
                     name: contact.name,
                     phone: contact.phone,
-                    email: contact.email,
+                    dateOfBirth: contact.dateOfBirth,
+                    gender: contact.gender,
+                    // email: user.email,
                     isOnline: contact.isOnline
                 }
             })
@@ -28,33 +31,37 @@ router.get('/:id/contacts', verifyToken, async (req, res) => {
 });
 
 router.get('/search', async (req, res) => {
-    const { email, name } = req.query;
-    const query = {};
-    if (email) query.email = email;
-    if (name) query.name = name;
-    User.find(query).then(function (users) {
+    const { phone, name } = req.query;
+    if (!phone && !name) return res.status(400).send('Bad request');
+    try {
+        const users = await User.find({ $or: [{ phone: phone }, { name: name }] });
+        if (users.length === 0) return res.status(404).send('User not found');
         const result = users.map((user) => {
             return {
                 _id: user._id,
                 avatar: user.avatar,
                 name: user.name,
                 phone: user.phone,
-                email: user.email,
+                dateOfBirth: user.dateOfBirth,
+                gender: user.gender,
+                // email: user.email,
                 isOnline: user.isOnline
             }
         })
-        res.status(200).json(result);
-    })
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(500).send('Internal server error');
+    }
 });
 router.post('/addFriend', verifyToken, async (req, res) => {
     const { senderId, receiverId } = req.body;
-    if(!senderId || !receiverId) return res.status(400).send('Bad request');
+    if (!senderId || !receiverId) return res.status(400).send('Bad request');
     try {
         const sender = await User.findById(senderId);
         const receiver = await User.findById(receiverId);
-        if(!sender || !receiver) return res.status(404).send('User not found');
-        if(receiver.contacts.includes(senderId)) return res.status(400).send('User already in your contact list');
-        if(receiver.pendingRequests.includes(senderId)) return res.status(400).send('Request already sent');
+        if (!sender || !receiver) return res.status(404).send('User not found');
+        if (receiver.contacts.includes(senderId)) return res.status(400).send('User already in your contact list');
+        if (receiver.pendingRequests.includes(senderId)) return res.status(400).send('Request already sent');
         receiver.pendingRequests.push(senderId);
         await receiver.save();
         res.status(200).send('Request sent');
@@ -65,77 +72,77 @@ router.post('/addFriend', verifyToken, async (req, res) => {
 
 router.post('/acceptFriend', verifyToken, async (req, res) => {
     const { senderId, receiverId } = req.body;
-    if(!senderId || !receiverId) return res.status(400).send('Bad request');
-    if(senderId === receiverId) return res.status(400).send('Bad request');
-    try{
+    if (!senderId || !receiverId) return res.status(400).send('Bad request');
+    if (senderId === receiverId) return res.status(400).send('Bad request');
+    try {
         const sender = await User.findById(senderId);
         const receiver = await User.findById(receiverId);
-        if(!sender || !receiver) return res.status(404).send('User not found');
-        if(!receiver.pendingRequests.includes(senderId)) return res.status(400).send('No request found');
+        if (!sender || !receiver) return res.status(404).send('User not found');
+        if (!receiver.pendingRequests.includes(senderId)) return res.status(400).send('No request found');
         receiver.pendingRequests = receiver.pendingRequests.filter((request) => request.toString() !== senderId);
         receiver.contacts.push(senderId);
         sender.contacts.push(receiverId);
-        await receiver.save(); 
+        await receiver.save();
         await sender.save();
         res.status(200).send('Request accepted');
-    }catch(error){
+    } catch (error) {
         res.status(500).send('Internal server error');
     }
 });
 
 router.post('/rejectFriend', verifyToken, async (req, res) => {
     const { senderId, receiverId } = req.body;
-    if(!senderId || !receiverId) return res.status(400).send('Bad request');
-    if(senderId === receiverId) return res.status(400).send('Bad request');
-    try{
+    if (!senderId || !receiverId) return res.status(400).send('Bad request');
+    if (senderId === receiverId) return res.status(400).send('Bad request');
+    try {
         const sender = await User.findById(senderId);
         const receiver = await User.findById(receiverId);
-        if(!sender || !receiver) return res.status(404).send('User not found');
-        if(!receiver.pendingRequests.includes(senderId)) return res.status(400).send('No request found');
+        if (!sender || !receiver) return res.status(404).send('User not found');
+        if (!receiver.pendingRequests.includes(senderId)) return res.status(400).send('No request found');
         receiver.pendingRequests = receiver.pendingRequests.filter((request) => request.toString() !== senderId);
-        await receiver.save(); 
+        await receiver.save();
         res.status(200).send('Request rejected');
-    }catch(error){
+    } catch (error) {
         res.status(500).send('Internal server error');
     }
 });
 
 router.post('/block', verifyToken, async (req, res) => {
     const { senderId, receiverId } = req.body;
-    if(!senderId || !receiverId) return res.status(400).send('Bad request');
-    if(senderId === receiverId) return res.status(400).send('Bad request');
-    try{
+    if (!senderId || !receiverId) return res.status(400).send('Bad request');
+    if (senderId === receiverId) return res.status(400).send('Bad request');
+    try {
         const sender = await User.findById(senderId);
         const receiver = await User.findById(receiverId);
-        if(!sender || !receiver) return res.status(404).send('User not found');
-        if(sender.blocked.includes(receiverId)) return res.status(400).send('User already blocked');
-        if(receiver.blockedFrom.includes(senderId)) return res.status(400).send('User already blocked');
+        if (!sender || !receiver) return res.status(404).send('User not found');
+        if (sender.blocked.includes(receiverId)) return res.status(400).send('User already blocked');
+        if (receiver.blockedFrom.includes(senderId)) return res.status(400).send('User already blocked');
         sender.blocked.push(receiverId);
         receiver.blockedFrom.push(senderId);
         await sender.save();
         await receiver.save();
         res.status(200).send('User blocked');
-    }catch(error){
+    } catch (error) {
         res.status(500).send('Internal server error');
     }
 });
 
 router.post('/unblock', verifyToken, async (req, res) => {
     const { senderId, receiverId } = req.body;
-    if(!senderId || !receiverId) return res.status(400).send('Bad request');
-    if(senderId === receiverId) return res.status(400).send('Bad request');
-    try{
+    if (!senderId || !receiverId) return res.status(400).send('Bad request');
+    if (senderId === receiverId) return res.status(400).send('Bad request');
+    try {
         const sender = await User.findById(senderId);
         const receiver = await User.findById(receiverId);
-        if(!sender || !receiver) return res.status(404).send('User not found');
-        if(!sender.blocked.includes(receiverId)) return res.status(400).send('User not blocked');
-        if(!receiver.blockedFrom.includes(senderId)) return res.status(400).send('User not blocked');
+        if (!sender || !receiver) return res.status(404).send('User not found');
+        if (!sender.blocked.includes(receiverId)) return res.status(400).send('User not blocked');
+        if (!receiver.blockedFrom.includes(senderId)) return res.status(400).send('User not blocked');
         sender.blocked = sender.blocked.filter((blockedUser) => blockedUser.toString() !== receiverId);
         receiver.blockedFrom = receiver.blockedFrom.filter((blockedUser) => blockedUser.toString() !== senderId);
         await sender.save();
         await receiver.save();
         res.status(200).send('User unblocked');
-    }catch(error){
+    } catch (error) {
         res.status(500).send('Internal server error');
     }
 });
@@ -148,15 +155,18 @@ router.get('/:id', verifyToken, async (req, res) => {
 });
 
 router.put('/:id', verifyToken, async (req, res) => {
-    const { name, phone, password } = req.body;
+    const { name, gender, dateOfBirth, password } = req.body;
+    const { error } = updateValidation(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
     const query = {};
     if (name) query.name = name;
-    if (phone) query.phone = phone;
-    if (password) query.password = password;
-    const { error } = updateValidation(query);
-    if (error) return res.status(400).send(error.details[0].message);
-
-
+    if (gender) query.gender = gender;
+    if (dateOfBirth) query.dateOfBirth = dateOfBirth;
+    if (password) {
+        const salt = await bcrypt.genSalt(10); 
+        const hashPassword = await bcrypt.hash(password, salt);
+        query.password = hashPassword;
+    }
     User.findByIdAndUpdate(req.params.id, query, { new: true }).then(function (user) {
         if (!user) return res.status(404).send('User not found');
         res.json(user);
