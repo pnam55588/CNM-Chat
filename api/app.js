@@ -7,12 +7,20 @@ var logger = require('morgan');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
-const socketio = require('socket.io');
-const http = require('http');
 const cors = require('cors');
+const { createServer } = require('http');
 
 const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
+const conversationRouter = require('./routes/conversation');
+
+const socket = require('./config/socket');
+const PORT = process.env.PORT || 3300
+const app = express();
+const server = createServer(app);
+
+server.listen(PORT, () => {console.log(`listening on *:${PORT}`);});
+socket(server);
 
 dotenv.config();
 mongoose.connect(
@@ -20,15 +28,6 @@ mongoose.connect(
   { useUnifiedTopology: true, useNewUrlParser: true },
 );
 
-var app = express();
-const server = http.createServer(app);
-const io = socketio(server);
-io.on('connection', (socket) => {
-  console.log('New connection');
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
-  });
-});
 
 
 // view engine setup
@@ -45,6 +44,7 @@ app.use(cors());
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter); 
+app.use('/api/conversation', conversationRouter); 
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -61,5 +61,7 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+
 
 module.exports = app;

@@ -15,6 +15,7 @@ const UserSchema = new mongoose.Schema({
     blocked: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
     blockedFrom: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
     createdAt: { type: Date, default: new Date() },
+    conversations: [{ type: mongoose.Types.ObjectId, ref: 'Conversation' }],
 })
 
 module.exports = mongoose.model("User",UserSchema)
