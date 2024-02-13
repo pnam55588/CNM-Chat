@@ -4,6 +4,10 @@ const router = express.Router();
 const verifyToken = require('../middlewares/verifyToken');
 const { updateValidation } = require('../validations/user');
 const bcrypt = require('bcryptjs');
+const multer = require('multer')
+const upload = require('../config/multer');
+const s3 = require('../config/s3');
+const config= require('../config/config.json');
 
 router.get('/', verifyToken, async (req, res) => {
     User.find({}).then(function (users) {
@@ -163,7 +167,7 @@ router.put('/:id', verifyToken, async (req, res) => {
     if (gender) query.gender = gender;
     if (dateOfBirth) query.dateOfBirth = dateOfBirth;
     if (password) {
-        const salt = await bcrypt.genSalt(10); 
+        const salt = await bcrypt.genSalt(10);
         const hashPassword = await bcrypt.hash(password, salt);
         query.password = hashPassword;
     }
@@ -171,6 +175,17 @@ router.put('/:id', verifyToken, async (req, res) => {
         if (!user) return res.status(404).send('User not found');
         res.json(user);
     })
+});
+
+router.post('/uploadAvatar/:id', upload.single('file'), async (req, res) => {
+    const file = req.file;
+    if (!file) {
+        return res.status(400).send('No file uploaded.');
+    }
+    const result = await s3.uploadToS3(file);
+    const user = await User.findByIdAndUpdate(req.params.id, { avatar: result.Location }, { new: true });
+    console.log(user);
+    res.status(200).send(user);
 });
 
 module.exports = router;
