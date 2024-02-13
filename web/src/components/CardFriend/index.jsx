@@ -9,6 +9,8 @@ import { getUserStorage } from "../../Utils";
 import { useDispatch, useSelector } from "react-redux";
 import { getBlocks } from "../../features/User/userSlice";
 import Swal from "sweetalert2";
+import { selectMenu } from "../../features/Menu/menuSlice";
+import { getAllConversations } from "../../features/Conversations/conversationsSlice";
 const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
   <a
     href=""
@@ -39,7 +41,7 @@ export default function CardFriend({ data, tab }) {
     if (result.status === 200) {
       await dispatch(getBlocks(`/users/${getUserStorage().user._id}`));
       Swal.fire({
-        text: 'Blocked this user.'
+        text: "Blocked this user.",
       });
     }
   };
@@ -53,8 +55,20 @@ export default function CardFriend({ data, tab }) {
     if (result.status === 200) {
       await dispatch(getBlocks(`/users/${getUserStorage().user._id}`));
       Swal.fire({
-        text: 'Unblocked this user. You can text normally.'
+        text: "Unblocked this user. You can text normally.",
       });
+    }
+  };
+
+  const handeleCreateconversation = async () => {
+    const dt = {
+      userId: getUserStorage().user._id,
+      recipientId: data,
+    };
+    const result = await postApiWithToken("/conversation/createConversation", dt);
+    if(result.status===200){
+      getAllConversations(`/conversation/getConversations/${getUserStorage().user._id}`)
+      dispatch(selectMenu('allChats'))
     }
   };
 
@@ -67,7 +81,10 @@ export default function CardFriend({ data, tab }) {
   }, []);
   return (
     <div className={clsx(style.cardF)}>
-      <div className={clsx(style.wrap)}>
+      <div
+        className={clsx(style.wrap)}
+        onClick={() => handeleCreateconversation()}
+      >
         <Image
           className={clsx(style.cardImgF)}
           src="https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
@@ -82,9 +99,11 @@ export default function CardFriend({ data, tab }) {
         <Dropdown.Menu size="sm" title="">
           <Dropdown.Item onClick={() => setShow(true)}>Profile</Dropdown.Item>
           {!blocked?.includes(data) ? (
-            <Dropdown.Item onClick={()=>handleBlock()}>Block</Dropdown.Item>
+            <Dropdown.Item onClick={() => handleBlock()}>Block</Dropdown.Item>
           ) : (
-            <Dropdown.Item onClick={()=>handleUnBlock()}>UnBlock</Dropdown.Item>
+            <Dropdown.Item onClick={() => handleUnBlock()}>
+              UnBlock
+            </Dropdown.Item>
           )}
           <Dropdown.Item>Delete friendship</Dropdown.Item>
         </Dropdown.Menu>

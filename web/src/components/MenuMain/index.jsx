@@ -10,6 +10,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { selectMenu } from "../../features/Menu/menuSlice";
 import Profile from "../Profile";
 import { RiLogoutCircleLine } from "react-icons/ri";
+import { disconnectSocket } from "../../Utils/socket";
 
 export default function MenuMain() {
   const menuActive = useSelector((state) => state.menuActive.active);
@@ -53,7 +54,7 @@ export default function MenuMain() {
             navigate('/chat-app/login')
           }}
         >
-          <RiLogoutCircleLine size={40} />
+          <RiLogoutCircleLine size={40} onClick={()=>disconnectSocket()}/>
         </span>
       </div>
       <Profile show={modalShow} onHide={() => setModalShow(false)} />
