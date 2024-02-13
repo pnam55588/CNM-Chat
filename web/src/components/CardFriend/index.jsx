@@ -67,8 +67,8 @@ export default function CardFriend({ data, tab }) {
     };
     const result = await postApiWithToken("/conversation/createConversation", dt);
     if(result.status===200){
-      getAllConversations(`/conversation/getConversations/${getUserStorage().user._id}`)
-      dispatch(selectMenu('allChats'))
+      await dispatch(getAllConversations(`/conversation/getConversations/${getUserStorage().user._id}`))
+      await dispatch(selectMenu('allChats'))
     }
   };
 

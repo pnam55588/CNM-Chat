@@ -12,6 +12,15 @@
         height: 70%;
         background-color: #d1d4e3;
     }
+    .online{
+        background-color: rgb(9, 207, 68);
+        height: 15px;
+        width: 15px;
+        border-radius: 10px;
+        position: absolute;
+        bottom: 12%;
+        left: 24%;
+    }
     .cardBody{
         width: 75%;
         padding: 35px 18px 18px 18px;
@@ -21,6 +30,7 @@
             span{
                 color: #B6B5B5;
             }
+            
         }
         .cardText{
             display: flex;
@@ -34,10 +44,14 @@
             color: white;
             font-size: 13px;
             }
+            
         }
     }
 }
 .cardChat:hover{
     background: #EEEEF8;
     cursor: pointer;
+}
+.cardChat.action{
+    background: #EEEEF8;
 }

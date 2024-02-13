@@ -51,10 +51,12 @@ export default function MenuMain() {
         <span
           onClick={() => {
             localStorage.removeItem("user");
+            disconnectSocket()
             navigate('/chat-app/login')
+            window.location.reload()
           }}
         >
-          <RiLogoutCircleLine size={40} onClick={()=>disconnectSocket()}/>
+          <RiLogoutCircleLine size={40}/>
         </span>
       </div>
       <Profile show={modalShow} onHide={() => setModalShow(false)} />

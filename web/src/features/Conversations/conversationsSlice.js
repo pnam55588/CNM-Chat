@@ -25,8 +25,8 @@ export const selectedConversation = createAsyncThunk(
   }
 );
 
-export const getConversationById= createAsyncThunk(
-  "conversation/getConversationById",
+export const getRecipient= createAsyncThunk(
+  "conversation/getRecipient",
   async(params)=>{
     try {
       const result = await getApiWithToken(params);
@@ -41,9 +41,14 @@ const conversationsSlice = createSlice({
   name: "conversationsSlice",
   initialState: {
     allConversation: [],
-    selectedConversation: {},
+    selectedConversation: null,
+    userRecipient: null
   },
-  reducers: {},
+  reducers: {
+    selectConversation:(state, action)=>{
+      state.selectedConversation = action.payload
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getAllConversations.fulfilled, (state, action) => {
@@ -52,11 +57,11 @@ const conversationsSlice = createSlice({
       .addCase(selectedConversation.fulfilled, (state, action) => {
         state.selectedConversation = action.payload;
       })
-      .addCase(getConversationById.fulfilled, (state, action)=>{
-        state.selectedConversation = action.payload
+      .addCase(getRecipient.fulfilled, (state, action)=>{
+        state.userRecipient = action.payload
       });
   },
 });
 const { reducer, actions } = conversationsSlice;
-export const {} = actions;
+export const {selectConversation} = actions;
 export default reducer;

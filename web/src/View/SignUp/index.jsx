@@ -33,12 +33,15 @@ export default function SignUp() {
           navigate("/chat-app/login");
         }
       } catch (error) {
-        console.log(error);
+        Swal.fire({
+          icon: "error",
+          text: error.request.data,
+        });
       }
     } else {
       Swal.fire({
         icon: "error",
-        text: "Invalid email. Please re-enter!!!",
+        text: "Invalid phone. Please re-enter!!!",
       });
     }
   };

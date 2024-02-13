@@ -25,8 +25,8 @@ export default function LayoutChat() {
   useEffect(() => {
     if (user._id) {
       initiateSocket(user._id);
+      getConversations();
     }
-    getConversations();
   }, [user._id]);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function LayoutChat() {
 
   const getConversations = async () => {
     try {
-      dispatch(
+      await dispatch(
         getAllConversations(`/conversation/getConversations/${user._id}`)
       );
     } catch (error) {

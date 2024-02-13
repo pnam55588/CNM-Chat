@@ -40,7 +40,7 @@ export default function CardReceivedInvitation({ data }) {
   const handleRejectFriend = async () => {
     const dt = {
       receiverId: getUserStorage().user._id,
-      senderId: data,
+      senderId: user._id,
     };
     try {
       const result = await postApiWithToken("/users/rejectFriend", dt);
