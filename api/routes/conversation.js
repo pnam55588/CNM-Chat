@@ -17,6 +17,10 @@ router.post('/createConversation', async (req, res) => {
         let recipient = await User.findById(req.body.recipientId);
         if (!recipient) return res.status(400).json("Recipient not found");
 
+        // check if a conversation already exists between the two users
+        const checkExists = await Conversation.findOne({ users: { $all: [req.body.userId, req.body.recipientId] } });
+        if (checkExists) return res.status(400).json("Conversation already exists");
+
         const users = [req.body.userId, req.body.recipientId]//nguoi login va lien lac
         const conversation = new Conversation({
             users: users,
@@ -62,11 +66,22 @@ router.post('/sendMessage', async (req, res) => { //req.body = {conversationId, 
         if (!req.body.text) return res.status(400).json("text is required");
         const message = new Message({
             conversationId: req.body.conversationId,
-            senderId: req.body.senderId,
+            user: req.body.senderId, // có cần đổi thành object id không ? 
             text: req.body.text,
         });
         const newMessage = await message.save();
         res.status(200).json(newMessage);
+    } catch (err) {
+        res.status(400).json(err);
+    }
+});
+
+// remove all message have no user
+router.delete('/removeMessageNoUser', async (req, res) => {
+    try {
+        const messages = await Message.find({ user: null });
+        await Message.deleteMany({ user: null });
+        res.status(200).json(messages);
     } catch (err) {
         res.status(400).json(err);
     }
