@@ -8,12 +8,13 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const { createServer } = require('http');
+const multer = require('multer');
 
 const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
 const conversationRouter = require('./routes/conversation');
 
+const { createServer } = require('http');
 const socket = require('./config/socket');
 const PORT = process.env.PORT || 3300
 const app = express();
@@ -60,6 +61,39 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({
+        message: 'File size too large',
+      });
+    }
+    if (err.code === 'LIMIT_FILE_COUNT') {
+      return res.status(400).json({
+        message: 'Too many files',
+      });
+    }
+    if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+      return res.status(400).json({
+        message: 'Unexpected field',
+      });
+    }
+    if (err.code === 'LIMIT_PART_COUNT') {
+      return res.status(400).json({
+        message: 'Too many parts',
+      });
+    }
+    if (err.code === 'LIMIT_FIELD_KEY') {
+      return res.status(400).json({
+        message: 'Field name too long',
+      });
+    }
+    if (err.code === 'LIMIT_FIELD_VALUE') {
+      return res.status(400).json({
+        message: 'Field value too long',
+      });
+    }
+  }
 });
 
 
