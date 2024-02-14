@@ -59,14 +59,14 @@ router.get('/getMessages/:conversationId', async (req, res) => {
         res.status(400).json(err);
     }
 });
-router.post('/sendMessage', async (req, res) => { //req.body = {conversationId, senderId, text}
+router.post('/sendMessage', async (req, res) => { //req.body = {conversationId, user, text}
     try {
         if (!req.body.conversationId) return res.status(400).json("conversationId is required");
-        if (!req.body.senderId) return res.status(400).json("senderId is required");
+        if (!req.body.user) return res.status(400).json("user is required");
         if (!req.body.text) return res.status(400).json("text is required");
         const message = new Message({
             conversationId: req.body.conversationId,
-            user: req.body.senderId, // có cần đổi thành object id không ? 
+            user: req.body.user, // có cần đổi thành object id không ? 
             text: req.body.text,
         });
         const newMessage = await message.save();
