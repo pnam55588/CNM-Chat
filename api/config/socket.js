@@ -32,7 +32,7 @@ module.exports = function (server) {
 
 
         socket.on('disconnect', () => {
-            delete users[socket.id];
+            delete users[userId];
             io.emit('usersOnline', users);
         });
     });

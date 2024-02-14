@@ -53,7 +53,6 @@ export default function MenuMain() {
             localStorage.removeItem("user");
             disconnectSocket()
             navigate('/chat-app/login')
-            window.location.reload()
           }}
         >
           <RiLogoutCircleLine size={40}/>

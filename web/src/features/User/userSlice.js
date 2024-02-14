@@ -37,9 +37,14 @@ const userSlice = createSlice({
   initialState: {
     pendingRequests: [],
     contacts: [],
-    blocked:[]
+    blocked:[],
+    usersOnline:{}
   },
-  reducers: {},
+  reducers: {
+    handleGetUsersOnline:(state, action)=>{
+      state.usersOnline = action.payload
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getPenddingRequests.fulfilled, (state, action) => {
@@ -53,5 +58,6 @@ const userSlice = createSlice({
       });
   },
 });
-const { reducer } = userSlice;
+const { reducer, actions } = userSlice;
+export const {handleGetUsersOnline} = actions
 export default reducer;

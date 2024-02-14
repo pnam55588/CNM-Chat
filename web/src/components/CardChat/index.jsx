@@ -12,6 +12,8 @@ import { getCurrentMessage } from "../../features/Message/messageSlice";
 
 export default function CardChat({ data }) {
   const [userRecipient, setUserRecipient] = useState({});
+  const usersOnline = useSelector((state)=>state.userReducer.usersOnline)
+  const isOnline = Object.keys(usersOnline).find(id=>id===userRecipient._id);
   const selectedConversation = useSelector(
     (state) => state.conversationReducer.selectedConversation
   );
@@ -22,6 +24,7 @@ export default function CardChat({ data }) {
     const recipient = data.users.find((user) => user._id !== userId);
     setUserRecipient(recipient);
   }, [data]);
+
 
   const handleSelectedConversation = async () => {
     await dispatch(selectConversation(data));
@@ -40,7 +43,7 @@ export default function CardChat({ data }) {
         className={clsx(style.cardImage)}
         src="https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
       />
-      {userRecipient.isOnline ? (
+      {userRecipient.isOnline || isOnline ? (
         <div className={clsx(style.online)}></div>
       ) : null}
       <Card.Body className={clsx(style.cardBody)}>

@@ -10,8 +10,14 @@ import Chat from "../../View/Chat";
 import Friends from "../../View/Friends";
 import Invitation from "../../View/Invitation";
 import { getUserStorage } from "../../Utils";
-import { initiateSocket } from "../../Utils/socket";
+import {
+  disconnectSocket,
+  getUsersOnline,
+  initiateSocket,
+  socket,
+} from "../../Utils/socket";
 import { getAllConversations } from "../../features/Conversations/conversationsSlice";
+import { handleGetUsersOnline } from "../../features/User/userSlice";
 
 export default function LayoutChat() {
   const menuActive = useSelector((state) => state.menuActive.active);
@@ -23,11 +29,21 @@ export default function LayoutChat() {
   const user = getUserStorage().user;
 
   useEffect(() => {
-    if (user._id) {
+    if (!socket) {
       initiateSocket(user._id);
-      getConversations();
     }
   }, [user._id]);
+
+  useEffect(()=>{
+    getUsersOnline()
+    .then((result) => {
+      console.log(result);
+      dispatch(handleGetUsersOnline(result));
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  },[socket, user._id])
 
   useEffect(() => {
     getConversations();
@@ -55,7 +71,7 @@ export default function LayoutChat() {
             {menuActive === "allChats" ? (
               <>
                 {allConversations?.map((item, index) => (
-                  <CardChat key={index} data={item}/>
+                  <CardChat key={index} data={item} />
                 ))}
               </>
             ) : (
