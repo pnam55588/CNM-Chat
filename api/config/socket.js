@@ -1,5 +1,8 @@
 const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+const Conversation = require('../models/Conversation');
+const Message = require('../models/Message');
 
 let io = null;
 module.exports = function (server) {
@@ -17,13 +20,22 @@ module.exports = function (server) {
         io.emit('userOnline', userId);
 
         // Hàm này lắng nghe khi một client gửi tin nhắn
-        socket.on('sendMessage', (message) => { // message = {senderId, receiverIds, text, conversationId}
+        socket.on('sendMessage', async (message) => { // message = {user, receiverIds, text, conversationId}
             // Gửi tin nhắn đến tất cả người nhận online
             if (message.receiverIds.length > 0) {
+                // get avatar and name of message.user
+                const user = await User.findById(message.user, 'name avatar');
+                console.log(user);
+                const newMessage = {
+                    user: user,
+                    text: message.text,
+                    conversationId: message.conversationId,
+                    createdAt: new Date(),
+                }
                 message.receiverIds.forEach(receiverId => {
                     if (users[receiverId])  {
                         message.receiverId = receiverId;
-                        socket.to(users[receiverId]).emit('receiveMessage', message);
+                        socket.to(users[receiverId]).emit('receiveMessage', newMessage);
                     }
                 });
             }
