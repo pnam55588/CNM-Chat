@@ -65,10 +65,18 @@ export default function CardFriend({ data, tab }) {
       userId: getUserStorage().user._id,
       recipientId: data,
     };
-    const result = await postApiWithToken("/conversation/createConversation", dt);
-    if(result.status===200){
-      await dispatch(getAllConversations(`/conversation/getConversations/${getUserStorage().user._id}`))
-      await dispatch(selectMenu('allChats'))
+    try {
+      
+      const result = await postApiWithToken("/conversation/createConversation", dt);
+      if(result.status===200){
+        await dispatch(getAllConversations(`/conversation/getConversations/${getUserStorage().user._id}`))
+        await dispatch(selectMenu('allChats'))
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        text: error.response.data,
+      });
     }
   };
 

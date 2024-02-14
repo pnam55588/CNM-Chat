@@ -66,7 +66,7 @@ export default function Profile(props) {
               inputFileReference.current.click();
             }}
             onChange={() => uploadImage()}
-            disabled={!isUpdate}
+            disabled={isUpdate?"":'disabled'}
           >
             <MdCameraAlt size={25} />
             <input type="file" hidden ref={inputFileReference} />
@@ -76,15 +76,17 @@ export default function Profile(props) {
           id="inputText-02"
           type="text"
           placeholder="Name"
-          disabled={!isUpdate}
+          name="name"
+          disabled={isUpdate?"":'disabled'}
           value={user.name}
           onChange={(e) => setInputName(e.target.value)}
         />
         <Form.Control
           id="inputText-02"
           type="date"
+          name="dateOfBirth"
           placeholder="Date of Birth"
-          disabled={!isUpdate}
+          disabled={isUpdate?"":'disabled'}
           value={user.dateOfBirth}
           onChange={(e) => setInputDoB(e.target.value)}
         />
@@ -95,7 +97,7 @@ export default function Profile(props) {
             name="gender"
             type={"radio"}
             value={"female"}
-            disabled={!isUpdate}
+            disabled={isUpdate?"":'disabled'}
             defaultChecked={user.gender==="female"}
             onSelect={(e)=>setInputGender(e.target.value)}
           />
@@ -105,7 +107,7 @@ export default function Profile(props) {
             name="gender"
             type={"radio"}
             value={"male"}
-            disabled={!isUpdate}
+            disabled={isUpdate?"":'disabled'}
             defaultChecked={user.gender==="male"}
             onSelect={(e)=>setInputGender(e.target.value)}
           />
@@ -113,8 +115,9 @@ export default function Profile(props) {
         <Form.Control
           id="inputText-02"
           type="password"
+          name="password"
           placeholder="Password"
-          disabled={!isUpdate}
+          disabled={isUpdate?"":'disabled'}
           value={user.password}
           onChange={(e) => setInputPW(e.target.value)}
         />

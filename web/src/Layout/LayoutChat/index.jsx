@@ -43,7 +43,7 @@ export default function LayoutChat() {
       .catch((err) => {
         console.log(err);
       });
-  }, [socket, user._id]);
+  }, [socket]);
 
   useEffect(() => {
     getConversations();
