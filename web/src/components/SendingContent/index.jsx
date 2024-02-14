@@ -6,8 +6,10 @@ import moment from "moment";
 export default function SendingContent({ data }) {
   return (
     <div className={clsx(style.sendingContent)}>
-      <p>{data.text}</p>
-      <p>{moment(data.createdAt).calendar()}</p>
+      <div className={clsx(style.content)}>
+        <p>{data.text}</p>
+        <p>{moment(data.createdAt).calendar()}</p>
+      </div>
     </div>
   );
 }

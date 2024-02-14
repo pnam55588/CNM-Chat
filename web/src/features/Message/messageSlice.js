@@ -1,11 +1,25 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getApiWithToken } from "../../API";
+import { getApiWithToken, postApiWithToken } from "../../API";
 
 export const getCurrentMessage = createAsyncThunk(
   "message/getCurrentMessage",
   async (params) => {
     try {
-      const result = await getApiWithToken(params);
+      const result = await getApiWithToken(`/conversation/getMessages/${params}`);
+      return result.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+export const sendMessage = createAsyncThunk(
+  "message/sendMessage",
+  async (params) => {
+    try {
+      const result = await postApiWithToken(
+        "/conversation/sendMessage",
+        params
+      );
       return result.data;
     } catch (error) {
       console.log(error);
@@ -16,15 +30,25 @@ export const getCurrentMessage = createAsyncThunk(
 const messageSlice = createSlice({
   name: "messageSlice",
   initialState: {
-    newMessage: "",
+    newMessage: [],
     currentMessage: [],
   },
-  reducers: {},
+  reducers: {
+    handleSetCurrentMessage:(state,action)=>{
+      state.currentMessage=[...state.currentMessage, action.payload]
+    }
+  },
   extraReducers: (builder) => {
-    builder.addCase(getCurrentMessage.fulfilled, (state, action) => {
-      state.currentMessage = action.payload;
-    });
+    builder
+      .addCase(getCurrentMessage.fulfilled, (state, action) => {
+        state.currentMessage = action.payload;
+      })
+      .addCase(sendMessage.fulfilled, (state, action) => {
+        state.newMessage = action.payload;
+        state.currentMessage = [...state.currentMessage, action.payload];
+      });
   },
 });
-const { reducer } = messageSlice;
+const { reducer, actions } = messageSlice;
+export const {handleSetCurrentMessage} = actions
 export default reducer;

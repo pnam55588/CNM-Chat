@@ -1,14 +1,19 @@
-.sendingContent{
-    max-width: 50%;
-    background-color: #7679EE;
-    color: white;
+.sendingContent {
+  width: 90%;
+  color: white;
+  margin: 1%;
+  float: right;
+  .content {
+    background: #7679ee !important;
     border-radius: 5px;
-    float: right;
     padding: 1% 1% 0% 1%;
-    margin: 1%;
+    width: fit-content;
+    max-width: 50%;
     text-align: right;
-    :nth-child(2){
-        text-align: left;
-        font-size: 13px;
+    float: right;
+    :nth-child(2) {
+      text-align: left;
+      font-size: 13px;
     }
+  }
 }

@@ -11,13 +11,14 @@ import Friends from "../../View/Friends";
 import Invitation from "../../View/Invitation";
 import { getUserStorage } from "../../Utils";
 import {
-  disconnectSocket,
+  getMessageSocket,
   getUsersOnline,
   initiateSocket,
   socket,
 } from "../../Utils/socket";
 import { getAllConversations } from "../../features/Conversations/conversationsSlice";
 import { handleGetUsersOnline } from "../../features/User/userSlice";
+import { handleSetCurrentMessage } from "../../features/Message/messageSlice";
 
 export default function LayoutChat() {
   const menuActive = useSelector((state) => state.menuActive.active);
@@ -34,16 +35,15 @@ export default function LayoutChat() {
     }
   }, [user._id]);
 
-  useEffect(()=>{
+  useEffect(() => {
     getUsersOnline()
-    .then((result) => {
-      console.log(result);
-      dispatch(handleGetUsersOnline(result));
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  },[socket, user._id])
+      .then((result) => {
+        dispatch(handleGetUsersOnline(result));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [socket, user._id]);
 
   useEffect(() => {
     getConversations();
