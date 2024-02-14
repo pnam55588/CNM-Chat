@@ -8,7 +8,7 @@ export default function ReceivingContent({ data, sender }) {
   const senderName= sender.name
   return (
     <div className={clsx(style.receivingContent)}>
-      {/* <div className={clsx(style.name)}>{senderName.charAt(0).toUpperCase()}</div> */}
+      <div className={clsx(style.name)}>{senderName.charAt(0).toUpperCase()}</div>
       <div className={clsx(style.content)}>
         <p>{data.text}</p>
         <p>{moment(data.createdAt).calendar()}</p>

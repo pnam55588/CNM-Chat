@@ -41,12 +41,11 @@ export default function Chat() {
   const currentMessage = useSelector(
     (state) => state.messageReducer.currentMessage
   );
-  const newMessage = useSelector((state) => state.messageReducer.newMessage);
 
   const handleSendMessage = async () => {
     const dt = {
       conversationId: selectedConversation._id,
-      senderId: getUserStorage().user._id,
+      user: getUserStorage().user._id,
       text: inputMessage,
     };
     const result = await postApiWithToken("/conversation/sendMessage", dt);
