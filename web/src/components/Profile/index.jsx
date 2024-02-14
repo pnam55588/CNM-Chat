@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {  useRef, useState } from "react";
 import { Button, Form, Image, Modal } from "react-bootstrap";
 import clsx from "clsx";
 import style from "./profile.module.scss";
@@ -6,6 +6,7 @@ import { MdCameraAlt } from "react-icons/md";
 import { CiEdit } from "react-icons/ci";
 import { getUserStorage } from "../../Utils";
 import { putApiWithToken } from "../../API";
+import Swal from "sweetalert2";
 
 export default function Profile(props) {
   const inputFileReference = useRef(null);
@@ -13,10 +14,11 @@ export default function Profile(props) {
   const [isUpdate, setIsUpdate] = useState(false);
   const [user, setUser] = useState(getUserStorage().user);
 
-  const [inputName, setInputName] = useState("");
+  const [inputName, setInputName] = useState(user.name);
   const [inputGender, setInputGender] = useState(user.gender);
-  const [inputDoB,setInputDoB] = useState("")
-  const [inputPW,setInputPW] = useState("")
+  const [inputDoB, setInputDoB] = useState(user.dateOfBirth);
+  const [inputPW, setInputPW] = useState(user.password);
+
 
   const uploadImage = async () => {
     const selectedFile = inputFileReference.current.files[0];
@@ -29,14 +31,23 @@ export default function Profile(props) {
       name: inputName,
       gender: inputGender,
       dateOfBirth: inputDoB,
-      password: inputPW
+      password: inputPW,
     };
-    const result = await putApiWithToken(
-      `/users/${getUserStorage().user._id}`,
-      data
-    );
-    if (result.status === 200) {
-      setUser(result.data);
+    try {
+      const result = await putApiWithToken(
+        `/users/${getUserStorage().user._id}`,
+        data
+      );
+      if (result.status === 200) {
+        setUser(result.data);
+        setIsUpdate(!isUpdate)
+        Swal.fire({
+          icon: "success",
+          text: "Successfully updated user information",
+        });
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -66,7 +77,7 @@ export default function Profile(props) {
               inputFileReference.current.click();
             }}
             onChange={() => uploadImage()}
-            disabled={isUpdate?"":'disabled'}
+            disabled={isUpdate ? "" : "disabled"}
           >
             <MdCameraAlt size={25} />
             <input type="file" hidden ref={inputFileReference} />
@@ -77,8 +88,8 @@ export default function Profile(props) {
           type="text"
           placeholder="Name"
           name="name"
-          disabled={isUpdate?"":'disabled'}
-          value={user.name}
+          disabled={isUpdate ? "" : "disabled"}
+          value={inputName}
           onChange={(e) => setInputName(e.target.value)}
         />
         <Form.Control
@@ -86,8 +97,8 @@ export default function Profile(props) {
           type="date"
           name="dateOfBirth"
           placeholder="Date of Birth"
-          disabled={isUpdate?"":'disabled'}
-          value={user.dateOfBirth}
+          disabled={isUpdate ? "" : "disabled"}
+          value={inputDoB}
           onChange={(e) => setInputDoB(e.target.value)}
         />
         <Form.Group>
@@ -97,9 +108,9 @@ export default function Profile(props) {
             name="gender"
             type={"radio"}
             value={"female"}
-            disabled={isUpdate?"":'disabled'}
-            defaultChecked={user.gender==="female"}
-            onSelect={(e)=>setInputGender(e.target.value)}
+            disabled={isUpdate ? "" : "disabled"}
+            defaultChecked={inputGender==='female'}
+            onChange={(e) => setInputGender(e.target.value)}
           />
           <Form.Check
             inline
@@ -107,9 +118,9 @@ export default function Profile(props) {
             name="gender"
             type={"radio"}
             value={"male"}
-            disabled={isUpdate?"":'disabled'}
-            defaultChecked={user.gender==="male"}
-            onSelect={(e)=>setInputGender(e.target.value)}
+            disabled={isUpdate ? "" : "disabled"}
+            defaultChecked={inputGender==='male'}
+            onChange={(e) => setInputGender(e.target.value)}
           />
         </Form.Group>
         <Form.Control
@@ -117,8 +128,8 @@ export default function Profile(props) {
           type="password"
           name="password"
           placeholder="Password"
-          disabled={isUpdate?"":'disabled'}
-          value={user.password}
+          disabled={isUpdate ? "" : "disabled"}
+          value={inputPW}
           onChange={(e) => setInputPW(e.target.value)}
         />
       </Modal.Body>
