@@ -99,6 +99,7 @@ router.post('/createGroup', async (req, res) => { //req.body = {userId, groupNam
             name: groupName,
             users: [userId],
             isGroup: true,
+            admin: userId,
         });
         const newGroup = await group.save();
         await User.updateOne({ _id: userId }, { $push: { conversations: newGroup._id } });
@@ -114,14 +115,13 @@ router.put('/addMembers', async (req, res) => { //req.body = {conversationId, us
     try {
         const conversation = await Conversation.findById(conversationId);
         if (!conversation) return res.status(400).json("Conversation not found");
-        userIds.forEach(async (userId) => {
-            if(conversation.users.includes(userId)) return res.status(400).json("User already in the group");
+        for(let userId of userIds) {
+            if (conversation.users.includes(userId)) return res.status(400).json("User already in the group");
             const user = await User.findById(userId);
             if (!user) return res.status(400).json("User not found");
             await Conversation.updateOne({ _id: conversationId }, { $push: { users: userId } });
-            await User.updateOne({ _id: userId }, { $push: { conversations: conversationId } });
-        });
-        res.status(200).json("Members added successfully");
+        }
+        return res.status(200).json("Members added successfully");
     } catch (err) {
         res.status(400).json(err);
     }
@@ -134,6 +134,7 @@ router.put('/removeMember', async (req, res) => { //req.body = {conversationId, 
         const conversation = await Conversation.findById(conversationId);
         if (!conversation) return res.status(400).json("Conversation not found");
         if (!conversation.users.includes(userId)) return res.status(400).json("User not in the group");
+        if (conversation.admin == userId) return res.status(400).json("Admin can't be removed");
         await Conversation.updateOne({ _id: conversationId }, { $pull: { users: userId } });
         await User.updateOne({ _id: userId }, { $pull: { conversations: conversationId } });
         res.status(200).json("Member removed successfully");
@@ -209,15 +210,7 @@ router.put('/changeGroupImage/:conversationId', uploadImage.single('file') ,asyn
         res.status(400).json(err);
     }
 });
-router.get('/getGroupMembers/:conversationId', async (req, res) => {
-    try {
-        const conversation = await Conversation.findById(req.params.conversationId).populate('users', 'name avatar');
-        if (!conversation) return res.status(400).json("Conversation not found");
-        res.status(200).json(conversation.users);
-    } catch (err) {
-        res.status(400).json(err);
-    }
-});
+
 router.post('/sendImages', uploadImage.array('file', 50), async (req, res) => {
     const files = req.files;
     if (!files) return res.status(400).json("No file uploaded.");
