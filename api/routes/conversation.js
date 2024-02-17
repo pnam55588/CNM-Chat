@@ -3,7 +3,8 @@ const { verifyToken } = require('../middlewares/verifyToken');
 const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
 const User = require('../models/User');
-const { io } = require('../config/socket');
+const {uploadImage, uploadVideo, uploadFile} = require('../config/multer');
+const s3 = require('../config/s3');
 
 router.post('/createConversation', async (req, res) => {
     try {
@@ -86,5 +87,173 @@ router.delete('/removeMessageNoUser', async (req, res) => {
         res.status(400).json(err);
     }
 });
+
+router.post('/createGroup', async (req, res) => { //req.body = {userId, groupName}
+    const { userId, groupName } = req.body;
+    if (!userId) return res.status(400).json("userId is required");
+    if (!groupName) return res.status(400).json("groupName is required");
+    try {
+        const user = await User.findById(userId);
+        if (!user) return res.status(400).json("User not found");
+        const group = new Conversation({
+            name: groupName,
+            users: [userId],
+            isGroup: true,
+        });
+        const newGroup = await group.save();
+        await User.updateOne({ _id: userId }, { $push: { conversations: newGroup._id } });
+        res.status(200).json(newGroup);
+    } catch (err) {
+        res.status(400).json(err);
+    }
+});
+router.put('/addMembers', async (req, res) => { //req.body = {conversationId, userIds}
+    const { conversationId, userIds } = req.body;
+    if (!conversationId) return res.status(400).json("conversationId is required");
+    if (!userIds) return res.status(400).json("userIds is required");
+    try {
+        const conversation = await Conversation.findById(conversationId);
+        if (!conversation) return res.status(400).json("Conversation not found");
+        userIds.forEach(async (userId) => {
+            if(conversation.users.includes(userId)) return res.status(400).json("User already in the group");
+            const user = await User.findById(userId);
+            if (!user) return res.status(400).json("User not found");
+            await Conversation.updateOne({ _id: conversationId }, { $push: { users: userId } });
+            await User.updateOne({ _id: userId }, { $push: { conversations: conversationId } });
+        });
+        res.status(200).json("Members added successfully");
+    } catch (err) {
+        res.status(400).json(err);
+    }
+});
+router.put('/removeMember', async (req, res) => { //req.body = {conversationId, userId}
+    const { conversationId, userId } = req.body;
+    if (!conversationId) return res.status(400).json("conversationId is required");
+    if (!userId) return res.status(400).json("userId is required");
+    try {
+        const conversation = await Conversation.findById(conversationId);
+        if (!conversation) return res.status(400).json("Conversation not found");
+        if (!conversation.users.includes(userId)) return res.status(400).json("User not in the group");
+        await Conversation.updateOne({ _id: conversationId }, { $pull: { users: userId } });
+        await User.updateOne({ _id: userId }, { $pull: { conversations: conversationId } });
+        res.status(200).json("Member removed successfully");
+    } catch (err) {
+        res.status(400).json(err);
+    }
+});
+router.delete('/deleteConversation/:conversationId', async (req, res) => {
+    try {
+        const conversation = await Conversation.findById(req.params.conversationId);
+        if (!conversation) return res.status(400).json("Conversation not found");
+        await Message.deleteMany({ conversationId: req.params.conversationId });
+        await Conversation.deleteOne({ _id: req.params.conversationId });
+        res.status(200).json("Conversation deleted successfully");
+    } catch (err) {
+        res.status(400).json(err);
+    }
+});
+router.put('/muteConversation', async (req, res) => { //req.body = {conversationId, userId}
+    const { conversationId, userId } = req.body;
+    if (!conversationId) return res.status(400).json("conversationId is required");
+    if (!userId) return res.status(400).json("userId is required");
+    try {
+        const conversation = await Conversation.findById(conversationId);
+        if (!conversation) return res.status(400).json("Conversation not found");
+        if (conversation.mutedBy.includes(userId)) return res.status(400).json("Conversation already muted");
+        await Conversation.updateOne({ _id: conversationId }, { $push: { mutedBy: userId } });
+        res.status(200).json("Conversation muted successfully");
+    } catch (err) {
+        res.status(400).json(err);
+    }
+});
+router.put('/unmuteConversation', async (req, res) => { //req.body = {conversationId, userId}
+    const { conversationId, userId } = req.body;
+    if (!conversationId) return res.status(400).json("conversationId is required");
+    if (!userId) return res.status(400).json("userId is required");
+    try {
+        const conversation = await Conversation.findById(conversationId);
+        if (!conversation) return res.status(400).json("Conversation not found");
+        if (!conversation.mutedBy.includes(userId)) return res.status(400).json("Conversation not muted");
+        await Conversation.updateOne({ _id: conversationId }, { $pull: { mutedBy: userId } });
+        res.status(200).json("Conversation unmuted successfully");
+    } catch (err) {
+        res.status(400).json(err);
+    }
+});
+router.put('/changeGroupName', async (req, res) => { //req.body = {conversationId, name}
+    const { conversationId, name } = req.body;
+    if (!conversationId) return res.status(400).json("conversationId is required");
+    if (!name) return res.status(400).json("name is required");
+    try {
+        const conversation = await Conversation.findById(conversationId);
+        if (!conversation) return res.status(400).json("Conversation not found");
+        await Conversation.updateOne({ _id: conversationId }, { name: name });
+        res.status(200).json("Group name changed successfully");
+    } catch (err) {
+        res.status(400).json(err);
+    }
+});
+router.put('/changeGroupImage/:conversationId', uploadImage.single('file') ,async (req, res) => { //req.body = {conversationId, image}
+    const { conversationId } = req.params;
+    const file = req.file;
+    if (!conversationId) return res.status(400).json("conversationId is required");
+    if (!file) return res.status(400).json("image is required");
+    const result = await s3.uploadToS3(file);
+    const imageUrl = result.Location;
+    try {
+        const conversation = await Conversation.findById(conversationId);
+        if (!conversation) return res.status(400).json("Conversation not found");
+        await Conversation.updateOne({ _id: conversationId }, { image: imageUrl });
+        res.status(200).json(conversation);
+    } catch (err) {
+        res.status(400).json(err);
+    }
+});
+router.get('/getGroupMembers/:conversationId', async (req, res) => {
+    try {
+        const conversation = await Conversation.findById(req.params.conversationId).populate('users', 'name avatar');
+        if (!conversation) return res.status(400).json("Conversation not found");
+        res.status(200).json(conversation.users);
+    } catch (err) {
+        res.status(400).json(err);
+    }
+});
+router.post('/sendImages', uploadImage.array('file', 50), async (req, res) => {
+    const files = req.files;
+    if (!files) return res.status(400).json("No file uploaded.");
+    const results = await Promise.all(files.map(async (file) => { 
+        const result = await s3.uploadToS3(file);
+        return result.Location;
+    }));
+    const message = new Message({
+        conversationId: req.body.conversationId,
+        user: req.body.user,
+        images: results,
+    });
+    res.status(200).json(message);
+});
+router.post('/sendVideo', uploadVideo.single('file'), async (req, res) => {
+    const file = req.file;
+    if (!file) return res.status(400).json("No file uploaded.");
+    const result = await s3.uploadToS3(file);
+    const message = new Message({
+        conversationId: req.body.conversationId,
+        user: req.body.user,
+        video: result.Location,
+    });
+    res.status(200).json(message);
+});
+router.post('/sendFile', uploadFile.single('file'), async (req, res) => {
+    const file = req.file;
+    if (!file) return res.status(400).json("No file uploaded.");
+    const result = await s3.uploadToS3(file);
+    const message = new Message({
+        conversationId: req.body.conversationId,
+        user: req.body.user,
+        file: result.Location,
+    });
+    res.status(200).json(message);
+});
+
 
 module.exports = router;

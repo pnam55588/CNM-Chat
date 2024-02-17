@@ -5,7 +5,7 @@ const verifyToken = require('../middlewares/verifyToken');
 const { updateValidation } = require('../validations/user');
 const bcrypt = require('bcryptjs');
 const multer = require('multer')
-const upload = require('../config/multer');
+const {uploadImage} = require('../config/multer');
 const s3 = require('../config/s3');
 const config= require('../config/config.json');
 
@@ -111,6 +111,26 @@ router.post('/rejectFriend', verifyToken, async (req, res) => {
     }
 });
 
+router.post('/deleteFriend', verifyToken, async (req, res) => {
+    const { userId, friendId } = req.body;
+    if (!userId || !friendId) return res.status(400).send('Bad request');
+    if (userId === friendId) return res.status(400).send('Bad request');
+    try {
+        const user = await User.findById(userId);
+        const friend = await User.findById(friendId);
+        if (!user || !friend) return res.status(404).send('User not found');
+        if (!user.contacts.includes(friendId)) return res.status(400).send('User not in your contact list');
+        if (!friend.contacts.includes(userId)) return res.status(400).send('User not in your contact list');
+        user.contacts = user.contacts.filter((contact) => contact.toString() !== friendId);
+        friend.contacts = friend.contacts.filter((contact) => contact.toString() !== userId);
+        await user.save();
+        await friend.save();
+        res.status(200).send('Friend deleted');
+    } catch (error) {
+        res.status(500).send('Internal server error');
+    }
+});
+
 router.post('/block', verifyToken, async (req, res) => {
     const { senderId, receiverId } = req.body;
     if (!senderId || !receiverId) return res.status(400).send('Bad request');
@@ -177,7 +197,7 @@ router.put('/:id', verifyToken, async (req, res) => {
     })
 });
 
-router.post('/uploadAvatar/:id', upload.single('file'), async (req, res) => {
+router.post('/uploadAvatar/:id', uploadImage.single('file'), async (req, res) => {
     const file = req.file;
     if (!file) {
         return res.status(400).send('No file uploaded.');
@@ -187,5 +207,7 @@ router.post('/uploadAvatar/:id', upload.single('file'), async (req, res) => {
     console.log(user);
     res.status(200).send(user);
 });
+
+
 
 module.exports = router;

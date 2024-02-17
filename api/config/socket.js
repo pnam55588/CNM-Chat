@@ -40,7 +40,21 @@ module.exports = function (server) {
                 });
             }
         });
-
+        socket.on('newConversation', async (conversation, message) => { // newConversation = {users, name, type, avatar}
+            if(!conversation.users || conversation.users.length === 0) return;
+            const userSend = await User.findById(message.user, 'name avatar');
+            const newMessage = new Message({
+                conversationId: conversation._id,
+                user: userSend,
+                text: newMessage.text,
+            });
+            conversation.users?.forEach(userId => {
+                if (users[userId]) {
+                    socket.to(users[userId]).emit('receiveNewConversation', newConversation);
+                    socket.to(users[userId]).emit('receiveMessage', newMessage);
+                }
+            });
+        })
 
 
         socket.on('disconnect', () => {
