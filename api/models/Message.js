@@ -4,7 +4,7 @@ const MessageSchema = new mongoose.Schema({
   conversationId: mongoose.Types.ObjectId,
   user: {type: mongoose.Types.ObjectId, ref: 'User'},
   text: String,
-  images: String,
+  images: [{type: String}],
   video: String,
   file: String,
   location: {latitude: Number, longitude: Number},

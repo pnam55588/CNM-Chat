@@ -205,44 +205,71 @@ router.put('/changeGroupImage/:conversationId', uploadImage.single('file') ,asyn
         const conversation = await Conversation.findById(conversationId);
         if (!conversation) return res.status(400).json("Conversation not found");
         await Conversation.updateOne({ _id: conversationId }, { image: imageUrl });
-        res.status(200).json(conversation);
+        res.status(200).json(imageUrl);
     } catch (err) {
         res.status(400).json(err);
     }
 });
 
-router.post('/sendImages', uploadImage.array('file', 50), async (req, res) => {
+router.post('/sendImages', uploadImage.array('files', 50), async (req, res) => {
     const files = req.files;
+    const { conversationId, user } = req.body;
+    if (!conversationId) return res.status(400).json("conversationId is required");
+    if (!user) return res.status(400).json("user is required");
+    const conversation = await Conversation.findById(conversationId);
+    if (!conversation) return res.status(400).json("Conversation not found");
+    const findUser = await User.findById(user);
+    if (!findUser) return res.status(400).json("User not found");
+    if(conversation.users.indexOf(user) === -1) return res.status(400).json("User not in the conversation");
     if (!files) return res.status(400).json("No file uploaded.");
-    const results = await Promise.all(files.map(async (file) => { 
-        const result = await s3.uploadToS3(file);
-        return result.Location;
-    }));
+
+    const results = await s3.uploadMultipleToS3(files);
+    const images = results.map(result => result.Location);
     const message = new Message({
-        conversationId: req.body.conversationId,
-        user: req.body.user,
-        images: results,
+        conversationId: conversationId,
+        user: user,
+        images: images,
     });
+    await message.save();
     res.status(200).json(message);
 });
 router.post('/sendVideo', uploadVideo.single('file'), async (req, res) => {
     const file = req.file;
+    const { conversationId, user } = req.body;
     if (!file) return res.status(400).json("No file uploaded.");
+    if (!conversationId) return res.status(400).json("conversationId is required");
+    if (!user) return res.status(400).json("user is required");
+    const conversation = await Conversation.findById(conversationId);
+    if (!conversation) return res.status(400).json("Conversation not found");
+    const findUser = await User.findById(user);
+    if (!findUser) return res.status(400).json("User not found");
+    if(conversation.users.indexOf(user) === -1) return res.status(400).json("User not in the conversation");
+
     const result = await s3.uploadToS3(file);
     const message = new Message({
-        conversationId: req.body.conversationId,
-        user: req.body.user,
+        conversationId: conversationId,
+        user: user,
         video: result.Location,
     });
+    message.save();
     res.status(200).json(message);
 });
 router.post('/sendFile', uploadFile.single('file'), async (req, res) => {
     const file = req.file;
+    const { conversationId, user } = req.body;
     if (!file) return res.status(400).json("No file uploaded.");
+    if (!conversationId) return res.status(400).json("conversationId is required");
+    if (!user) return res.status(400).json("user is required");
+    const conversation = await Conversation.findById(conversationId);
+    if (!conversation) return res.status(400).json("Conversation not found");
+    const findUser = await User.findById(user);
+    if (!findUser) return res.status(400).json("User not found");
+    if(conversation.users.indexOf(user) === -1) return res.status(400).json("User not in the conversation");
+
     const result = await s3.uploadToS3(file);
     const message = new Message({
-        conversationId: req.body.conversationId,
-        user: req.body.user,
+        conversationId: conversationId,
+        user: user,
         file: result.Location,
     });
     res.status(200).json(message);
