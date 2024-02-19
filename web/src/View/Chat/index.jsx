@@ -20,9 +20,8 @@ import {
 } from "../../features/Message/messageSlice";
 import {
   getMessageSocket,
-  initiateConversationsocket,
+  newConversationSocket,
   sendMessageSocket,
-  socket,
 } from "../../Utils/socket";
 
 export default function Chat() {
@@ -55,10 +54,16 @@ export default function Chat() {
         conversationId: selectedConversation._id,
         user: getUserStorage().user._id,
         receiverIds: selectedConversation.users
-          .filter((user) => user._id !== getUserStorage().user._id).map(user=>user._id),
+          .filter((user) => user._id !== getUserStorage().user._id)
+          .map((user) => user._id),
         text: inputMessage,
       };
-      sendMessageSocket(message);
+      if (currentMessage.length <= 0) {
+        console.log("new");
+        newConversationSocket(selectedConversation, message);
+      } else {
+        sendMessageSocket(message);
+      }
       await dispatch(getCurrentMessage(selectedConversation._id));
     }
   };
@@ -66,16 +71,6 @@ export default function Chat() {
     scrollRef.current?.scrollIntoView({ behaviour: "smooth" });
   }, [currentMessage, selectedConversation]);
 
-  useEffect(() => {
-    getMessageSocket()
-      .then((result) => {
-        console.log(result);
-        dispatch(handleSetCurrentMessage(result));
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [user._id]);
 
   return (
     <div className={clsx(style.chat)}>

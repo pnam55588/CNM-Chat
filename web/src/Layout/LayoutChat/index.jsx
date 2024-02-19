@@ -11,12 +11,16 @@ import Friends from "../../View/Friends";
 import Invitation from "../../View/Invitation";
 import { getUserStorage } from "../../Utils";
 import {
+  disconnectSocket,
   getMessageSocket,
+  getReceiveNewConverstionsocket,
   getUsersOnline,
   initiateSocket,
-  socket,
 } from "../../Utils/socket";
-import { getAllConversations } from "../../features/Conversations/conversationsSlice";
+import {
+  getAllConversations,
+  handleNewConversation,
+} from "../../features/Conversations/conversationsSlice";
 import { handleGetUsersOnline } from "../../features/User/userSlice";
 import { handleSetCurrentMessage } from "../../features/Message/messageSlice";
 
@@ -30,20 +34,44 @@ export default function LayoutChat() {
   const user = getUserStorage().user;
 
   useEffect(() => {
-    if (!socket) {
-      initiateSocket(user._id);
+    if (user._id) {
+      initiateSocket(user._id)
+      handleUsersOnline();
+      handleGetMessageSocket()
+      handleNewConverstionsocket();
+    }
+    return()=>{
+      disconnectSocket()
     }
   }, [user._id]);
 
-  useEffect(() => {
-    getUsersOnline()
+  const handleUsersOnline = async () => {
+    await getUsersOnline()
       .then((result) => {
         dispatch(handleGetUsersOnline(result));
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [socket]);
+  };
+  const handleNewConverstionsocket = async () => {
+    await getReceiveNewConverstionsocket()
+      .then((result) => {
+        dispatch(handleNewConversation(result));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  const handleGetMessageSocket = async () => {
+    await getMessageSocket()
+      .then((result) => {
+        dispatch(handleSetCurrentMessage(result));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   useEffect(() => {
     getConversations();
@@ -51,9 +79,7 @@ export default function LayoutChat() {
 
   const getConversations = async () => {
     try {
-      await dispatch(
-        getAllConversations(`/conversation/getConversations/${user._id}`)
-      );
+      await dispatch(getAllConversations(user._id));
     } catch (error) {
       console.log(error);
     }

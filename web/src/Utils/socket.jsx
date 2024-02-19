@@ -10,15 +10,6 @@ const initiateSocket = (userId) => {
     socket.disconnect();
   };
 };
-const initiateConversationsocket= (conversationId)=>{
-  socket = io(baseURL, {
-    transports: ["websocket"],
-    query: { conversationId },
-  });
-  return () => {
-    socket.disconnect();
-  };
-}
 const getUsersOnline = () => {
   return new Promise((resolve, reject) => {
     if (socket) {
@@ -49,6 +40,25 @@ const getMessageSocket = () => {
     }
   });
 };
+const newConversationSocket=(conversation, message)=>{
+  if(socket) {
+    socket.emit('newConversation', conversation, message)
+  }
+}
+const getReceiveNewConverstionsocket=()=>{
+  return new Promise((resolve, reject)=>{
+    if(socket){
+      socket.on("receiveNewConversation", (res)=>{
+        resolve(res)
+      })
+    }else{
+      reject(new Error("Socket is not available."));
+    }
+    return()=>{
+      socket.off("receiveNewConversation")
+    }
+  })
+}
 const disconnectSocket = () => {
   if (socket) {
     socket.disconnect();
@@ -61,5 +71,6 @@ export {
   sendMessageSocket,
   getUsersOnline,
   initiateSocket,
-  initiateConversationsocket,
+  newConversationSocket,
+  getReceiveNewConverstionsocket,
 };

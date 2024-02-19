@@ -46,11 +46,12 @@ module.exports = function (server) {
             const newMessage = new Message({
                 conversationId: conversation._id,
                 user: userSend,
-                text: newMessage.text,
+                text: message.text,
             });
-            conversation.users?.forEach(userId => {
+            message.receiverIds?.forEach(userId => {
                 if (users[userId]) {
-                    socket.to(users[userId]).emit('receiveNewConversation', newConversation);
+                    console.log(userId);
+                    socket.to(users[userId]).emit('receiveNewConversation', conversation);
                     socket.to(users[userId]).emit('receiveMessage', newMessage);
                 }
             });

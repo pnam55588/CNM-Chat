@@ -5,7 +5,7 @@ export const getAllConversations = createAsyncThunk(
   "conversation/getAllconversations",
   async (params) => {
     try {
-      const result = await getApiWithToken(params);
+      const result = await getApiWithToken(`/conversation/getConversations/${params}`);
       return result.data;
     } catch (error) {
       console.log(error);
@@ -13,17 +13,17 @@ export const getAllConversations = createAsyncThunk(
   }
 );
 
-export const selectedConversation = createAsyncThunk(
-  "conversation/selectedConersation",
-  async (params) => {
-    try {
-      const result = await getApiWithToken(params);
-      return result.data;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-);
+// export const selectedConversation = createAsyncThunk(
+//   "conversation/selectedConersation",
+//   async (params) => {
+//     try {
+//       const result = await getApiWithToken(params);
+//       return result.data;
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   }
+// );
 
 export const getRecipient= createAsyncThunk(
   "conversation/getRecipient",
@@ -47,6 +47,9 @@ const conversationsSlice = createSlice({
   reducers: {
     selectConversation:(state, action)=>{
       state.selectedConversation = action.payload
+    },
+    handleNewConversation:(state, action)=>{
+      state.allConversation=[...state.allConversation, action.payload]
     }
   },
   extraReducers: (builder) => {
@@ -54,14 +57,14 @@ const conversationsSlice = createSlice({
       .addCase(getAllConversations.fulfilled, (state, action) => {
         state.allConversation = action.payload;
       })
-      .addCase(selectedConversation.fulfilled, (state, action) => {
-        state.selectedConversation = action.payload;
-      })
+      // .addCase(selectedConversation.fulfilled, (state, action) => {
+      //   state.selectedConversation = action.payload;
+      // })
       .addCase(getRecipient.fulfilled, (state, action)=>{
         state.userRecipient = action.payload
       });
   },
 });
 const { reducer, actions } = conversationsSlice;
-export const {selectConversation} = actions;
+export const {selectConversation, handleNewConversation} = actions;
 export default reducer;
