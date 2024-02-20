@@ -44,7 +44,14 @@ router.get('/getConversations/:userId', async (req, res) => {
         res.status(400).json(err);
     }
 });
-
+router.get('/:conversationId', async(req,res)=>{
+    try {
+        const conversation = await Conversation.findById({_id: req.params.conversationId}).populate('users', 'name avatar');
+        res.status(200).json(conversation)
+    } catch (error) {
+        console.log(error);
+    }
+})
 router.get('/getMessages/:conversationId', async (req, res) => {
     try {
         const conversationId = req.params.conversationId;

@@ -10,8 +10,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { selectMenu } from "../../features/Menu/menuSlice";
 import Profile from "../Profile";
 import { RiLogoutCircleLine } from "react-icons/ri";
-import { disconnectSocket, getUsersOnline } from "../../Utils/socket";
-import { handleGetUsersOnline } from "../../features/User/userSlice";
+import { disconnectSocket} from "../../Utils/socket";
 
 export default function MenuMain() {
   const menuActive = useSelector((state) => state.menuActive.active);

@@ -12,18 +12,15 @@ import CardFriend from "../../components/CardFriend";
 export default function Friends() {
   const contacts = useSelector((state) => state.userReducer.contacts);
 
-  const [tab, setTab] = useState("friends");
   const dispatch = useDispatch();
   useEffect(() => {
     const fetchData = async () => {
-      await dispatch(getContacts(`/users/${getUserStorage().user._id}`));
+      await dispatch(getContacts(getUserStorage().user._id));
       await dispatch(getBlocks(`/users/${getUserStorage().user._id}`))
     };
     fetchData();
   }, []);
-  const handleTab = (value) => {
-    setTab(value);
-  };
+
   return (
     <div className={clsx(style.friends)}>
       <div className={clsx(style.tabTop)}>

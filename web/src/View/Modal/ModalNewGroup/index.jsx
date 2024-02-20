@@ -1,19 +1,55 @@
 import clsx from "clsx";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, Col, Form, Image, Modal, Row } from "react-bootstrap";
 import { AiOutlineUsergroupAdd } from "react-icons/ai";
 import { MdCameraAlt } from "react-icons/md";
 import style from "./modalNewGroup.module.scss";
 import { IoMdClose } from "react-icons/io";
+import { useSelector, useDispatch } from "react-redux";
+import { getApiWithToken, postApiWithToken } from "../../../API";
+import { getContacts } from "../../../features/User/userSlice";
+import { getUserStorage } from "../../../Utils";
+import { getAllConversations, selectConversation } from "../../../features/Conversations/conversationsSlice";
+import { selectMenu } from "../../../features/Menu/menuSlice";
 
 export default function ModalNewGroup(props) {
   const inputFileReference = useRef(null);
+  const dispatch = useDispatch();
+  const contacts = useSelector((state) => state.userReducer.contacts);
   const [urlImage, setUrlImage] = useState("");
+  const [inputNameGroup, setInputNameGroup] = useState("");
+  const [selectContacts, setSelectContacts] = useState([]);
+
   const uploadImage = async () => {
     const selectedFile = inputFileReference.current.files[0];
     const url = URL.createObjectURL(selectedFile);
     await setUrlImage(url);
   };
+
+  const handleSelectContacts = (item) => {
+    if (selectContacts.includes(item)) {
+      const update = selectContacts.filter((i) => i !== item);
+      setSelectContacts(update);
+    } else {
+      setSelectContacts([...selectContacts, item]);
+    }
+  };
+
+  const handleNewGroup = async () => {
+    const dt = {
+      adminId: getUserStorage().user._id,
+      groupName: inputNameGroup,
+      userIds: selectContacts,
+    };
+    const result = await postApiWithToken("/conversation/createGroup", dt);
+    if (result.status === 200) {
+      await dispatch(getAllConversations(getUserStorage().user._id));
+      await dispatch(selectMenu("allChats"));
+      await dispatch(selectConversation(result.data._id))
+      props.onHide()
+    }
+  };
+
   return (
     <Modal
       {...props}
@@ -28,7 +64,7 @@ export default function ModalNewGroup(props) {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body className={clsx(style.groupWrap)}>
-        <div className="d-flex w-100">
+        <div className="d-flex align-items-center w-100">
           <Button
             onClick={() => {
               inputFileReference.current.click();
@@ -45,60 +81,90 @@ export default function ModalNewGroup(props) {
             )}
             <input type="file" hidden ref={inputFileReference} />
           </Button>
-          <Form.Control placeholder="Enter group name ..."></Form.Control>
+          <Form.Control
+            id="inputText-02"
+            name="groupName"
+            value={inputNameGroup}
+            onChange={(e) => setInputNameGroup(e.target.value)}
+            placeholder="Enter group name ..."
+          ></Form.Control>
         </div>
         <div className={clsx(style.list)}>
           <Row>
-            <Col id="scroll-style-01" style={{overflow:'auto',height:'30rem'}} lg={6} md={6}>
-              <div className={clsx(style.cardF)}>
-                <Form.Check // prettier-ignore
-                  type="checkbox"
-                />
-                <Image
-                  className={clsx(style.cardImgF)}
-                  src="https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
-                />
-                <p>Name</p>
-              </div>
-              <div className={clsx(style.cardF)}>
-                <Form.Check // prettier-ignore
-                  type="checkbox"
-                />
-                <Image
-                  className={clsx(style.cardImgF)}
-                  src="https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
-                />
-                <p>Name</p>
-              </div>
+            <Col
+              id="scroll-style-01"
+              style={{ overflow: "auto", height: "30rem" }}
+              lg={6}
+              md={6}
+            >
+              {contacts?.map((item, index) => (
+                <div
+                  className={clsx(style.cardF)}
+                  key={index}
+                  onClick={() => handleSelectContacts(item)}
+                >
+                  <Form.Check // prettier-ignore
+                    type="checkbox"
+                    id={`checkbox-${item._id}`}
+                    checked={selectContacts.includes(item)}
+                  />
+                  <Image
+                    className={clsx(style.cardImgF)}
+                    src={
+                      item.avatar
+                        ? item.avatar
+                        : "https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
+                    }
+                  />
+                  <p>{item.name}</p>
+                </div>
+              ))}
             </Col>
-            <Col id="scroll-style-01" style={{overflow:'auto'}} lg={6} md={6} className={clsx(style.selectWrap)}>
-              <div className={clsx(style.cardF)}>
-                <span>
-                  <Image
-                    className={clsx(style.cardImgF)}
-                    src="https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
+            <Col
+              id="scroll-style-01"
+              style={{ overflow: "auto" }}
+              lg={6}
+              md={6}
+              className={clsx(style.selectWrap)}
+            >
+              {selectContacts?.map((item, index) => (
+                <div className={clsx(style.cardF)} key={index}>
+                  <span>
+                    <Image
+                      className={clsx(style.cardImgF)}
+                      src={item.avatar ? item.avatar : "https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"}
+                    />
+                    <p>{item.name}</p>
+                  </span>
+                  <IoMdClose
+                    onClick={() => {
+                      const update = selectContacts.filter((i) => i !== item);
+                      setSelectContacts(update);
+                    }}
                   />
-                  <p>Name</p>
-                </span>
-                <IoMdClose />
-              </div>
-              <div className={clsx(style.cardF)}>
-                <span>
-                  <Image
-                    className={clsx(style.cardImgF)}
-                    src="https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
-                  />
-                  <p>Name</p>
-                </span>
-                <IoMdClose />
-              </div>
+                </div>
+              ))}
             </Col>
           </Row>
         </div>
       </Modal.Body>
       <Modal.Footer className={clsx(style.modalFooter)}>
-        <Button onClick={props.onHide}>Cancel</Button>
-        <Button>Create</Button>
+        <Button
+          onClick={() => {
+            props.onHide();
+            setSelectContacts([]);
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          disabled={
+            !inputNameGroup && selectContacts.length < 2 ? "disabled" : ""
+          }
+          onClick={()=>handleNewGroup()}
+        >
+          Create
+        </Button>
       </Modal.Footer>
     </Modal>
   );

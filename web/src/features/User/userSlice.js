@@ -16,8 +16,8 @@ export const getContacts = createAsyncThunk(
   "user/getContacts",
   async (params) => {
     try {
-      const pendingRequests = await getApiWithToken(params);
-      return pendingRequests.data.contacts;
+      const pendingRequests = await getApiWithToken(`/users/${params}/contacts`);
+      return pendingRequests.data;
     } catch (error) {
       console.log(error);
     }
@@ -38,7 +38,7 @@ const userSlice = createSlice({
     pendingRequests: [],
     contacts: [],
     blocked:[],
-    usersOnline:{}
+    usersOnline:[]
   },
   reducers: {
     handleGetUsersOnline:(state, action)=>{

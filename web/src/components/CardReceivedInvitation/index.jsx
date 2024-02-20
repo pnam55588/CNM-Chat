@@ -6,7 +6,7 @@ import { getApiWithToken, postApiWithToken } from "../../API";
 import { getUserStorage } from "../../Utils";
 import Swal from "sweetalert2";
 import { useDispatch } from "react-redux";
-import { getPenddingRequests } from "../../features/User/userSlice";
+import { getContacts, getPenddingRequests } from "../../features/User/userSlice";
 
 export default function CardReceivedInvitation({ data }) {
   const [user, setUser] = useState({});
@@ -28,6 +28,7 @@ export default function CardReceivedInvitation({ data }) {
           await dispatch(
             getPenddingRequests(`/users/${getUserStorage().user._id}`)
           );
+          await dispatch(getContacts(getUserStorage().user._id))
         } catch (error) {
           console.log(error);
         }

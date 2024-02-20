@@ -13,11 +13,12 @@ export const getAllConversations = createAsyncThunk(
   }
 );
 
-// export const selectedConversation = createAsyncThunk(
+// export const selectedConversationApi = createAsyncThunk(
 //   "conversation/selectedConersation",
 //   async (params) => {
+//     console.log(params);
 //     try {
-//       const result = await getApiWithToken(params);
+//       const result = await getApiWithToken(`/conversation/${params}`);
 //       return result.data;
 //     } catch (error) {
 //       console.log(error);
@@ -57,7 +58,7 @@ const conversationsSlice = createSlice({
       .addCase(getAllConversations.fulfilled, (state, action) => {
         state.allConversation = action.payload;
       })
-      // .addCase(selectedConversation.fulfilled, (state, action) => {
+      // .addCase(selectedConversationApi.fulfilled, (state, action) => {
       //   state.selectedConversation = action.payload;
       // })
       .addCase(getRecipient.fulfilled, (state, action)=>{

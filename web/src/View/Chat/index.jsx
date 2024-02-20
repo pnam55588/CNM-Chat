@@ -14,25 +14,26 @@ import { useSelector, useDispatch } from "react-redux";
 import welcome from "./../../image/welcome_v2.jpg";
 import { postApiWithToken } from "../../API";
 import { getUserStorage } from "../../Utils";
-import {
-  getCurrentMessage,
-  handleSetCurrentMessage,
-} from "../../features/Message/messageSlice";
-import {
-  getMessageSocket,
-  newConversationSocket,
-  sendMessageSocket,
-} from "../../Utils/socket";
+import { getCurrentMessage } from "../../features/Message/messageSlice";
+import { newConversationSocket, sendMessageSocket } from "../../Utils/socket";
+import { FaFileImage } from "react-icons/fa6";
 
 export default function Chat() {
   const [openChatInfo, setOpenChatInfo] = useState(false);
   const [inputMessage, setInputMessage] = useState("");
+  const [urlImages, setUrlImages] = useState([]);
+  const [notiAddMember, setNotiAddMember] = useState("");
   const scrollRef = useRef(null);
-  const user = getUserStorage().user;
-
   const dispatch = useDispatch();
+  const inputFileReference = useRef(null);
+  const inputImageReference = useRef(null);
+  const usersOnline = useSelector((state) => state.userReducer.usersOnline);
+
   const selectedConversation = useSelector(
     (state) => state.conversationReducer.selectedConversation
+  );
+  const allConversation = useSelector(
+    (state) => state.conversationReducer.allConversation
   );
   const recipient = useSelector(
     (state) => state.conversationReducer.userRecipient
@@ -40,6 +41,33 @@ export default function Chat() {
   const currentMessage = useSelector(
     (state) => state.messageReducer.currentMessage
   );
+
+  const isOnline = Object.keys(usersOnline).find((id) => id === recipient?._id);
+
+  const handleNotiAddMember = (noti) => {
+    setNotiAddMember(noti);
+  };
+
+  const uploadFile = async () => {
+    const selectedFiles = inputFileReference.current.files;
+    var list = [];
+    for (let i = 0; i < selectedFiles.length; i++) {
+      const url = URL.createObjectURL(selectedFiles[i]);
+      list.push(url);
+    }
+    console.log(list);
+  };
+
+  const uploadImage = async () => {
+    const selectedFiles = inputImageReference.current.files;
+    var list = [];
+    for (let i = 0; i < selectedFiles.length; i++) {
+      const url = URL.createObjectURL(selectedFiles[i]);
+      list.push(url);
+    }
+    console.log(list);
+    setUrlImages(list);
+  };
 
   const handleSendMessage = async () => {
     const dt = {
@@ -58,7 +86,10 @@ export default function Chat() {
           .map((user) => user._id),
         text: inputMessage,
       };
-      if (currentMessage.length <= 0) {
+      if (
+        currentMessage.length <= 0 &&
+        !Object.values(allConversation._id).includes(selectedConversation._id)
+      ) {
         console.log("new");
         newConversationSocket(selectedConversation, message);
       } else {
@@ -71,7 +102,6 @@ export default function Chat() {
     scrollRef.current?.scrollIntoView({ behaviour: "smooth" });
   }, [currentMessage, selectedConversation]);
 
-
   return (
     <div className={clsx(style.chat)}>
       {selectedConversation !== null ? (
@@ -79,8 +109,16 @@ export default function Chat() {
           <div style={{ width: openChatInfo ? "70%" : "100%" }}>
             <div className={clsx(style.recipient)}>
               <div className={clsx(style.name)}>
-                <h4>{recipient?.name}</h4>
-                <p>{recipient?.isOnline ? "Online" : "Offline"}</p>
+                <h4>
+                  {selectedConversation.isGroup
+                    ? selectedConversation.name
+                    : recipient?.name}
+                </h4>
+                <p>
+                  {(recipient && recipient.isOnline) || isOnline
+                    ? "Online"
+                    : "Offline"}
+                </p>
               </div>
               <div>
                 <IoCallOutline size={35} cursor={"pointer"} />
@@ -110,11 +148,31 @@ export default function Chat() {
                     );
                   }
                 })}
+                {selectedConversation.isGroup && notiAddMember ? (
+                  <p className={clsx(style.notiAddMember)}>
+                    {notiAddMember}
+                  </p>
+                ) : null}
               </div>
               <div className={clsx(style.inputWrap)}>
-                <Button className={clsx(style.basicaddon1)} id="basic-addon1">
+                <Button
+                  className={clsx(style.basicaddon1)}
+                  id="basic-addon1"
+                  onClick={() => {
+                    inputFileReference.current.click();
+                  }}
+                  onChange={() => {
+                    uploadFile();
+                  }}
+                >
                   <HiLink size={25} cursor={"pointer"} />
-                  <input type="file" hidden />
+                  <input
+                    type="file"
+                    hidden
+                    multiple
+                    accept=".pdf, .doc, .docx, .txt"
+                    ref={inputFileReference}
+                  />
                 </Button>
                 <InputEmoji
                   cleanOnEnter
@@ -123,6 +181,25 @@ export default function Chat() {
                   value={inputMessage}
                   onEnter={() => handleSendMessage()}
                 />
+                <Button
+                  className={clsx(style.basicaddon1)}
+                  id="basic-addon1"
+                  onClick={() => {
+                    inputImageReference.current.click();
+                  }}
+                  onChange={() => {
+                    uploadImage();
+                  }}
+                >
+                  <FaFileImage size={25} cursor={"pointer"} />
+                  <input
+                    type="file"
+                    hidden
+                    multiple
+                    accept="image/jpeg, image/png"
+                    ref={inputImageReference}
+                  />
+                </Button>
                 <Button className={clsx(style.basicaddon1)} id="basic-addon1">
                   <IoIosSend
                     size={35}
@@ -139,7 +216,7 @@ export default function Chat() {
               display: openChatInfo ? "block" : "none",
             }}
           >
-            <ChatInfo />
+            <ChatInfo handleNotiAddMember={handleNotiAddMember} />
           </div>
         </>
       ) : (

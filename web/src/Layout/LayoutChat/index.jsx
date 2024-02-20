@@ -21,7 +21,10 @@ import {
   getAllConversations,
   handleNewConversation,
 } from "../../features/Conversations/conversationsSlice";
-import { handleGetUsersOnline } from "../../features/User/userSlice";
+import {
+  getContacts,
+  handleGetUsersOnline,
+} from "../../features/User/userSlice";
 import { handleSetCurrentMessage } from "../../features/Message/messageSlice";
 
 export default function LayoutChat() {
@@ -35,14 +38,14 @@ export default function LayoutChat() {
 
   useEffect(() => {
     if (user._id) {
-      initiateSocket(user._id)
+      initiateSocket(user._id);
       handleUsersOnline();
-      handleGetMessageSocket()
+      handleGetMessageSocket();
       handleNewConverstionsocket();
     }
-    return()=>{
-      disconnectSocket()
-    }
+    return () => {
+      disconnectSocket();
+    };
   }, [user._id]);
 
   const handleUsersOnline = async () => {
@@ -75,11 +78,20 @@ export default function LayoutChat() {
 
   useEffect(() => {
     getConversations();
+    getAllContacts()
   }, []);
 
   const getConversations = async () => {
     try {
       await dispatch(getAllConversations(user._id));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getAllContacts = async () => {
+    try {
+      await dispatch(getContacts(getUserStorage().user._id));
     } catch (error) {
       console.log(error);
     }

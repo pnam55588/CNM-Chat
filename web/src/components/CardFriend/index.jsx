@@ -26,7 +26,6 @@ const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
 ));
 
 export default function CardFriend({ data, tab }) {
-  const [user, setUser] = useState({});
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const dispatch = useDispatch();
@@ -35,7 +34,7 @@ export default function CardFriend({ data, tab }) {
   const handleBlock = async () => {
     const dt = {
       senderId: getUserStorage().user._id,
-      receiverId: data,
+      receiverId: data._id,
     };
     const result = await postApiWithToken("/users/block", dt);
     if (result.status === 200) {
@@ -49,7 +48,7 @@ export default function CardFriend({ data, tab }) {
   const handleUnBlock = async () => {
     const dt = {
       senderId: getUserStorage().user._id,
-      receiverId: data,
+      receiverId: data._id,
     };
     const result = await postApiWithToken("/users/unblock", dt);
     if (result.status === 200) {
@@ -63,7 +62,7 @@ export default function CardFriend({ data, tab }) {
   const handeleCreateconversation = async () => {
     const dt = {
       userId: getUserStorage().user._id,
-      recipientId: data,
+      recipientId: data._id,
     };
     try {
       
@@ -80,13 +79,6 @@ export default function CardFriend({ data, tab }) {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const result = await getApiWithToken(`/users/${data}`);
-      setUser(result.data);
-    };
-    fetchData();
-  }, []);
   return (
     <div className={clsx(style.cardF)}>
       <div
@@ -98,15 +90,14 @@ export default function CardFriend({ data, tab }) {
           src="https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
         />
         <span>
-          <p>{user.name}</p>
-          <p>{user.email}</p>
+          <p>{data.name}</p>
         </span>
       </div>
       <Dropdown>
         <Dropdown.Toggle as={CustomToggle} />
         <Dropdown.Menu size="sm" title="">
           <Dropdown.Item onClick={() => setShow(true)}>Profile</Dropdown.Item>
-          {!blocked?.includes(data) ? (
+          {!blocked?.includes(data._id) ? (
             <Dropdown.Item onClick={() => handleBlock()}>Block</Dropdown.Item>
           ) : (
             <Dropdown.Item onClick={() => handleUnBlock()}>
@@ -116,7 +107,7 @@ export default function CardFriend({ data, tab }) {
           <Dropdown.Item>Delete friendship</Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
-      <ModalOtherUser show={show} onHide={handleClose} user={user} />
+      <ModalOtherUser show={show} onHide={handleClose} user={data} />
     </div>
   );
 }

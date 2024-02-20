@@ -16,7 +16,6 @@ export default function CardUser({ data }) {
       senderId: senderId,
       receiverId: receiverId,
     };
-    console.log(data);
     postApiWithToken("/users/addFriend", data)
       .then((result) => {
         if (result.status === 200) {

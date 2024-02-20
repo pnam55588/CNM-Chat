@@ -1,11 +1,56 @@
-.chatinfo{
-    border-left: 1px solid #eeeef8;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    padding: 10% 5% 10% 5%;
-    .Accordion{
-        padding-top: 5%;
+.chatinfo {
+  border-left: 1px solid #eeeef8;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  padding: 10% 5% 10% 5%;
+  position: relative;
+  .Accordion {
+    padding-top: 5%;
+    .accordionBoby{
+        max-height: 20rem;
+        height: fit-content;
+        overflow: auto;
+        .addMembers{
+          background: none;
+          border: none;
+          color: black;
+          width: 100%;
+          margin-bottom: 5%;
+        }
+        .addMembers:hover{
+          background: #eeeef8;
+        }
     }
-    
+    .cardF {
+      padding: 1%;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      .cardImgF {
+        width: 20%;
+        height: 20%;
+        background: #d1d4e3;
+        border-radius: 5px;
+        margin: 0 2%;
+      }
+      p {
+        font-weight: bold;
+        font-size: 1rem;
+      }
+      .admin{
+        color: gray;
+        font-size: 0.7rem;
+      }
+    }
+    .cardF:hover {
+      background: #eeeef8;
+    }
+  }
+  .leaveGroup{
+    color: red;
+    position: absolute;
+    bottom: 5%;
+    left: 5%;
+  }
 }

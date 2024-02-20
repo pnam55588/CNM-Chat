@@ -26,6 +26,15 @@
     .conversation {
       height: 87%;
       overflow: auto;
+      display: flex;
+      flex-direction: column;
+      .notiAddMember {
+        text-align: center;
+        position: relative;
+        font-size: 0.9rem;
+        color: #DCDCFF;
+        font-weight: bold;
+      }
     }
     .inputWrap {
       text-align: center;
