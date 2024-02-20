@@ -88,24 +88,37 @@ router.delete('/removeMessageNoUser', async (req, res) => {
     }
 });
 
-router.post('/createGroup', async (req, res) => { //req.body = {userId, groupName}
-    const { userId, groupName } = req.body;
-    if (!userId) return res.status(400).json("userId is required");
-    if (!groupName) return res.status(400).json("groupName is required");
+router.get('/getAllGroup', async (req, res) => {
     try {
-        const user = await User.findById(userId);
-        if (!user) return res.status(400).json("User not found");
-        const group = new Conversation({
-            name: groupName,
-            users: [userId],
-            isGroup: true,
-            admin: userId,
-        });
-        const newGroup = await group.save();
-        await User.updateOne({ _id: userId }, { $push: { conversations: newGroup._id } });
-        res.status(200).json(newGroup);
+        // order by date
+        const conversations = await Conversation.find({ isGroup: true }).sort({ createdAt: -1 });
+        res.status(200).json(conversations);
     } catch (err) {
         res.status(400).json(err);
+    }
+});
+router.post('/createGroup', async (req, res) => { //req.body = {userId, groupName}
+    const { adminId, groupName, userIds } = req.body;
+    if (!adminId) return res.status(400).json("admin is required");
+    if (!userIds) return res.status(400).json("userId is required");
+    if (!groupName) return res.status(400).json("groupName is required");
+    // check admin not in userIds
+    if (userIds.includes(adminId)) return res.status(400).json("Admin can't be in the group");
+    try {
+        const adminUser = await User.findById(adminId);
+        if (!adminUser) return res.status(400).json("admin not found");
+        const group = new Conversation({
+            name: groupName,
+            // users = userIds + adminId
+            users: [...userIds, adminId],
+            isGroup: true,
+            admin: adminId,
+        });
+        const newGroup = await group.save();
+        await User.updateMany({ _id: userIds }, { $push: { conversations: newGroup._id } });
+        res.status(200).json(newGroup);
+    } catch (err) {
+        res.status(400).json(err.message);
     }
 });
 router.put('/addMembers', async (req, res) => { //req.body = {conversationId, userIds}
@@ -148,6 +161,7 @@ router.delete('/deleteConversation/:conversationId', async (req, res) => {
         if (!conversation) return res.status(400).json("Conversation not found");
         await Message.deleteMany({ conversationId: req.params.conversationId });
         await Conversation.deleteOne({ _id: req.params.conversationId });
+        await User.updateMany({ conversations: req.params.conversationId }, { $pull: { conversations: req.params.conversationId } });
         res.status(200).json("Conversation deleted successfully");
     } catch (err) {
         res.status(400).json(err);
