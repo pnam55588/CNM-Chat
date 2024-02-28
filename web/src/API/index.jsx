@@ -38,3 +38,11 @@ export const putApiWithToken=(url,data)=>{
         },
       });
 }
+export const deleteApiWithToken=(url,data)=>{
+    const token = getUserStorage().token
+    return api.delete(url,data, {
+        headers: {
+            "auth-token":`${token}`
+        },
+      });
+}

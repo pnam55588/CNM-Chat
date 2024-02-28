@@ -5,14 +5,20 @@ import { Accordion, Button, Image } from "react-bootstrap";
 import { TbPhoto } from "react-icons/tb";
 import { MdGroups, MdPhotoCameraFront } from "react-icons/md";
 import { FaFileLines } from "react-icons/fa6";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FaSignOutAlt } from "react-icons/fa";
 import { LuUserPlus2 } from "react-icons/lu";
 import ModalAddMembers from "../../View/Modal/ModalAddMembers";
+import { getUserStorage } from "../../Utils";
+import { RiChatDeleteFill } from "react-icons/ri";
+import { deleteApiWithToken } from "../../API";
+import Swal from "sweetalert2";
+import { getAllConversations, selectConversation } from "../../features/Conversations/conversationsSlice";
 
 export default function ChatInfo(props) {
   const [members, setMembers] = useState([]);
   const [openAddMembers, setOpenAddMembers] = useState(false);
+  const dispatch = useDispatch()
   const selectedConversation = useSelector(
     (state) => state.conversationReducer.selectedConversation
   );
@@ -21,6 +27,26 @@ export default function ChatInfo(props) {
       setMembers(selectedConversation.users);
     }
   }, [selectedConversation]);
+
+  const handleDeleteConversation = async () => {
+    try {
+      const result = await deleteApiWithToken(
+        `/conversation/deleteConversation/${selectedConversation._id}`
+      );
+      if (result.status === 200) {
+        await dispatch(getAllConversations(getUserStorage().user._id))
+        await dispatch(selectConversation(null))
+        props.onHide()
+        Swal.fire({
+          icon: "success",
+          text: result.data,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className={clsx(style.chatinfo)}>
       <h2>Chat Info</h2>
@@ -101,10 +127,20 @@ export default function ChatInfo(props) {
           </Accordion.Item>
         ) : null}
       </Accordion>
-      {selectedConversation.isGroup ? (
+      {selectedConversation.isGroup &&
+      selectedConversation.admin !== getUserStorage().user._id ? (
         <span className={clsx(style.leaveGroup)}>
           <FaSignOutAlt size={25} />
           Leave group
+        </span>
+      ) : selectedConversation.isGroup &&
+        selectedConversation.admin === getUserStorage().user._id ? (
+        <span
+          className={clsx(style.leaveGroup)}
+          onClick={() => handleDeleteConversation()}
+        >
+          <RiChatDeleteFill size={25} />
+          Delete group
         </span>
       ) : null}
       <ModalAddMembers

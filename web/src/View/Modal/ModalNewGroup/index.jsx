@@ -1,16 +1,19 @@
 import clsx from "clsx";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Button, Col, Form, Image, Modal, Row } from "react-bootstrap";
 import { AiOutlineUsergroupAdd } from "react-icons/ai";
 import { MdCameraAlt } from "react-icons/md";
 import style from "./modalNewGroup.module.scss";
 import { IoMdClose } from "react-icons/io";
 import { useSelector, useDispatch } from "react-redux";
-import { getApiWithToken, postApiWithToken } from "../../../API";
-import { getContacts } from "../../../features/User/userSlice";
+import { postApiWithToken } from "../../../API";
 import { getUserStorage } from "../../../Utils";
-import { getAllConversations, selectConversation } from "../../../features/Conversations/conversationsSlice";
+import {
+  getAllConversations,
+  selectConversation,
+} from "../../../features/Conversations/conversationsSlice";
 import { selectMenu } from "../../../features/Menu/menuSlice";
+import Swal from "sweetalert2";
 
 export default function ModalNewGroup(props) {
   const inputFileReference = useRef(null);
@@ -36,17 +39,25 @@ export default function ModalNewGroup(props) {
   };
 
   const handleNewGroup = async () => {
-    const dt = {
-      adminId: getUserStorage().user._id,
-      groupName: inputNameGroup,
-      userIds: selectContacts,
-    };
-    const result = await postApiWithToken("/conversation/createGroup", dt);
-    if (result.status === 200) {
-      await dispatch(getAllConversations(getUserStorage().user._id));
-      await dispatch(selectMenu("allChats"));
-      await dispatch(selectConversation(result.data._id))
-      props.onHide()
+    try {
+      const dt = {
+        adminId: getUserStorage().user._id,
+        groupName: inputNameGroup,
+        userIds: selectContacts,
+      };
+      const result = await postApiWithToken("/conversation/createGroup", dt);
+      if (result.status === 200) {
+        await dispatch(getAllConversations(getUserStorage().user._id));
+        await dispatch(selectMenu("allChats"));
+        await dispatch(selectConversation(result.data._id));
+        props.onHide();
+      }
+    } catch (error) {
+      console.log(error);
+      Swal.fire({
+        icon:'error',
+        text: error.response.data
+      })
     }
   };
 
@@ -132,7 +143,11 @@ export default function ModalNewGroup(props) {
                   <span>
                     <Image
                       className={clsx(style.cardImgF)}
-                      src={item.avatar ? item.avatar : "https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"}
+                      src={
+                        item.avatar
+                          ? item.avatar
+                          : "https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
+                      }
                     />
                     <p>{item.name}</p>
                   </span>
@@ -154,14 +169,18 @@ export default function ModalNewGroup(props) {
             props.onHide();
             setSelectContacts([]);
           }}
+          id="buttonStyle2"
         >
           Cancel
         </Button>
         <Button
           disabled={
-            !inputNameGroup && selectContacts.length < 2 ? "disabled" : ""
+            inputNameGroup.length <= 0 && selectContacts.length < 2
+              ? "disabled"
+              : ""
           }
-          onClick={()=>handleNewGroup()}
+          onClick={() => handleNewGroup()}
+          id="buttonStyle1"
         >
           Create
         </Button>

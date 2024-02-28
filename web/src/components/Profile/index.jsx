@@ -82,16 +82,22 @@ export default function Profile(props) {
     }
   }, [props.show]);
   const fetchData = async () => {
-    const result = await getApiWithToken(`/users/${getUserStorage().user._id}`);
-    if (result.status === 200) {
-      setUser(result.data);
-      setInputName(result.data.name)
-      setInputDoB(result.data.dateOfBirth)
-      setInputGender(result.data.gender)
-      setUrlImage(result.data?.avatar)
-      setInputPW(result.data.password)
-    } else {
-      console.log(result);
+    try {
+      const result = await getApiWithToken(
+        `/users/${getUserStorage().user._id}`
+      );
+      if (result.status === 200) {
+        setUser(result.data);
+        setInputName(result.data.name);
+        setInputDoB(result.data.dateOfBirth);
+        setInputGender(result.data.gender);
+        setUrlImage(result.data?.avatar);
+        setInputPW(result.data.password);
+      } else {
+        console.log(result);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -206,23 +212,24 @@ export default function Profile(props) {
         </Modal.Body>
       )}
 
-      <Modal.Footer className={clsx(style.modalBody)}>
+      <Modal.Footer className={clsx(style.modalFooter)}>
         {!isUpdate ? (
           <Button
             onClick={() => {
               setIsUpdate(!isUpdate);
             }}
+
           >
             <CiEdit size={30} /> Update
           </Button>
         ) : (
           <div className={clsx(style.btnGroup)}>
             {isUpdateAvatar ? (
-              <Button onClick={() => handleUpdateAvatar()}>
+              <Button id="buttonStyle1" className="with-fit-content" onClick={() => handleUpdateAvatar()}>
                 Update Avatar
               </Button>
             ) : (
-              <Button onClick={() => handleUpdateInfo()}>Update</Button>
+              <Button id="buttonStyle1" onClick={() => handleUpdateInfo()}>Update</Button>
             )}
             <Button
               onClick={() => {
@@ -230,6 +237,7 @@ export default function Profile(props) {
                 setIsUpdateAvatar(false);
                 setUrlImage(user.avatar);
               }}
+              id="buttonStyle2"
             >
               Cancel
             </Button>

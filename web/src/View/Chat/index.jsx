@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import style from "./chat.module.scss";
 import { IoCallOutline } from "react-icons/io5";
-import { CiMenuKebab } from "react-icons/ci";
+import { CiEdit, CiMenuKebab } from "react-icons/ci";
 import { Button, Image } from "react-bootstrap";
 import { IoIosSend } from "react-icons/io";
 import { HiLink } from "react-icons/hi2";
@@ -17,6 +17,7 @@ import { getUserStorage } from "../../Utils";
 import { getCurrentMessage } from "../../features/Message/messageSlice";
 import { newConversationSocket, sendMessageSocket } from "../../Utils/socket";
 import { FaFileImage } from "react-icons/fa6";
+import ModalChandeGroupName from "../Modal/ModalChangeGroupName";
 
 export default function Chat() {
   const [openChatInfo, setOpenChatInfo] = useState(false);
@@ -28,6 +29,7 @@ export default function Chat() {
   const inputFileReference = useRef(null);
   const inputImageReference = useRef(null);
   const usersOnline = useSelector((state) => state.userReducer.usersOnline);
+  const [changeGroupName, setChangeGroupName] = useState(false);
 
   const selectedConversation = useSelector(
     (state) => state.conversationReducer.selectedConversation
@@ -65,7 +67,6 @@ export default function Chat() {
       const url = URL.createObjectURL(selectedFiles[i]);
       list.push(url);
     }
-    console.log(list);
     setUrlImages(list);
   };
 
@@ -109,11 +110,20 @@ export default function Chat() {
           <div style={{ width: openChatInfo ? "70%" : "100%" }}>
             <div className={clsx(style.recipient)}>
               <div className={clsx(style.name)}>
-                <h4>
-                  {selectedConversation.isGroup
-                    ? selectedConversation.name
-                    : recipient?.name}
-                </h4>
+                {selectedConversation.isGroup ? (
+                  <div className="d-flex align-items-center">
+                    <h4>{selectedConversation.name}</h4>
+                    <CiEdit size={25} cursor={"pointer"} onClick={()=>setChangeGroupName(true)}/>
+                    <ModalChandeGroupName
+                      show={changeGroupName}
+                      onHide={()=>setChangeGroupName(false)}
+                      groupName = {selectedConversation.name}
+                      conversationId={selectedConversation._id}
+                    />
+                  </div>
+                ) : (
+                  <h4>{recipient?.name}</h4>
+                )}
                 <p>
                   {(recipient && recipient.isOnline) || isOnline
                     ? "Online"
@@ -149,9 +159,7 @@ export default function Chat() {
                   }
                 })}
                 {selectedConversation.isGroup && notiAddMember ? (
-                  <p className={clsx(style.notiAddMember)}>
-                    {notiAddMember}
-                  </p>
+                  <p className={clsx(style.notiAddMember)}>{notiAddMember}</p>
                 ) : null}
               </div>
               <div className={clsx(style.inputWrap)}>

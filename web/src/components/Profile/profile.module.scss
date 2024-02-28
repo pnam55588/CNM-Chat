@@ -7,7 +7,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: #F9FAFC;
+  background: #f9fafc;
   span {
     text-align: center;
     position: relative !important;
@@ -19,57 +19,57 @@
       border-radius: 5px;
       margin-top: -80px;
     }
-    :nth-child(2){
-        background: #d1d4e3;
-        border-radius: 20px;
-        border: 2px solid white;
-        position: absolute;
-        bottom: -10px;
-        left: 80%;
-        padding: 5px;
-        cursor: pointer;
-        color: black;
+    :nth-child(2) {
+      background: #d1d4e3;
+      border-radius: 20px;
+      border: 2px solid white;
+      position: absolute;
+      bottom: -10px;
+      left: 80%;
+      padding: 5px;
+      cursor: pointer;
+      color: black;
     }
   }
-  input{
+  input {
     margin-bottom: 5%;
   }
-  .modalImg_2{
+  .modalImg_2 {
     width: 250px;
     height: 250px;
     background: #d1d4e3;
     margin-bottom: 5%;
     border-radius: 5px;
   }
-  .btnUpload{
-    background-color: #DCDCFF;
+  .btnUpload {
+    background-color: #dcdcff;
+    border: none;
+    color: black;
   }
 }
-.modalBody{
-    border: none !important;
-    Button{
-        background: none ;
-        border: none;
-        color: black;
-        font-weight: bold;
+.modalFooter {
+  border: none !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;  
+  Button {
+    background: none;
+    border: none;
+    color: black;
+    font-weight: bold;
+  }
+  Button:hover {
+    background: #7679ee;
+  }
+  .btnGroup {
+    width: 100%;
+    Button {
+      width: 40%;
+      float: right;
+      color: black;
     }
-    Button:hover{
-        background: #7679ee;
+    :nth-child(1) {
+      margin-left: 5%;
     }
-    .btnGroup{
-        width: 100%;;
-        Button{
-            width: 40%;
-            float: right;
-            color: black;
-        }
-        :nth-child(2){
-            background: #D9D9D9;
-        }
-        :nth-child(1){
-            background: #7679ee;
-            margin-left: 5%;
-            color: white;
-        }
-    }
+  }
 }
