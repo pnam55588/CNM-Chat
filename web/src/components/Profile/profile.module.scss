@@ -34,6 +34,16 @@
   input{
     margin-bottom: 5%;
   }
+  .modalImg_2{
+    width: 250px;
+    height: 250px;
+    background: #d1d4e3;
+    margin-bottom: 5%;
+    border-radius: 5px;
+  }
+  .btnUpload{
+    background-color: #DCDCFF;
+  }
 }
 .modalBody{
     border: none !important;
@@ -49,7 +59,7 @@
     .btnGroup{
         width: 100%;;
         Button{
-            width: 30%;
+            width: 40%;
             float: right;
             color: black;
         }
