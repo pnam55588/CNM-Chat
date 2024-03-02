@@ -37,7 +37,7 @@ module.exports = function (server) {
                 message.receiverIds.forEach(receiverId => {
                     if (users[receiverId])  {
                         message.receiverId = receiverId;
-                        socket.to(users[receiverId]).emit('receiveMessage', message);
+                        socket.to(users[receiverId]).emit('receiveMessage', newMessage);
                     }
                 });
             }
