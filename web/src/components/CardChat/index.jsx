@@ -46,16 +46,20 @@ export default function CardChat({ data }) {
     if (result.status === 200) {
       const last = result.data[result.data?.length - 1];
       if (last?.user._id === getUserStorage().user._id) {
-        if (last.text) {
+        if (last?.text) {
           setLastMessage(`You: ${last?.text}`);
         } else if (last?.images.length > 0) {
           setLastMessage(`You: Bạn vừa gửi ${last.images.length} ảnh`);
+        } else if(last?.file){
+          setLastMessage(`You: Bạn vừa gửi file`);
         }
       } else {
-        if (last.text) {
+        if (last?.text) {
           setLastMessage(last?.text);
         }else if(last?.images.length > 0){
           setLastMessage(`Vừa gủi ${last.images.length} ảnh`)
+        }else if(last?.file){
+          setLastMessage(`Vừa gửi file`);
         }
       }
       setLastTime(last?.createdAt);

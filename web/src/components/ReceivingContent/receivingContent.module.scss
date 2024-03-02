@@ -35,5 +35,15 @@
       text-align: right;
       font-size: 13px;
     }
+    .fileWrap{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      :nth-child(1){
+        color: #7679ee;
+        font-size: 5rem;
+        margin-right: 3%;
+      }
+    }
   }
 }

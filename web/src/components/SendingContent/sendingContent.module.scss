@@ -1,6 +1,6 @@
 .sendingContent {
   width: 90%;
-  color: white;
+  color: white !important;
   margin: 1%;
   float: right;
   .content {
@@ -17,6 +17,18 @@
     .time {
       text-align: left;
       font-size: 13px;
+    }
+    .file{
+      display: flex;
+      justify-content: center;
+      align-items:center;
+      :nth-child(2){
+        font-size: 5rem;
+        margin-left: 3%;
+      }
+      .linkFile{
+        color: white !important;
+      }
     }
   }
 }

@@ -22,7 +22,6 @@ import ModalChandeGroupName from "../Modal/ModalChangeGroupName";
 export default function Chat() {
   const [openChatInfo, setOpenChatInfo] = useState(false);
   const [inputMessage, setInputMessage] = useState("");
-  const [urlImages, setUrlImages] = useState([]);
   const [notiAddMember, setNotiAddMember] = useState("");
   const scrollRef = useRef(null);
   const dispatch = useDispatch();
@@ -57,7 +56,29 @@ export default function Chat() {
       const url = URL.createObjectURL(selectedFiles[i]);
       list.push(url);
     }
-    console.log(list);
+    const formData = new FormData();
+    for (let i = 0; i < selectedFiles.length; i++) {
+      formData.append("file", selectedFiles[i]);
+    }
+    formData.append("conversationId", selectedConversation._id);
+    formData.append("user", getUserStorage().user._id);
+    try {
+      const result = await postApiWithToken(
+        `/conversation/sendFile`,
+        formData
+      );
+      if (result.status === 200) {
+        sendMessageSocket({
+          ...result.data,
+          receiverIds: selectedConversation.users
+            .filter((user) => user._id !== getUserStorage().user._id)
+            .map((user) => user._id),
+        });
+        await dispatch(getCurrentMessage(selectedConversation._id));
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const uploadImage = async () => {
@@ -67,7 +88,6 @@ export default function Chat() {
       const url = URL.createObjectURL(selectedFiles[i]);
       list.push(url);
     }
-    setUrlImages(list);
     const formData = new FormData();
     for (let i = 0; i < selectedFiles.length; i++) {
       formData.append("files", selectedFiles[i]);
@@ -80,15 +100,12 @@ export default function Chat() {
         formData
       );
       if (result.status === 200) {
-        const message1 = {
-          conversationId: selectedConversation._id,
-          user: getUserStorage().user._id,
+        sendMessageSocket({
+          ...result.data,
           receiverIds: selectedConversation.users
             .filter((user) => user._id !== getUserStorage().user._id)
             .map((user) => user._id),
-          images: result.data.images,
-        };
-        sendMessageSocket(message1);
+        });
         await dispatch(getCurrentMessage(selectedConversation._id));
       }
     } catch (error) {
@@ -104,19 +121,20 @@ export default function Chat() {
     };
     const result = await postApiWithToken("/conversation/sendMessage", dt);
     if (result.status === 200) {
-      const message = {
-        conversationId: selectedConversation._id,
-        user: getUserStorage().user._id,
-        receiverIds: selectedConversation.users
-          .filter((user) => user._id !== getUserStorage().user._id)
-          .map((user) => user._id),
-        text: result.data.text,
-        images:[]
-      };
       if (currentMessage.length <= 0) {
-        newConversationSocket(selectedConversation, message);
+        newConversationSocket(selectedConversation, {
+          ...result.data,
+          receiverIds: selectedConversation.users
+            .filter((user) => user._id !== getUserStorage().user._id)
+            .map((user) => user._id),
+        });
       } else {
-        sendMessageSocket(message);
+        sendMessageSocket({
+          ...result.data,
+          receiverIds: selectedConversation.users
+            .filter((user) => user._id !== getUserStorage().user._id)
+            .map((user) => user._id),
+        });
       }
       setInputMessage("");
       await dispatch(getCurrentMessage(selectedConversation._id));
