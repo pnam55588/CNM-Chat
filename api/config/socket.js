@@ -20,35 +20,37 @@ module.exports = function (server) {
         io.emit('userOnline', userId);
 
         // Hàm này lắng nghe khi một client gửi tin nhắn
-        socket.on('sendMessage', async (message) => { // message = {user, receiverIds, text, conversationId}
+        socket.on('sendMessage', async (message) => { // message = {message, receiverIds}, message is return from api
             // Gửi tin nhắn đến tất cả người nhận online
             if (message.receiverIds.length > 0) {
                 // get avatar and name of message.user
                 const user = await User.findById(message.user, 'name avatar');
                 console.log(user);
-                const newMessage = {
-                    user: user,
-                    text: message.text,
-                    images: message.images,
-                    conversationId: message.conversationId,
-                    createdAt: new Date(),
-                }
+                // const newMessage = {
+                //     user: user,
+                //     text: message.text,
+                //     images: message.images,
+                //     conversationId: message.conversationId,
+                //     createdAt: new Date(),
+                // }
+                const newMessage = {...message, user: user}
                 message.receiverIds.forEach(receiverId => {
                     if (users[receiverId])  {
                         message.receiverId = receiverId;
-                        socket.to(users[receiverId]).emit('receiveMessage', newMessage);
+                        socket.to(users[receiverId]).emit('receiveMessage', message);
                     }
                 });
             }
         });
-        socket.on('newConversation', async (conversation, message) => { // newConversation = {users, name, type, avatar}
+        socket.on('newConversation', async (conversation, message) => { // message = {message, receiverIds}, conversation and message is return from api
             if(!conversation.users || conversation.users.length === 0) return;
             const userSend = await User.findById(message.user, 'name avatar');
-            const newMessage = new Message({
-                conversationId: conversation._id,
-                user: userSend,
-                text: message.text,
-            });
+            // const newMessage = new Message({
+            //     conversationId: conversation._id,
+            //     user: userSend,
+            //     text: message.text,
+            // });
+            const newMessage = {...message, user: userSend}
             message.receiverIds?.forEach(userId => {
                 if (users[userId]) {
                     console.log(userId);

@@ -251,8 +251,8 @@ router.post('/sendImages', uploadImage.array('files', 50), async (req, res) => {
         user: user,
         images: images,
     });
-    await message.save();
-    res.status(200).json(message);
+    const newMessage=  await message.save();
+    res.status(200).json(newMessage);
 });
 router.post('/sendVideo', uploadVideo.single('file'), async (req, res) => {
     const file = req.file;
@@ -272,8 +272,8 @@ router.post('/sendVideo', uploadVideo.single('file'), async (req, res) => {
         user: user,
         video: result.Location,
     });
-    message.save();
-    res.status(200).json(message);
+    const newMessage  = await message.save();
+    res.status(200).json(newMessage);
 });
 router.post('/sendFile', uploadFile.single('file'), async (req, res) => {
     const file = req.file;
@@ -293,7 +293,8 @@ router.post('/sendFile', uploadFile.single('file'), async (req, res) => {
         user: user,
         file: result.Location,
     });
-    res.status(200).json(message);
+    const newMessage =  await message.save();
+    res.status(200).json(newMessage);
 });
 
 
