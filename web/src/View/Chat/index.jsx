@@ -80,7 +80,7 @@ export default function Chat() {
         formData
       );
       if (result.status === 200) {
-        const message = {
+        const message1 = {
           conversationId: selectedConversation._id,
           user: getUserStorage().user._id,
           receiverIds: selectedConversation.users
@@ -88,7 +88,7 @@ export default function Chat() {
             .map((user) => user._id),
           images: result.data.images,
         };
-        sendMessageSocket(message);
+        sendMessageSocket(message1);
         await dispatch(getCurrentMessage(selectedConversation._id));
       }
     } catch (error) {
@@ -104,20 +104,21 @@ export default function Chat() {
     };
     const result = await postApiWithToken("/conversation/sendMessage", dt);
     if (result.status === 200) {
-      setInputMessage("");
       const message = {
         conversationId: selectedConversation._id,
         user: getUserStorage().user._id,
         receiverIds: selectedConversation.users
           .filter((user) => user._id !== getUserStorage().user._id)
           .map((user) => user._id),
-        text: inputMessage,
+        text: result.data.text,
+        images:[]
       };
       if (currentMessage.length <= 0) {
         newConversationSocket(selectedConversation, message);
       } else {
         sendMessageSocket(message);
       }
+      setInputMessage("");
       await dispatch(getCurrentMessage(selectedConversation._id));
     }
   };

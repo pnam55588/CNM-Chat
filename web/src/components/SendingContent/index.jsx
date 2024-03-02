@@ -8,11 +8,16 @@ export default function SendingContent({ data }) {
   return (
     <div className={clsx(style.sendingContent)}>
       <div className={clsx(style.content)}>
-        <p>{data?.text}</p>
+        <p>{data.text}</p>
         {
-          data?.images.map((item,index)=>(
-            <Image className={clsx(style.imgSend)} src={item} key={index}/>
-          ))
+          // data?.images.map((item,index)=>(
+          //   <Image className={clsx(style.imgSend)} src={item} key={index}/>
+          // ))
+          data.images
+            ? data.images.map((item, index) => (
+                <Image className={clsx(style.imgSend)} src={item} key={index} />
+              ))
+            : null
         }
         <p className={clsx(style.time)}>{moment(data.createdAt).calendar()}</p>
       </div>
