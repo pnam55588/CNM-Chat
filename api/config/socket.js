@@ -29,6 +29,7 @@ module.exports = function (server) {
                 const newMessage = {
                     user: user,
                     text: message.text,
+                    images: message.images,
                     conversationId: message.conversationId,
                     createdAt: new Date(),
                 }

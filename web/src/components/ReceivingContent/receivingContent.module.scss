@@ -28,9 +28,12 @@
     padding: 1% 1% 0% 1%;
     border-radius: 5px;
     max-width: 50%;
-    :nth-child(2) {
+    .imgSend{
+      width: 100%;
+    }
+    .time {
+      text-align: right;
       font-size: 13px;
-      float: right;
     }
   }
 }

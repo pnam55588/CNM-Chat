@@ -14,7 +14,7 @@ import moment from "moment";
 
 export default function CardChat({ data }) {
   const [userRecipient, setUserRecipient] = useState({});
-  const [lastMessage, setLastMessage] = useState('')
+  const [lastMessage, setLastMessage] = useState("");
   const [lastTime, setLastTime] = useState("");
   const usersOnline = useSelector((state) => state.userReducer.usersOnline);
   const isOnline = Object.keys(usersOnline).find(
@@ -30,14 +30,14 @@ export default function CardChat({ data }) {
 
   useEffect(() => {
     const userId = getUserStorage().user._id;
-    getLastMessage()
+    getLastMessage();
     const recipient = data.users.find((user) => user._id !== userId);
     setUserRecipient(recipient);
   }, [data]);
 
-  useEffect(()=>{
-    getLastMessage()
-  },[currentMessage])
+  useEffect(() => {
+    getLastMessage();
+  }, [currentMessage]);
 
   const getLastMessage = async () => {
     const result = await getApiWithToken(
@@ -46,9 +46,17 @@ export default function CardChat({ data }) {
     if (result.status === 200) {
       const last = result.data[result.data?.length - 1];
       if (last?.user._id === getUserStorage().user._id) {
-        setLastMessage(`You: ${last?.text}`);
+        if (last.text) {
+          setLastMessage(`You: ${last?.text}`);
+        } else if (last?.images.length > 0) {
+          setLastMessage(`You: Bạn vừa gửi ${last.images.length} ảnh`);
+        }
       } else {
-        setLastMessage(last?.text);
+        if (last.text) {
+          setLastMessage(last?.text);
+        }else if(last?.images.length > 0){
+          setLastMessage(`Vừa gủi ${last.images.length} ảnh`)
+        }
       }
       setLastTime(last?.createdAt);
     }

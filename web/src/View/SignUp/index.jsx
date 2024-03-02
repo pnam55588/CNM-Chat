@@ -80,7 +80,7 @@ export default function SignUp() {
         }}
       />
       <Button
-        id="buttonStyle1"
+        id="buttonStyle3"
         onClick={() => {
           handleSignUp();
         }}

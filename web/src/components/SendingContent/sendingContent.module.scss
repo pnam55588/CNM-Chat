@@ -11,7 +11,10 @@
     max-width: 50%;
     text-align: right;
     float: right;
-    :nth-child(2) {
+    .imgSend{
+      width: 100%;
+    }
+    .time {
       text-align: left;
       font-size: 13px;
     }

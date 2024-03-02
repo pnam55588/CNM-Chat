@@ -56,9 +56,9 @@ export default function Login() {
           !isLoginEmail || isLoginPhone ? Style.action : ""
         )}
       >
-        <Button id="buttonStyle1">Login with email</Button>
+        <Button id="buttonStyle3">Login with email</Button>
         <Button
-          id="buttonStyle1"
+          id="buttonStyle3"
           onClick={() => {
             setIsLoginEmail(!isLoginEmail);
           }}
@@ -67,7 +67,7 @@ export default function Login() {
         </Button>
         <span className={clsx(Style.or)}>Or</span>
         <Button
-          id="buttonStyle1"
+          id="buttonStyle3"
           onClick={() => {
             navigate("/chat-app/sign-up");
           }}
@@ -99,7 +99,7 @@ export default function Login() {
           }}
           placeholder="Password"
         />
-        <Button id="buttonStyle1" onClick={() => handleLogin()}>
+        <Button id="buttonStyle3" onClick={() => handleLogin()}>
           Login
         </Button>
       </div>

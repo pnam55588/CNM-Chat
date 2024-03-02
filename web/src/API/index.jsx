@@ -30,6 +30,15 @@ export const postApiWithToken=(url,data)=>{
       });
 }
 
+export const postApiFileWithToken=(url,form,data)=>{
+    const token = getUserStorage().token
+    return api.post(url,form,data, {
+        headers: {
+            "auth-token":`${token}`
+        },
+      });
+}
+
 export const putApiWithToken=(url,data)=>{
     const token = getUserStorage().token
     return api.put(url,data, {
