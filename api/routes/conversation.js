@@ -297,5 +297,30 @@ router.post('/sendFile', uploadFile.single('file'), async (req, res) => {
     res.status(200).json(newMessage);
 });
 
+router.post('/sendLocation', async (req, res) => { // location = {latitude, longitude}
+    const { conversationId, user, location } = req.body;
+    if (!conversationId) return res.status(400).json("conversationId is required");
+    if (!user) return res.status(400).json("user is required");
+    const conversation = await Conversation.findById(conversationId);
+    if (!conversation) return res.status(400).json("Conversation not found");
+    const findUser = await User.findById(user);
+    if (!findUser) return res.status(400).json("User not found");
+    if(conversation.users.indexOf(user) === -1) return res.status(400).json("User not in the conversation");
+    
+    if (!location) return res.status(400).json("location is required");
+    const { latitude, longitude } = location;
+    if (!latitude) return res.status(400).json("latitude is required");
+    if (!longitude) return res.status(400).json("longitude is required");
+
+
+    const message = new Message({
+        conversationId: conversationId,
+        user: user,
+        location: location,
+    });
+    const newMessage = await message.save();
+    res.status(200).json(newMessage);
+});
+
 
 module.exports = router;
