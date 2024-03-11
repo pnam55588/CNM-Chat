@@ -20,11 +20,13 @@ export default function SendingContent({ data }) {
     <div className={clsx(style.sendingContent)}>
       <div className={clsx(style.content)}>
         <p>{data.text}</p>
-        {data.images
-          ? data.images.map((item, index) => (
-              <Image className={clsx(style.imgSend)} src={item} key={index} />
-            ))
-          : null}
+        <div className={clsx(style.grid_container, data.images?.length>=2? style.more2:'')}>
+          {data.images?.map((item, index) => (
+            <div key={index} className={clsx(style.grid_item)}>
+              <Image src={item} alt={`Image ${index}`} />
+            </div>
+          ))}
+        </div>
         {data.video ? (
           <div className={clsx(style.file)}>
             <a className={clsx(style.linkFile)} href={data.video}>

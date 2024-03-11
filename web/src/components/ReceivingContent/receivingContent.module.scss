@@ -5,7 +5,7 @@
   align-items: flex-end;
   margin: 1%;
   padding: 0.5%;
-  .name{
+  .name {
     width: 1.5rem;
     height: 1.5rem;
     border-radius: 1rem;
@@ -28,18 +28,34 @@
     padding: 1% 1% 0% 1%;
     border-radius: 5px;
     max-width: 50%;
-    .imgSend{
-      width: 100%;
+    .grid_container {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 10px; /* Khoảng cách giữa các ô */
+    }
+    .grid_container.more2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid_item {
+      width: 100%; /* Chiều rộng của mỗi ô là 100% của ô cha (grid-container) */
+      aspect-ratio: 1; /* Bảo đảm tỉ lệ khung hình là 1:1 */
+      overflow: hidden; /* Đảm bảo hình ảnh không vượt ra khỏi ô */
+      img {
+        width: 100%; /* Chiều rộng của hình ảnh là 100% của ô con (grid-item) */
+        height: 100%; /* Chiều cao của hình ảnh là 100% của ô con (grid-item) */
+        object-fit: cover; /* Bảo đảm hình ảnh không bị méo khi thay đổi kích thước */
+      }
     }
     .time {
       text-align: right;
       font-size: 13px;
     }
-    .fileWrap{
+    .fileWrap {
       display: flex;
       justify-content: center;
       align-items: center;
-      :nth-child(1){
+      :nth-child(1) {
         color: #7679ee;
         font-size: 5rem;
         margin-right: 3%;
@@ -52,7 +68,7 @@
         word-break: break-all;
         align-items: center; /* Adjust alignment as needed */
       }
-    
+
       .fileWrap:nth-child(1) {
         margin-right: 0; /* Remove right margin in column layout */
         margin-bottom: 10px; /* Add bottom margin for spacing in column layout */

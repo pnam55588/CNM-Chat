@@ -14,9 +14,13 @@ export default function ReceivingContent({ data, sender }) {
       </div>
       <div className={clsx(style.content)}>
         <p>{data?.text}</p>
-        {data?.images.map((item, index) => (
-          <Image className={clsx(style.imgSend)} src={item} key={index} />
-        ))}
+        <div className={clsx(style.grid_container, data.images?.length>=2? style.more2:'')}>
+          {data.images?.map((item, index) => (
+            <div key={index} className={clsx(style.grid_item)}>
+              <Image src={item} alt={`Image ${index}`} />
+            </div>
+          ))}
+        </div>
         {data.file ? (
           <div className={clsx(style.fileWrap)}>
             <FaFileAlt />

@@ -7,20 +7,47 @@
   position: relative;
   .Accordion {
     padding-top: 5%;
-    .accordionBoby{
-        max-height: 20rem;
-        height: fit-content;
-        overflow: auto;
-        .addMembers{
-          background: none;
-          border: none;
-          color: black;
-          width: 100%;
-          margin-bottom: 5%;
+    .accordionBoby {
+      max-height: 20rem;
+      height: fit-content;
+      overflow: auto;
+      .addMembers {
+        background: none;
+        border: none;
+        color: black;
+        width: 100%;
+        margin-bottom: 5%;
+      }
+      .addMembers:hover {
+        background: #eeeef8;
+      }
+      .linkWrap {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 1; /* Số dòng tối đa */
+        -webkit-box-orient: vertical;
+        margin-bottom: 5%;
+        :nth-child(1) {
+          margin-right: 10px;
         }
-        .addMembers:hover{
-          background: #eeeef8;
+      }
+      .grid_container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px; /* Khoảng cách giữa các ô */
+      }
+
+      .grid_item {
+        width: 100%; /* Chiều rộng của mỗi ô là 100% của ô cha (grid-container) */
+        aspect-ratio: 1; /* Bảo đảm tỉ lệ khung hình là 1:1 */
+        overflow: hidden; /* Đảm bảo hình ảnh không vượt ra khỏi ô */
+        img {
+          width: 100%; /* Chiều rộng của hình ảnh là 100% của ô con (grid-item) */
+          height: 100%; /* Chiều cao của hình ảnh là 100% của ô con (grid-item) */
+          object-fit: cover; /* Bảo đảm hình ảnh không bị méo khi thay đổi kích thước */
         }
+      }
     }
     .cardF {
       padding: 1%;
@@ -38,7 +65,7 @@
         font-weight: bold;
         font-size: 1rem;
       }
-      .admin{
+      .admin {
         color: gray;
         font-size: 0.7rem;
       }
@@ -47,7 +74,7 @@
       background: #eeeef8;
     }
   }
-  .leaveGroup{
+  .leaveGroup {
     color: red;
     position: absolute;
     bottom: 5%;

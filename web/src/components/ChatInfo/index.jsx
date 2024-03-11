@@ -1,26 +1,36 @@
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import style from "./chatInfo.module.scss";
-import { Accordion, Button, Image } from "react-bootstrap";
+import { Accordion, Button, Col, Container, Image, Row } from "react-bootstrap";
 import { TbPhoto } from "react-icons/tb";
 import { MdGroups, MdPhotoCameraFront } from "react-icons/md";
-import { FaFileLines } from "react-icons/fa6";
+import { FaFileLines, FaFileVideo } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
-import { FaSignOutAlt } from "react-icons/fa";
+import { FaFileAlt, FaSignOutAlt } from "react-icons/fa";
 import { LuUserPlus2 } from "react-icons/lu";
 import ModalAddMembers from "../../View/Modal/ModalAddMembers";
 import { getUserStorage } from "../../Utils";
 import { RiChatDeleteFill } from "react-icons/ri";
 import { deleteApiWithToken } from "../../API";
 import Swal from "sweetalert2";
-import { getAllConversations, selectConversation } from "../../features/Conversations/conversationsSlice";
+import {
+  getAllConversations,
+  selectConversation,
+} from "../../features/Conversations/conversationsSlice";
 
 export default function ChatInfo(props) {
   const [members, setMembers] = useState([]);
   const [openAddMembers, setOpenAddMembers] = useState(false);
-  const dispatch = useDispatch()
+  const [files, setFiles] = useState([]);
+  const [images, setImages] = useState([]);
+  const [video, setVideo] = useState([]);
+
+  const dispatch = useDispatch();
   const selectedConversation = useSelector(
     (state) => state.conversationReducer.selectedConversation
+  );
+  const currentMessage = useSelector(
+    (state) => state.messageReducer.currentMessage
   );
   useEffect(() => {
     if (selectedConversation.isGroup) {
@@ -28,15 +38,37 @@ export default function ChatInfo(props) {
     }
   }, [selectedConversation]);
 
+  useEffect(() => {
+    if (currentMessage) {
+      const file = [];
+      const video = [];
+      const image = [];
+      currentMessage.map((item) => {
+        if (item?.file) {
+          file.push(item.file);
+        } else if (item?.video) {
+          video.push(item.video);
+        } else if (item?.images) {
+          item.images?.map((img) => {
+            image.push(img);
+          });
+        }
+      });
+      setFiles(file);
+      setVideo(video);
+      setImages(image);
+    }
+  }, [currentMessage]);
+
   const handleDeleteConversation = async () => {
     try {
       const result = await deleteApiWithToken(
         `/conversation/deleteConversation/${selectedConversation._id}`
       );
       if (result.status === 200) {
-        await dispatch(getAllConversations(getUserStorage().user._id))
-        await dispatch(selectConversation(null))
-        props.onHide()
+        await dispatch(getAllConversations(getUserStorage().user._id));
+        await dispatch(selectConversation(null));
+        props.onHide();
         Swal.fire({
           icon: "success",
           text: result.data,
@@ -61,7 +93,13 @@ export default function ChatInfo(props) {
             id="scroll-style-01"
             className={clsx(style.accordionBoby)}
           >
-            Photos
+            <div className={clsx(style.grid_container)}>
+              {images?.map((item, index) => (
+                <div key={index} className={clsx(style.grid_item)}>
+                  <Image src={item} alt={`Image ${index}`} />
+                </div>
+              ))}
+            </div>
           </Accordion.Body>
         </Accordion.Item>
         <Accordion.Item eventKey="1">
@@ -74,7 +112,12 @@ export default function ChatInfo(props) {
             id="scroll-style-01"
             className={clsx(style.accordionBoby)}
           >
-            Videos
+            {video?.map((item, index) => (
+              <div key={index} className={clsx(style.linkWrap)}>
+                <FaFileVideo />
+                <a href={item}>{item}</a>
+              </div>
+            ))}
           </Accordion.Body>
         </Accordion.Item>
         <Accordion.Item eventKey="3">
@@ -87,7 +130,12 @@ export default function ChatInfo(props) {
             id="scroll-style-01"
             className={clsx(style.accordionBoby)}
           >
-            Files
+            {files?.map((item, index) => (
+              <div key={index} className={clsx(style.linkWrap)}>
+                <FaFileAlt />
+                <a href={item}>{item}</a>
+              </div>
+            ))}
           </Accordion.Body>
         </Accordion.Item>
         {selectedConversation.isGroup ? (

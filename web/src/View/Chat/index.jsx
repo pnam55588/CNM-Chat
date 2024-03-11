@@ -16,7 +16,7 @@ import { postApiWithToken } from "../../API";
 import { getUserStorage } from "../../Utils";
 import { getCurrentMessage } from "../../features/Message/messageSlice";
 import { newConversationSocket, sendMessageSocket } from "../../Utils/socket";
-import { FaFileImage } from "react-icons/fa6";
+import { FaFileImage, FaLocationDot } from "react-icons/fa6";
 import ModalChandeGroupName from "../Modal/ModalChangeGroupName";
 import Loading from "../../components/Loading";
 import { RiVideoUploadFill } from "react-icons/ri";
@@ -178,7 +178,13 @@ export default function Chat() {
   };
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behaviour: "smooth" });
-  }, [currentMessage, selectedConversation]);
+  }, [
+    currentMessage,
+    selectedConversation,
+    inputFileReference,
+    inputImageReference,
+    inputVideoReference,
+  ]);
 
   return (
     <div className={clsx(style.chat)}>
@@ -245,6 +251,9 @@ export default function Chat() {
                 ) : null}
               </div>
               <div className={clsx(style.inputWrap)}>
+                <Button className={clsx(style.basicaddon1)} id="basic-addon1">
+                  <FaLocationDot size={25} cursor={"pointer"} />
+                </Button>
                 <Button
                   className={clsx(style.basicaddon1)}
                   id="basic-addon1"
@@ -279,13 +288,13 @@ export default function Chat() {
                     ref={inputVideoReference}
                   />
                 </Button>
+
                 <InputEmoji
                   cleanOnEnter
                   placeholder="Type a message"
                   onChange={setInputMessage}
                   value={inputMessage}
                   onEnter={() => handleSendMessage()}
-                
                 ></InputEmoji>
 
                 <Button
