@@ -43,6 +43,19 @@
         color: #7679ee;
         font-size: 5rem;
         margin-right: 3%;
+        word-break: break-all;
+      }
+    }
+    @media screen and (max-width: 1200px) {
+      .fileWrap {
+        flex-direction: column;
+        word-break: break-all;
+        align-items: center; /* Adjust alignment as needed */
+      }
+    
+      .fileWrap:nth-child(1) {
+        margin-right: 0; /* Remove right margin in column layout */
+        margin-bottom: 10px; /* Add bottom margin for spacing in column layout */
       }
     }
   }

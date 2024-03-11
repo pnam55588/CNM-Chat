@@ -6,7 +6,8 @@ import { useNavigate } from "react-router";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import {postApiNoneToken } from "../../API";
 import Swal from "sweetalert2";
-import { checkEmailValid, checkPhoneValid, setUserStorage } from "../../Utils";
+import {checkPhoneValid, setUserStorage } from "../../Utils";
+import Loading from "../../components/Loading";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export default function Login() {
   const [isLoginPhone, setIsLoginPhone] = useState(false);
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false)
 
   const handleLogin = async () => {
     if (checkPhoneValid(phone)) {
@@ -23,6 +25,7 @@ export default function Login() {
         password: password,
       };
       try {
+        setLoading(true)
         const result = await postApiNoneToken("/auth/login", data);
         if (result.data.error) {
           Swal.fire({
@@ -35,12 +38,14 @@ export default function Login() {
         }
       } catch (error) {
         console.log(error);
+        setLoading(false)
         Swal.fire({
           icon: "error",
           text: error.response.data.error,
         });
       }
     } else {
+      setLoading(false)
       Swal.fire({
         icon: "error",
         text: "Invalid phone. Please re-enter!!!",
@@ -49,6 +54,10 @@ export default function Login() {
   };
 
   return (
+    <>
+    {
+      loading? <Loading/>:null
+    }
     <div className={clsx(Style.wrapLogin)}>
       <div
         className={clsx(
@@ -104,5 +113,6 @@ export default function Login() {
         </Button>
       </div>
     </div>
+    </>
   );
 }

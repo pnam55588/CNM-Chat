@@ -3,7 +3,7 @@ import clsx from "clsx";
 import style from "./chat.module.scss";
 import { IoCallOutline } from "react-icons/io5";
 import { CiEdit, CiMenuKebab } from "react-icons/ci";
-import { Button, Image } from "react-bootstrap";
+import { Button, Image, Spinner } from "react-bootstrap";
 import { IoIosSend } from "react-icons/io";
 import { HiLink } from "react-icons/hi2";
 import ChatInfo from "../../components/ChatInfo";
@@ -18,17 +18,24 @@ import { getCurrentMessage } from "../../features/Message/messageSlice";
 import { newConversationSocket, sendMessageSocket } from "../../Utils/socket";
 import { FaFileImage } from "react-icons/fa6";
 import ModalChandeGroupName from "../Modal/ModalChangeGroupName";
+import Loading from "../../components/Loading";
+import { RiVideoUploadFill } from "react-icons/ri";
 
 export default function Chat() {
   const [openChatInfo, setOpenChatInfo] = useState(false);
   const [inputMessage, setInputMessage] = useState("");
   const [notiAddMember, setNotiAddMember] = useState("");
+  const [changeGroupName, setChangeGroupName] = useState(false);
+  const [loadingInput, setLoadingInput] = useState(false);
+
   const scrollRef = useRef(null);
   const dispatch = useDispatch();
+  const usersOnline = useSelector((state) => state.userReducer.usersOnline);
+  const loading = useSelector((state) => state.menuActive.loading);
+
   const inputFileReference = useRef(null);
   const inputImageReference = useRef(null);
-  const usersOnline = useSelector((state) => state.userReducer.usersOnline);
-  const [changeGroupName, setChangeGroupName] = useState(false);
+  const inputVideoReference = useRef(null);
 
   const selectedConversation = useSelector(
     (state) => state.conversationReducer.selectedConversation
@@ -63,10 +70,7 @@ export default function Chat() {
     formData.append("conversationId", selectedConversation._id);
     formData.append("user", getUserStorage().user._id);
     try {
-      const result = await postApiWithToken(
-        `/conversation/sendFile`,
-        formData
-      );
+      const result = await postApiWithToken(`/conversation/sendFile`, formData);
       if (result.status === 200) {
         sendMessageSocket({
           ...result.data,
@@ -113,31 +117,63 @@ export default function Chat() {
     }
   };
 
-  const handleSendMessage = async () => {
-    const dt = {
-      conversationId: selectedConversation._id,
-      user: getUserStorage().user._id,
-      text: inputMessage,
-    };
-    const result = await postApiWithToken("/conversation/sendMessage", dt);
-    if (result.status === 200) {
-      if (currentMessage.length <= 0) {
-        newConversationSocket(selectedConversation, {
-          ...result.data,
-          receiverIds: selectedConversation.users
-            .filter((user) => user._id !== getUserStorage().user._id)
-            .map((user) => user._id),
-        });
-      } else {
+  const uploadVideo = async () => {
+    const selectedFiles = inputVideoReference.current.files;
+    const formData = new FormData();
+    formData.append("file", selectedFiles[0]);
+    formData.append("conversationId", selectedConversation._id);
+    formData.append("user", getUserStorage().user._id);
+    try {
+      setLoadingInput(true);
+      const result = await postApiWithToken(
+        `/conversation/sendVideo`,
+        formData
+      );
+      if (result.status === 200) {
         sendMessageSocket({
           ...result.data,
           receiverIds: selectedConversation.users
             .filter((user) => user._id !== getUserStorage().user._id)
             .map((user) => user._id),
         });
+        await dispatch(getCurrentMessage(selectedConversation._id));
+        setLoadingInput(false);
       }
-      setInputMessage("");
-      await dispatch(getCurrentMessage(selectedConversation._id));
+    } catch (error) {
+      setLoadingInput(false);
+      console.log(error);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    try {
+      const dt = {
+        conversationId: selectedConversation._id,
+        user: getUserStorage().user._id,
+        text: inputMessage,
+      };
+      const result = await postApiWithToken("/conversation/sendMessage", dt);
+      if (result.status === 200) {
+        if (currentMessage.length <= 0) {
+          newConversationSocket(selectedConversation, {
+            ...result.data,
+            receiverIds: selectedConversation.users
+              .filter((user) => user._id !== getUserStorage().user._id)
+              .map((user) => user._id),
+          });
+        } else {
+          sendMessageSocket({
+            ...result.data,
+            receiverIds: selectedConversation.users
+              .filter((user) => user._id !== getUserStorage().user._id)
+              .map((user) => user._id),
+          });
+        }
+        setInputMessage("");
+        await dispatch(getCurrentMessage(selectedConversation._id));
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
   useEffect(() => {
@@ -187,6 +223,7 @@ export default function Chat() {
               </div>
             </div>
             <div className={clsx(style.chatFrame)}>
+              {loading ? <Loading /> : null}
               <div id="scroll-style-01" className={clsx(style.conversation)}>
                 {currentMessage?.map((item, index) => {
                   if (item.user._id === getUserStorage().user._id) {
@@ -227,13 +264,30 @@ export default function Chat() {
                     ref={inputFileReference}
                   />
                 </Button>
+                <Button
+                  className={clsx(style.basicaddon1)}
+                  id="basic-addon1"
+                  onClick={() => inputVideoReference.current.click()}
+                  onChange={() => uploadVideo()}
+                >
+                  <RiVideoUploadFill size={30} cursor={"pointer"} />
+                  <input
+                    type="file"
+                    hidden
+                    multiple
+                    accept="video/*"
+                    ref={inputVideoReference}
+                  />
+                </Button>
                 <InputEmoji
                   cleanOnEnter
                   placeholder="Type a message"
                   onChange={setInputMessage}
                   value={inputMessage}
                   onEnter={() => handleSendMessage()}
-                />
+                
+                ></InputEmoji>
+
                 <Button
                   className={clsx(style.basicaddon1)}
                   id="basic-addon1"

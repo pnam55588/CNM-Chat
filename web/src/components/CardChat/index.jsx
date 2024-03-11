@@ -11,6 +11,7 @@ import {
 import { getCurrentMessage } from "../../features/Message/messageSlice";
 import { getApiWithToken } from "../../API";
 import moment from "moment";
+import { setLoading } from "../../features/Menu/menuSlice";
 
 export default function CardChat({ data }) {
   const [userRecipient, setUserRecipient] = useState({});
@@ -50,16 +51,20 @@ export default function CardChat({ data }) {
           setLastMessage(`You: ${last?.text}`);
         } else if (last?.images.length > 0) {
           setLastMessage(`You: Bạn vừa gửi ${last.images.length} ảnh`);
-        } else if(last?.file){
+        } else if (last?.file) {
           setLastMessage(`You: Bạn vừa gửi file`);
+        } else if(last?.video){
+          setLastMessage(`You: Bạn vừa gửi video`);
         }
       } else {
         if (last?.text) {
           setLastMessage(last?.text);
-        }else if(last?.images.length > 0){
-          setLastMessage(`Vừa gủi ${last.images.length} ảnh`)
-        }else if(last?.file){
+        } else if (last?.images.length > 0) {
+          setLastMessage(`Vừa gủi ${last.images.length} ảnh`);
+        } else if (last?.file) {
           setLastMessage(`Vừa gửi file`);
+        } else if (last?.video){
+          setLastMessage(`Vừa gửi video`);
         }
       }
       setLastTime(last?.createdAt);
@@ -67,9 +72,16 @@ export default function CardChat({ data }) {
   };
 
   const handleSelectedConversation = async () => {
-    await dispatch(selectConversation(data));
-    await dispatch(getRecipient(`/users/${userRecipient._id}`));
-    await dispatch(getCurrentMessage(data._id));
+    try {
+      dispatch(setLoading(true))
+      await dispatch(selectConversation(data));
+      await dispatch(getRecipient(`/users/${userRecipient._id}`));
+      await dispatch(getCurrentMessage(data._id));
+      dispatch(setLoading(false))
+    } catch (error) {
+      dispatch(setLoading(false))
+      console.log(error);
+    }
   };
   return (
     <Card

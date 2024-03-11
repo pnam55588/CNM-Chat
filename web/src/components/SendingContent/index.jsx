@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import style from "./sendingContent.module.scss";
 import moment from "moment";
 import { Image } from "react-bootstrap";
-import { FaFileAlt } from "react-icons/fa";
+import { FaFileAlt, FaFileVideo } from "react-icons/fa";
 
 export default function SendingContent({ data }) {
   const [fileStyle, setFileStyle] = useState("");
@@ -25,6 +25,14 @@ export default function SendingContent({ data }) {
               <Image className={clsx(style.imgSend)} src={item} key={index} />
             ))
           : null}
+        {data.video ? (
+          <div className={clsx(style.file)}>
+            <a className={clsx(style.linkFile)} href={data.video}>
+              {data.video}
+            </a>
+            <FaFileVideo />
+          </div>
+        ) : null}
         {data.file ? (
           <div className={clsx(style.file)}>
             <a className={clsx(style.linkFile)} href={data.file}>
