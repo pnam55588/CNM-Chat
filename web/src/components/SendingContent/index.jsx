@@ -7,6 +7,7 @@ import { FaFileAlt, FaFileVideo } from "react-icons/fa";
 
 export default function SendingContent({ data }) {
   const [fileStyle, setFileStyle] = useState("");
+  const KEY = "AIzaSyC3r4cYivNbIducKrIS_ebFyZDTKrb5DrA";
   useEffect(() => {
     if (data.file) {
       const storeName = data.file.substring(
@@ -43,6 +44,11 @@ export default function SendingContent({ data }) {
             <FaFileAlt />
           </div>
         ) : null}
+        {
+          data.location ? (
+            <iframe src={`https://www.google.com/maps/embed/v1/place?key=${KEY}&q=${data.location.latitude},${data.location.longitude}`}></iframe>
+          ):null
+        }
         <p className={clsx(style.time)}>{moment(data.createdAt).calendar()}</p>
       </div>
     </div>

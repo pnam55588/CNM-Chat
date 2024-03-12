@@ -3,7 +3,7 @@ import clsx from "clsx";
 import style from "./chat.module.scss";
 import { IoCallOutline } from "react-icons/io5";
 import { CiEdit, CiMenuKebab } from "react-icons/ci";
-import { Button, Image, Spinner } from "react-bootstrap";
+import { Button, Image } from "react-bootstrap";
 import { IoIosSend } from "react-icons/io";
 import { HiLink } from "react-icons/hi2";
 import ChatInfo from "../../components/ChatInfo";
@@ -176,6 +176,70 @@ export default function Chat() {
       console.log(error);
     }
   };
+
+  var options = {
+    enableHighAccuracy: true,
+    timeout: 5000,
+    maximumAge: 0,
+  };
+  const success =async (pos) => {
+    var crd = pos.coords;
+    const location = {
+      latitude: crd.latitude,
+      longitude: crd.longitude,
+    };
+    const data={
+      conversationId: selectedConversation._id,
+      user: getUserStorage().user._id,
+      location: location
+    }
+    try {
+      setLoadingInput(true);
+      const result = await postApiWithToken(
+        `/conversation/sendLocation`,
+        data
+      );
+      if (result.status === 200) {
+        sendMessageSocket({
+          ...result.data,
+          receiverIds: selectedConversation.users
+            .filter((user) => user._id !== getUserStorage().user._id)
+            .map((user) => user._id),
+        });
+        await dispatch(getCurrentMessage(selectedConversation._id));
+        setLoadingInput(false);
+      }
+    } catch (error) {
+      setLoadingInput(false);
+      console.log(error);
+    }
+  };
+
+  const errors = (err) => {
+    console.warn(`ERROR(${err.code}): ${err.message}`);
+  };
+
+  const handleGetLocation = () => {
+    if (navigator.geolocation) {
+      navigator.permissions
+        .query({ name: "geolocation" })
+        .then(function (result) {
+          console.log(result);
+          if (result.state === "granted") {
+            //If granted then you can directly call your function here
+            navigator.geolocation.getCurrentPosition(success, errors, options);
+          } else if (result.state === "prompt") {
+            //If prompt then the user will be asked to give permission
+            navigator.geolocation.getCurrentPosition(success, errors, options);
+          } else if (result.state === "denied") {
+            //If denied then you have to show instructions to enable location
+          }
+        });
+    } else {
+      console.log("Geolocation is not supported by this browser.");
+    }
+  };
+
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behaviour: "smooth" });
   }, [
@@ -251,7 +315,11 @@ export default function Chat() {
                 ) : null}
               </div>
               <div className={clsx(style.inputWrap)}>
-                <Button className={clsx(style.basicaddon1)} id="basic-addon1">
+                <Button
+                  className={clsx(style.basicaddon1)}
+                  id="basic-addon1"
+                  onClick={() => handleGetLocation()}
+                >
                   <FaLocationDot size={25} cursor={"pointer"} />
                 </Button>
                 <Button

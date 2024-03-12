@@ -55,6 +55,8 @@ export default function CardChat({ data }) {
           setLastMessage(`You: Bạn vừa gửi file`);
         } else if(last?.video){
           setLastMessage(`You: Bạn vừa gửi video`);
+        } else if (last?.location){
+          setLastMessage(`You: Bạn chia sẻ vị trí`);
         }
       } else {
         if (last?.text) {
@@ -65,6 +67,8 @@ export default function CardChat({ data }) {
           setLastMessage(`Vừa gửi file`);
         } else if (last?.video){
           setLastMessage(`Vừa gửi video`);
+        } else if (last?.location){
+          setLastMessage(`Vừa chia sẻ vị trí`);
         }
       }
       setLastTime(last?.createdAt);
