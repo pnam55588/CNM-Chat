@@ -20,6 +20,8 @@ import { FaFileImage, FaLocationDot } from "react-icons/fa6";
 import ModalChandeGroupName from "../Modal/ModalChangeGroupName";
 import Loading from "../../components/Loading";
 import { RiVideoUploadFill } from "react-icons/ri";
+import { LuAlertCircle } from "react-icons/lu";
+import { getBlocks } from "../../features/User/userSlice";
 
 export default function Chat() {
   const [openChatInfo, setOpenChatInfo] = useState(false);
@@ -31,6 +33,7 @@ export default function Chat() {
   const scrollRef = useRef(null);
   const dispatch = useDispatch();
   const usersOnline = useSelector((state) => state.userReducer.usersOnline);
+  const blocked = useSelector((state) => state.userReducer.blocked);
   const loading = useSelector((state) => state.menuActive.loading);
 
   const inputFileReference = useRef(null);
@@ -51,6 +54,7 @@ export default function Chat() {
   );
 
   const isOnline = Object.keys(usersOnline).find((id) => id === recipient?._id);
+  const isBlocked = blocked.some((id) => id === recipient?._id);
 
   const handleNotiAddMember = (noti) => {
     setNotiAddMember(noti);
@@ -182,23 +186,20 @@ export default function Chat() {
     timeout: 5000,
     maximumAge: 0,
   };
-  const success =async (pos) => {
+  const success = async (pos) => {
     var crd = pos.coords;
     const location = {
       latitude: crd.latitude,
       longitude: crd.longitude,
     };
-    const data={
+    const data = {
       conversationId: selectedConversation._id,
       user: getUserStorage().user._id,
-      location: location
-    }
+      location: location,
+    };
     try {
       setLoadingInput(true);
-      const result = await postApiWithToken(
-        `/conversation/sendLocation`,
-        data
-      );
+      const result = await postApiWithToken(`/conversation/sendLocation`, data);
       if (result.status === 200) {
         sendMessageSocket({
           ...result.data,
@@ -237,6 +238,21 @@ export default function Chat() {
         });
     } else {
       console.log("Geolocation is not supported by this browser.");
+    }
+  };
+
+  const handleUnBlock = async () => {
+    try {
+      const dt = {
+        senderId: getUserStorage().user._id,
+        receiverId: recipient._id,
+      };
+      const result = await postApiWithToken("/users/unblock", dt);
+      if(result.status===200){
+        await dispatch(getBlocks(`/users/${getUserStorage().user._id}`));
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -314,84 +330,92 @@ export default function Chat() {
                   <p className={clsx(style.notiAddMember)}>{notiAddMember}</p>
                 ) : null}
               </div>
-              <div className={clsx(style.inputWrap)}>
-                <Button
-                  className={clsx(style.basicaddon1)}
-                  id="basic-addon1"
-                  onClick={() => handleGetLocation()}
-                >
-                  <FaLocationDot size={25} cursor={"pointer"} />
-                </Button>
-                <Button
-                  className={clsx(style.basicaddon1)}
-                  id="basic-addon1"
-                  onClick={() => {
-                    inputFileReference.current.click();
-                  }}
-                  onChange={() => {
-                    uploadFile();
-                  }}
-                >
-                  <HiLink size={25} cursor={"pointer"} />
-                  <input
-                    type="file"
-                    hidden
-                    multiple
-                    accept=".pdf, .doc, .docx, .txt"
-                    ref={inputFileReference}
-                  />
-                </Button>
-                <Button
-                  className={clsx(style.basicaddon1)}
-                  id="basic-addon1"
-                  onClick={() => inputVideoReference.current.click()}
-                  onChange={() => uploadVideo()}
-                >
-                  <RiVideoUploadFill size={30} cursor={"pointer"} />
-                  <input
-                    type="file"
-                    hidden
-                    multiple
-                    accept="video/*"
-                    ref={inputVideoReference}
-                  />
-                </Button>
+              {isBlocked ? (
+                <div className={clsx(style.blockWrap)}>
+                  <LuAlertCircle size={25} /> Bỏ chặn để gửi tin nhắn tới người
+                  này. <span onClick={()=>handleUnBlock()}>Bỏ chặn</span>
+                </div>
+              ) : (
+                <div className={clsx(style.inputWrap)}>
+                  <Button
+                    className={clsx(style.basicaddon1)}
+                    id="basic-addon1"
+                    onClick={() => handleGetLocation()}
+                  >
+                    <FaLocationDot size={25} cursor={"pointer"} />
+                  </Button>
+                  <Button
+                    className={clsx(style.basicaddon1)}
+                    id="basic-addon1"
+                    onClick={() => {
+                      inputFileReference.current.click();
+                    }}
+                    onChange={() => {
+                      uploadFile();
+                    }}
+                  >
+                    <HiLink size={25} cursor={"pointer"} />
+                    <input
+                      type="file"
+                      hidden
+                      multiple
+                      accept=".pdf, .doc, .docx, .txt"
+                      ref={inputFileReference}
+                    />
+                  </Button>
+                  <Button
+                    className={clsx(style.basicaddon1)}
+                    id="basic-addon1"
+                    onClick={() => inputVideoReference.current.click()}
+                    onChange={() => uploadVideo()}
+                  >
+                    <RiVideoUploadFill size={30} cursor={"pointer"} />
+                    <input
+                      type="file"
+                      hidden
+                      multiple
+                      accept="video/*"
+                      ref={inputVideoReference}
+                    />
+                  </Button>
 
-                <InputEmoji
-                  cleanOnEnter
-                  placeholder="Type a message"
-                  onChange={setInputMessage}
-                  value={inputMessage}
-                  onEnter={() => handleSendMessage()}
-                ></InputEmoji>
+                  <InputEmoji
+                    cleanOnEnter
+                    placeholder="Type a message"
+                    onChange={setInputMessage}
+                    value={inputMessage}
+                    onEnter={() => handleSendMessage()}
+                    disabled={isBlocked ? true : false}
+                  ></InputEmoji>
 
-                <Button
-                  className={clsx(style.basicaddon1)}
-                  id="basic-addon1"
-                  onClick={() => {
-                    inputImageReference.current.click();
-                  }}
-                  onChange={() => {
-                    uploadImage();
-                  }}
-                >
-                  <FaFileImage size={25} cursor={"pointer"} />
-                  <input
-                    type="file"
-                    hidden
-                    multiple
-                    accept="image/jpeg, image/png"
-                    ref={inputImageReference}
-                  />
-                </Button>
-                <Button className={clsx(style.basicaddon1)} id="basic-addon1">
-                  <IoIosSend
-                    size={35}
-                    cursor={"pointer"}
-                    onClick={() => handleSendMessage()}
-                  />
-                </Button>
-              </div>
+                  <Button
+                    className={clsx(style.basicaddon1)}
+                    id="basic-addon1"
+                    onClick={() => {
+                      inputImageReference.current.click();
+                    }}
+                    onChange={() => {
+                      uploadImage();
+                    }}
+                  >
+                    <FaFileImage size={25} cursor={"pointer"} />
+                    <input
+                      type="file"
+                      hidden
+                      multiple
+                      accept="image/jpeg, image/png"
+                      ref={inputImageReference}
+                    />
+                  </Button>
+                  <Button className={clsx(style.basicaddon1)} id="basic-addon1">
+                    <IoIosSend
+                      size={35}
+                      cursor={"pointer"}
+                      onClick={() => handleSendMessage()}
+                    />
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
           <div

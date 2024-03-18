@@ -22,6 +22,7 @@ import {
   handleNewConversation,
 } from "../../features/Conversations/conversationsSlice";
 import {
+  getBlocks,
   getContacts,
   handleGetUsersOnline,
 } from "../../features/User/userSlice";
@@ -79,6 +80,7 @@ export default function LayoutChat() {
   useEffect(() => {
     getConversations();
     getAllContacts()
+    getBlocked()
   }, []);
 
   const getConversations = async () => {
@@ -96,6 +98,14 @@ export default function LayoutChat() {
       console.log(error);
     }
   };
+
+  const getBlocked = async() =>{
+    try {
+      await dispatch(getBlocks(`/users/${getUserStorage().user._id}`));
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <div className={clsx(style.mainWrap)}>

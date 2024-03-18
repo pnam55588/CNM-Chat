@@ -56,5 +56,21 @@
         background: #eeeef8 !important;
       }
     }
+    .blockWrap{
+      background-color: #EEEEF8;
+      height: 13%;
+      border-bottom-right-radius: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      :first-child{
+        color: #7679ee;
+      }
+      span{
+        color: #7679ee;
+        cursor: pointer;
+      }
+    }
   }
 }
