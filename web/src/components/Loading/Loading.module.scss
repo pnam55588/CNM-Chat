@@ -1,0 +1,12 @@
+.loadingWrap{
+    position: absolute;
+    top: 0;
+    height: 100%;
+    right: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(38, 38, 38,0.3);
+    z-index: 1000;
+}

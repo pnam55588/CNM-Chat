@@ -23,6 +23,7 @@
   .chatFrame {
     height: 88%;
     width: 100%;
+    position: relative;
     .conversation {
       height: 87%;
       overflow: auto;
@@ -48,10 +49,27 @@
         color: black !important;
         border: none !important;
         background: none !important;
+        padding: 0.5%;
       }
       .react-input-emoji--wrapper {
         height: 50px !important;
         background: #eeeef8 !important;
+      }
+    }
+    .blockWrap{
+      background-color: #EEEEF8;
+      height: 13%;
+      border-bottom-right-radius: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      :first-child{
+        color: #7679ee;
+      }
+      span{
+        color: #7679ee;
+        cursor: pointer;
       }
     }
   }

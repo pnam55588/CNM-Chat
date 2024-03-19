@@ -11,6 +11,7 @@ import { getBlocks } from "../../features/User/userSlice";
 import Swal from "sweetalert2";
 import { selectMenu } from "../../features/Menu/menuSlice";
 import { getAllConversations } from "../../features/Conversations/conversationsSlice";
+import { LuBan } from "react-icons/lu";
 const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
   <a
     href=""
@@ -65,11 +66,13 @@ export default function CardFriend({ data, tab }) {
       recipientId: data._id,
     };
     try {
-      
-      const result = await postApiWithToken("/conversation/createConversation", dt);
-      if(result.status===200){
-        await dispatch(getAllConversations(getUserStorage().user._id))
-        await dispatch(selectMenu('allChats'))
+      const result = await postApiWithToken(
+        "/conversation/createConversation",
+        dt
+      );
+      if (result.status === 200) {
+        await dispatch(getAllConversations(getUserStorage().user._id));
+        await dispatch(selectMenu("allChats"));
       }
     } catch (error) {
       Swal.fire({
@@ -85,10 +88,10 @@ export default function CardFriend({ data, tab }) {
         className={clsx(style.wrap)}
         onClick={() => handeleCreateconversation()}
       >
-        <Image
-          className={clsx(style.cardImgF)}
-          src="https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
-        />
+        <div className={clsx(style.cardImgF)}>
+          <Image src="https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png" />
+          {blocked?.includes(data._id) ? <LuBan color="red" /> : null}
+        </div>
         <span>
           <p>{data.name}</p>
         </span>

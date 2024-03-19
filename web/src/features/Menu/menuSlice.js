@@ -4,7 +4,8 @@ const menuSlice = createSlice({
     name: 'menuSlice',
     initialState:{
         active:'allChats',
-        tab:'friendList'
+        tab:'friendList',
+        loading: false
     },
     reducers: {
         selectMenu:(state, action)=>{
@@ -12,9 +13,12 @@ const menuSlice = createSlice({
         },
         selectTab:(state, action)=>{
             state.tab = action.payload
+        },
+        setLoading:(state, action)=>{
+            state.loading = action.payload
         }
     },
 })
 const { reducer, actions } = menuSlice;
-  export const {selectMenu, selectTab} = actions
+  export const {selectMenu, selectTab, setLoading} = actions
   export default reducer;

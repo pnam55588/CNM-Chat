@@ -11,8 +11,24 @@
     max-width: 50%;
     text-align: right;
     float: right;
-    .imgSend{
-      width: 100%;
+    .grid_container {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 10px; /* Khoảng cách giữa các ô */
+    }
+    .grid_container.more2{
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid_item {
+      width: 100%; /* Chiều rộng của mỗi ô là 100% của ô cha (grid-container) */
+      aspect-ratio: 1; /* Bảo đảm tỉ lệ khung hình là 1:1 */
+      overflow: hidden; /* Đảm bảo hình ảnh không vượt ra khỏi ô */
+      img {
+        width: 100%; /* Chiều rộng của hình ảnh là 100% của ô con (grid-item) */
+        height: 100%; /* Chiều cao của hình ảnh là 100% của ô con (grid-item) */
+        object-fit: cover; /* Bảo đảm hình ảnh không bị méo khi thay đổi kích thước */
+      }
     }
     .time {
       text-align: left;
@@ -28,6 +44,22 @@
       }
       .linkFile{
         color: white !important;
+      }
+    }
+    @media screen and (max-width: 1200px) {
+      .file{
+        display: flex;
+        justify-content: center;
+        flex-direction: column-reverse;
+        align-items:center;
+        :nth-child(2){
+          font-size: 5rem;
+          margin-left: 3%;
+        }
+        .linkFile{
+          color: white !important;
+          word-break: break-all;
+        }
       }
     }
   }
