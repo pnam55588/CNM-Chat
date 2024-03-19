@@ -7,7 +7,6 @@ const bcrypt = require('bcryptjs');
 const multer = require('multer')
 const {uploadImage} = require('../config/multer');
 const s3 = require('../config/s3');
-const config= require('../config/config.json');
 
 router.get('/', verifyToken, async (req, res) => {
     User.find({}).then(function (users) {
@@ -204,7 +203,7 @@ router.post('/uploadAvatar/:id', uploadImage.single('file'), async (req, res) =>
     }
     const result = await s3.uploadToS3(file);
     const user = await User.findByIdAndUpdate(req.params.id, { avatar: result.Location }, { new: true });
-    console.log(user);
+    // res.status(200).send(result);
     res.status(200).send(user);
 });
 
