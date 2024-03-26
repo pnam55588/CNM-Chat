@@ -18,8 +18,9 @@ router.post('/createConversation', async (req, res) => {
         let recipient = await User.findById(req.body.recipientId);
         if (!recipient) return res.status(400).json("Recipient not found");
 
-        // check if a conversation already exists between the two users
-        const checkExists = await Conversation.findOne({ users: { $all: [req.body.userId, req.body.recipientId] } });
+        // check if a conversation already exists between the two users, check isGroup = false
+        // const checkExists = await Conversation.findOne({ users: { $all: [req.body.userId, req.body.recipientId] } });
+        const checkExists = await Conversation.findOne({isGroup: {$ne: true} ,users: { $all: [req.body.userId, req.body.recipientId] } });
         if (checkExists) return res.status(400).json("Conversation already exists");
 
         const users = [req.body.userId, req.body.recipientId]//nguoi login va lien lac
@@ -36,6 +37,10 @@ router.post('/createConversation', async (req, res) => {
         res.status(400).json("something went wrong");
     }
 });
+
+
+
+
 router.get('/getConversations/:userId', async (req, res) => {
     try {
         const conversations = await Conversation.find({ users: req.params.userId }).populate('users', 'name avatar');
@@ -83,7 +88,7 @@ router.post('/sendMessage', async (req, res) => { //req.body = {conversationId, 
         res.status(400).json(err);
     }
 });
-
+// THIS ROUTE IS FOR TESTING PURPOSES ONLY
 // remove all message have no user
 router.delete('/removeMessageNoUser', async (req, res) => {
     try {
@@ -94,8 +99,15 @@ router.delete('/removeMessageNoUser', async (req, res) => {
         res.status(400).json(err);
     }
 });
-
-router.get('/getAllGroup', async (req, res) => {
+router.get('/test/query', async (req, res) => {
+    try {
+        const checkExists = await Conversation.findOne({isGroup: {$ne: true} ,users: { $all: [req.body.userId, req.body.recipientId] } });
+        res.status(200).json(checkExists);
+    } catch (err) {
+        res.status(400).json(err);
+    }
+});
+router.get('/test/getAllGroup', async (req, res) => {
     try {
         // order by date
         const conversations = await Conversation.find({ isGroup: true }).sort({ createdAt: -1 });
@@ -104,6 +116,8 @@ router.get('/getAllGroup', async (req, res) => {
         res.status(400).json(err);
     }
 });
+//-----------------------------Group Chat--------------------------------
+
 router.post('/createGroup', async (req, res) => { //req.body = {userId, groupName}
     const { adminId, groupName, userIds } = req.body;
     if (!adminId) return res.status(400).json("admin is required");

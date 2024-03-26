@@ -59,6 +59,7 @@ router.get('/search', async (req, res) => {
 router.post('/addFriend', verifyToken, async (req, res) => {
     const { senderId, receiverId } = req.body;
     if (!senderId || !receiverId) return res.status(400).send('Bad request');
+    if (senderId === receiverId) return res.status(400).send('you cannot add yourself as a friend');
     try {
         const sender = await User.findById(senderId);
         const receiver = await User.findById(receiverId);
