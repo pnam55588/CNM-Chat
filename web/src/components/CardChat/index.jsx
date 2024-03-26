@@ -17,10 +17,9 @@ export default function CardChat({ data }) {
   const [userRecipient, setUserRecipient] = useState({});
   const [lastMessage, setLastMessage] = useState("");
   const [lastTime, setLastTime] = useState("");
+  const [isOnline, setIsOnline] = useState(null);
   const usersOnline = useSelector((state) => state.userReducer.usersOnline);
-  const isOnline = Object.keys(usersOnline).find(
-    (id) => id === userRecipient._id
-  );
+
   const currentMessage = useSelector(
     (state) => state.messageReducer.currentMessage
   );
@@ -33,6 +32,7 @@ export default function CardChat({ data }) {
     const userId = getUserStorage().user._id;
     getLastMessage();
     const recipient = data.users.find((user) => user._id !== userId);
+    setIsOnline(Object.keys(usersOnline).includes(recipient._id));
     setUserRecipient(recipient);
   }, [data]);
 
@@ -53,9 +53,9 @@ export default function CardChat({ data }) {
           setLastMessage(`You: Bạn vừa gửi ${last.images.length} ảnh`);
         } else if (last?.file) {
           setLastMessage(`You: Bạn vừa gửi file`);
-        } else if(last?.video){
+        } else if (last?.video) {
           setLastMessage(`You: Bạn vừa gửi video`);
-        } else if (last?.location){
+        } else if (last?.location) {
           setLastMessage(`You: Bạn chia sẻ vị trí`);
         }
       } else {
@@ -65,9 +65,9 @@ export default function CardChat({ data }) {
           setLastMessage(`Vừa gủi ${last.images.length} ảnh`);
         } else if (last?.file) {
           setLastMessage(`Vừa gửi file`);
-        } else if (last?.video){
+        } else if (last?.video) {
           setLastMessage(`Vừa gửi video`);
-        } else if (last?.location){
+        } else if (last?.location) {
           setLastMessage(`Vừa chia sẻ vị trí`);
         }
       }
@@ -77,13 +77,13 @@ export default function CardChat({ data }) {
 
   const handleSelectedConversation = async () => {
     try {
-      dispatch(setLoading(true))
+      dispatch(setLoading(true));
       await dispatch(selectConversation(data));
       await dispatch(getRecipient(`/users/${userRecipient._id}`));
       await dispatch(getCurrentMessage(data._id));
-      dispatch(setLoading(false))
+      dispatch(setLoading(false));
     } catch (error) {
-      dispatch(setLoading(false))
+      dispatch(setLoading(false));
       console.log(error);
     }
   };
@@ -114,7 +114,7 @@ export default function CardChat({ data }) {
 
         <Card.Text className={clsx(style.cardText)}>
           <span>{lastMessage}</span>
-          <span>2</span>
+          {/* <span>2</span> */}
         </Card.Text>
       </Card.Body>
     </Card>

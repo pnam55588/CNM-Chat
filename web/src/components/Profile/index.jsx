@@ -7,6 +7,7 @@ import { CiEdit } from "react-icons/ci";
 import { getUserStorage } from "../../Utils";
 import { getApiWithToken, postApiWithToken, putApiWithToken } from "../../API";
 import Swal from "sweetalert2";
+import moment from "moment";
 
 export default function Profile(props) {
   const inputFileReference = useRef(null);
@@ -33,7 +34,7 @@ export default function Profile(props) {
     const data = {
       name: inputName,
       gender: inputGender,
-      dateOfBirth: inputDoB,
+      dateOfBirth: moment(inputDoB).format("YYYY-MM-DD"),
       password: inputPW,
     };
     try {
@@ -77,9 +78,7 @@ export default function Profile(props) {
   };
 
   useEffect(() => {
-    if (props.show) {
-      fetchData();
-    }
+    fetchData();
   }, [props.show]);
   const fetchData = async () => {
     try {
@@ -100,6 +99,11 @@ export default function Profile(props) {
       console.log(error);
     }
   };
+
+  const handleGenderChange = (e) => {
+    setInputGender(e.target.value);
+  };
+
 
   return (
     <Modal
@@ -149,7 +153,7 @@ export default function Profile(props) {
             name="dateOfBirth"
             placeholder="Date of Birth"
             disabled={isUpdate ? "" : "disabled"}
-            value={inputDoB}
+            value={moment(inputDoB).format("YYYY-MM-DD")}
             onChange={(e) => setInputDoB(e.target.value)}
           />
           <Form.Group>
@@ -158,20 +162,20 @@ export default function Profile(props) {
               label="Female"
               name="gender"
               type={"radio"}
-              value={"female"}
+              value={'female'}
               disabled={isUpdate ? "" : "disabled"}
-              defaultChecked={inputGender === "female"}
-              onChange={(e) => setInputGender(e.target.value)}
+              defaultChecked={inputGender === "female" }
+              onChange={handleGenderChange}
             />
             <Form.Check
               inline
               label="Male"
               name="gender"
               type={"radio"}
-              value={"male"}
+              value={'male'}
               disabled={isUpdate ? "" : "disabled"}
               defaultChecked={inputGender === "male"}
-              onChange={(e) => setInputGender(e.target.value)}
+              onChange={handleGenderChange}
             />
           </Form.Group>
           <Form.Control
@@ -218,18 +222,23 @@ export default function Profile(props) {
             onClick={() => {
               setIsUpdate(!isUpdate);
             }}
-
           >
             <CiEdit size={30} /> Update
           </Button>
         ) : (
           <div className={clsx(style.btnGroup)}>
             {isUpdateAvatar ? (
-              <Button id="buttonStyle1" className="with-fit-content" onClick={() => handleUpdateAvatar()}>
+              <Button
+                id="buttonStyle1"
+                className="with-fit-content"
+                onClick={() => handleUpdateAvatar()}
+              >
                 Update Avatar
               </Button>
             ) : (
-              <Button id="buttonStyle1" onClick={() => handleUpdateInfo()}>Update</Button>
+              <Button id="buttonStyle1" onClick={() => handleUpdateInfo()}>
+                Update
+              </Button>
             )}
             <Button
               onClick={() => {

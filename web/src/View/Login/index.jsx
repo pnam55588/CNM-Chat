@@ -65,7 +65,7 @@ export default function Login() {
           !isLoginEmail || isLoginPhone ? Style.action : ""
         )}
       >
-        <Button id="buttonStyle3">Login with email</Button>
+        {/* <Button id="buttonStyle3">Login with email</Button> */}
         <Button
           id="buttonStyle3"
           onClick={() => {

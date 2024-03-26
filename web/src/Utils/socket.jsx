@@ -3,9 +3,11 @@ let socket;
 const baseURL = "http://localhost:3300";
 const initiateSocket = (userId) => {
   socket = io(baseURL, {
+    path:"",
     transports: ["websocket"],
     query: { userId },
   });
+  console.log(socket);
   return () => {
     socket.disconnect();
   };

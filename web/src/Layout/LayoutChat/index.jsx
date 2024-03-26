@@ -31,6 +31,7 @@ import { handleSetCurrentMessage } from "../../features/Message/messageSlice";
 export default function LayoutChat() {
   const menuActive = useSelector((state) => state.menuActive.active);
   const tabActive = useSelector((state) => state.menuActive.tab);
+  const usersOnline = useSelector((state) => state.userReducer.usersOnline);
   const allConversations = useSelector(
     (state) => state.conversationReducer.allConversation
   );
@@ -79,8 +80,8 @@ export default function LayoutChat() {
 
   useEffect(() => {
     getConversations();
-    getAllContacts()
-    getBlocked()
+    getAllContacts();
+    getBlocked();
   }, []);
 
   const getConversations = async () => {
@@ -99,13 +100,13 @@ export default function LayoutChat() {
     }
   };
 
-  const getBlocked = async() =>{
+  const getBlocked = async () => {
     try {
       await dispatch(getBlocks(`/users/${getUserStorage().user._id}`));
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   return (
     <div className={clsx(style.mainWrap)}>

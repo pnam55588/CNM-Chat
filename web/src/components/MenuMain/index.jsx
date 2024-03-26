@@ -48,15 +48,14 @@ export default function MenuMain() {
           <FaRegUser size={35} color="white" />
           Profile
         </span>
-        <span
+        <a href="/chat-app/login"
           onClick={() => {
             localStorage.removeItem("user");
             disconnectSocket()
-            navigate('/chat-app/login')
           }}
         >
           <RiLogoutCircleLine size={40}/>
-        </span>
+        </a>
       </div>
       <Profile show={modalShow} onHide={() => setModalShow(false)} />
     </>

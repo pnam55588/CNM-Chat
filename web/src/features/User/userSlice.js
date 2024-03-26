@@ -38,7 +38,7 @@ const userSlice = createSlice({
     pendingRequests: [],
     contacts: [],
     blocked:[],
-    usersOnline:[]
+    usersOnline:{}
   },
   reducers: {
     handleGetUsersOnline:(state, action)=>{
