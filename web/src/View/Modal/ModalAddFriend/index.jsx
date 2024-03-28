@@ -64,7 +64,7 @@ export default function ModalAddFriend(props) {
         </InputGroup>
         <div id="scroll-style-01" className={clsx(style.list)}>
           {listSearch.map((item, index) => (
-            <CardUserSearch data={item} />
+            <CardUserSearch key={index} data={item} />
           ))}
         </div>
       </Modal.Body>

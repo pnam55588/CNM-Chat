@@ -19,7 +19,6 @@ export default function Profile(props) {
   const [inputName, setInputName] = useState();
   const [inputGender, setInputGender] = useState();
   const [inputDoB, setInputDoB] = useState();
-  const [inputPW, setInputPW] = useState();
   const [inputAvatar, setInputAvatar] = useState();
 
   const uploadImage = async () => {
@@ -35,7 +34,6 @@ export default function Profile(props) {
       name: inputName,
       gender: inputGender,
       dateOfBirth: moment(inputDoB).format("YYYY-MM-DD"),
-      password: inputPW,
     };
     try {
       const result = await putApiWithToken(
@@ -91,7 +89,6 @@ export default function Profile(props) {
         setInputDoB(result.data.dateOfBirth);
         setInputGender(result.data.gender);
         setUrlImage(result.data?.avatar);
-        setInputPW(result.data.password);
       } else {
         console.log(result);
       }
@@ -178,7 +175,7 @@ export default function Profile(props) {
               onChange={handleGenderChange}
             />
           </Form.Group>
-          <Form.Control
+          {/* <Form.Control
             id="inputText-02"
             type="password"
             name="password"
@@ -186,7 +183,7 @@ export default function Profile(props) {
             disabled={isUpdate ? "" : "disabled"}
             value={inputPW}
             onChange={(e) => setInputPW(e.target.value)}
-          />
+          /> */}
         </Modal.Body>
       ) : (
         <Modal.Body className={clsx(style.modalBody)}>

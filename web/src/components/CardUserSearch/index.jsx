@@ -5,10 +5,11 @@ import { Button, Image } from "react-bootstrap";
 import { getUserStorage } from "../../Utils";
 import { postApiWithToken } from "../../API";
 import Swal from "sweetalert2";
+import {useSelector} from 'react-redux'
 
 export default function CardUser({ data }) {
   const [textButton, setTextButton] = useState("Invitation");
-  const currentFriends = getUserStorage().user.contacts;
+  const currentFriends = useSelector(state => state.userReducer.contacts)
 
   const handleInvitation = (receiverId) => {
     const senderId = getUserStorage().user._id;
@@ -46,7 +47,7 @@ export default function CardUser({ data }) {
           <p>{data.email}</p>
         </div>
       </span>
-      {!currentFriends.some((f) => f._id === data._id) ? (
+      {currentFriends?.some((f) => f._id === data._id) ? (
         <Button onClick={() => handleInvitation(data._id)}>{textButton}</Button>
       ) : null}
     </div>

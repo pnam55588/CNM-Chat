@@ -54,7 +54,7 @@ export default function Chat() {
   );
 
   const isOnline = Object.keys(usersOnline).find((id) => id === recipient?._id);
-  const isBlocked = blocked.some((id) => id === recipient?._id);
+  const isBlocked = blocked?.some((id) => id === recipient?._id);
 
   const handleNotiAddMember = (noti) => {
     setNotiAddMember(noti);

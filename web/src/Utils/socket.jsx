@@ -7,10 +7,6 @@ const initiateSocket = (userId) => {
     transports: ["websocket"],
     query: { userId },
   });
-  console.log(socket);
-  return () => {
-    socket.disconnect();
-  };
 };
 const getUsersOnline = () => {
   return new Promise((resolve, reject) => {
