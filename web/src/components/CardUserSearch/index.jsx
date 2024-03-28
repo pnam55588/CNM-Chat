@@ -47,7 +47,7 @@ export default function CardUser({ data }) {
           <p>{data.email}</p>
         </div>
       </span>
-      {currentFriends?.some((f) => f._id === data._id) ? (
+      {!currentFriends?.some((f) => f._id === data._id) ? (
         <Button onClick={() => handleInvitation(data._id)}>{textButton}</Button>
       ) : null}
     </div>

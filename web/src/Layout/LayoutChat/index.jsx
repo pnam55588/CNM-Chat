@@ -16,6 +16,7 @@ import {
   getReceiveNewConverstionsocket,
   getUsersOnline,
   initiateSocket,
+  socket,
 } from "../../Utils/socket";
 import {
   getAllConversations,
@@ -45,9 +46,6 @@ export default function LayoutChat() {
       handleGetMessageSocket();
       handleNewConverstionsocket();
     }
-    return () => {
-      disconnectSocket();
-    };
   }, [user._id]);
 
   const handleUsersOnline = async () => {
