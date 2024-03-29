@@ -112,12 +112,15 @@ export default function ChatInfo(props) {
             id="scroll-style-01"
             className={clsx(style.accordionBoby)}
           >
-            {video?.map((item, index) => (
-              <div key={index} className={clsx(style.linkWrap)}>
-                <FaFileVideo />
-                <a href={item}>{item}</a>
-              </div>
-            ))}
+            <div className={clsx(style.grid_container_video)}>
+              {video?.map((item, index) => (
+                <div key={index} className={clsx(style.grid_item)}>
+                  <video controls>
+                    <source src={item} type="video/mp4"></source>
+                  </video>
+                </div>
+              ))}
+            </div>
           </Accordion.Body>
         </Accordion.Item>
         <Accordion.Item eventKey="3">

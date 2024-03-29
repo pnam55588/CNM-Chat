@@ -2,8 +2,23 @@ import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import style from "./sendingContent.module.scss";
 import moment from "moment";
-import { Image } from "react-bootstrap";
+import { Dropdown, Image } from "react-bootstrap";
 import { FaFileAlt, FaFileVideo } from "react-icons/fa";
+import { CiMenuKebab } from "react-icons/ci";
+
+const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
+  <a
+    href=""
+    ref={ref}
+    onClick={(e) => {
+      e.preventDefault();
+      onClick(e);
+    }}
+  >
+    {children}
+    <CiMenuKebab />
+  </a>
+));
 
 export default function SendingContent({ data }) {
   const [fileStyle, setFileStyle] = useState("");
@@ -30,10 +45,12 @@ export default function SendingContent({ data }) {
         </div>
         {data.video ? (
           <div className={clsx(style.file)}>
-            <a className={clsx(style.linkFile)} href={data.video}>
-              {data.video}
-            </a>
-            <FaFileVideo />
+            <video controls>
+              <source
+                src={data.video}
+                type="video/mp4"
+              />
+            </video>
           </div>
         ) : null}
         {data.file ? (
@@ -51,6 +68,12 @@ export default function SendingContent({ data }) {
         }
         <p className={clsx(style.time)}>{moment(data.createdAt).calendar()}</p>
       </div>
+      <Dropdown>
+        <Dropdown.Toggle as={CustomToggle} />
+        <Dropdown.Menu size="sm" title="">
+          <Dropdown.Item>Delete message</Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown>
     </div>
   );
 }

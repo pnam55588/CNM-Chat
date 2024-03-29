@@ -3,6 +3,9 @@
   color: white !important;
   margin: 1%;
   float: right;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-end;
   .content {
     background: #7679ee !important;
     border-radius: 5px;
@@ -16,7 +19,7 @@
       grid-template-columns: repeat(1, 1fr);
       gap: 10px; /* Khoảng cách giữa các ô */
     }
-    .grid_container.more2{
+    .grid_container.more2 {
       grid-template-columns: repeat(2, 1fr);
     }
 
@@ -34,32 +37,36 @@
       text-align: left;
       font-size: 13px;
     }
-    .file{
+    .file {
       display: flex;
       justify-content: center;
-      align-items:center;
-      :nth-child(2){
+      align-items: center;
+      :nth-child(2) {
         font-size: 5rem;
         margin-left: 3%;
       }
-      .linkFile{
+      .linkFile {
         color: white !important;
+      }
+      video{
+        width: 100%;
       }
     }
     @media screen and (max-width: 1200px) {
-      .file{
+      .file {
         display: flex;
         justify-content: center;
         flex-direction: column-reverse;
-        align-items:center;
-        :nth-child(2){
+        align-items: center;
+        :nth-child(2) {
           font-size: 5rem;
           margin-left: 3%;
         }
-        .linkFile{
+        .linkFile {
           color: white !important;
           word-break: break-all;
         }
+        
       }
     }
   }

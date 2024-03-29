@@ -13,6 +13,7 @@ export default function Profile(props) {
   const inputFileReference = useRef(null);
   const [isUpdate, setIsUpdate] = useState(false);
   const [isUpdateAvatar, setIsUpdateAvatar] = useState(false);
+  const [isChangePW, setIsChangePW] = useState(false);
 
   const [user, setUser] = useState();
   const [urlImage, setUrlImage] = useState();
@@ -20,6 +21,7 @@ export default function Profile(props) {
   const [inputGender, setInputGender] = useState();
   const [inputDoB, setInputDoB] = useState();
   const [inputAvatar, setInputAvatar] = useState();
+  const [newPW, setNewPW] = useState();
 
   const uploadImage = async () => {
     const selectedFile = inputFileReference.current.files[0];
@@ -46,6 +48,32 @@ export default function Profile(props) {
         Swal.fire({
           icon: "success",
           text: "Successfully updated user information",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handlechangePassword = async () => {
+    const data = {
+      name: inputName,
+      gender: inputGender,
+      dateOfBirth: moment(inputDoB).format("YYYY-MM-DD"),
+      password: newPW,
+    };
+    try {
+      const result = await putApiWithToken(
+        `/users/${getUserStorage().user._id}`,
+        data
+      );
+      if (result.status === 200) {
+        setUser(result.data);
+        setIsChangePW(false);
+        setIsUpdate(false);
+        Swal.fire({
+          icon: "success",
+          text: "Successfully change password",
         });
       }
     } catch (error) {
@@ -101,7 +129,6 @@ export default function Profile(props) {
     setInputGender(e.target.value);
   };
 
-
   return (
     <Modal
       {...props}
@@ -113,7 +140,7 @@ export default function Profile(props) {
         closeButton
         className={clsx(style.modalHeader)}
       ></Modal.Header>
-      {!isUpdateAvatar ? (
+      {!isUpdateAvatar && !isChangePW ? (
         <Modal.Body className={clsx(style.modalBody)}>
           <span>
             <Image
@@ -144,6 +171,28 @@ export default function Profile(props) {
             value={inputName}
             onChange={(e) => setInputName(e.target.value)}
           />
+          <Form.Group className="mb-4">
+            <Form.Check
+              inline
+              label="Female"
+              name="gender"
+              type={"radio"}
+              value={"female"}
+              disabled={isUpdate ? "" : "disabled"}
+              defaultChecked={inputGender === "female"}
+              onChange={handleGenderChange}
+            />
+            <Form.Check
+              inline
+              label="Male"
+              name="gender"
+              type={"radio"}
+              value={"male"}
+              disabled={isUpdate ? "" : "disabled"}
+              defaultChecked={inputGender === "male"}
+              onChange={handleGenderChange}
+            />
+          </Form.Group>
           <Form.Control
             id="inputText-02"
             type="date"
@@ -153,39 +202,17 @@ export default function Profile(props) {
             value={moment(inputDoB).format("YYYY-MM-DD")}
             onChange={(e) => setInputDoB(e.target.value)}
           />
-          <Form.Group>
-            <Form.Check
-              inline
-              label="Female"
-              name="gender"
-              type={"radio"}
-              value={'female'}
-              disabled={isUpdate ? "" : "disabled"}
-              defaultChecked={inputGender === "female" }
-              onChange={handleGenderChange}
-            />
-            <Form.Check
-              inline
-              label="Male"
-              name="gender"
-              type={"radio"}
-              value={'male'}
-              disabled={isUpdate ? "" : "disabled"}
-              defaultChecked={inputGender === "male"}
-              onChange={handleGenderChange}
-            />
-          </Form.Group>
-          {/* <Form.Control
-            id="inputText-02"
-            type="password"
-            name="password"
-            placeholder="Password"
-            disabled={isUpdate ? "" : "disabled"}
-            value={inputPW}
-            onChange={(e) => setInputPW(e.target.value)}
-          /> */}
+          <span
+            className={style.changePW}
+            onClick={() => {
+              setIsChangePW(true);
+              setInputAvatar(false);
+            }}
+          >
+            Change Password
+          </span>
         </Modal.Body>
-      ) : (
+      ) : isUpdateAvatar && !isChangePW ? (
         <Modal.Body className={clsx(style.modalBody)}>
           <Image
             className={clsx(style.modalImg_2)}
@@ -211,10 +238,22 @@ export default function Profile(props) {
             />
           </Button>
         </Modal.Body>
-      )}
+      ) : isChangePW && !isUpdateAvatar ? (
+        <div className={style.modalBody}>
+          <h5 className="m-3">Change Password</h5>
+          <Form.Control
+            id="inputText-02"
+            type="password"
+            placeholder="New password"
+            name="New password"
+            value={newPW}
+            onChange={(e) => setNewPW(e.target.value)}
+          />
+        </div>
+      ) : null}
 
       <Modal.Footer className={clsx(style.modalFooter)}>
-        {!isUpdate ? (
+        {!isUpdate && !isChangePW ? (
           <Button
             onClick={() => {
               setIsUpdate(!isUpdate);
@@ -222,7 +261,7 @@ export default function Profile(props) {
           >
             <CiEdit size={30} /> Update
           </Button>
-        ) : (
+        ) : isUpdate && !isChangePW ? (
           <div className={clsx(style.btnGroup)}>
             {isUpdateAvatar ? (
               <Button
@@ -239,8 +278,9 @@ export default function Profile(props) {
             )}
             <Button
               onClick={() => {
-                setIsUpdate(!isUpdate);
+                setIsUpdate(false);
                 setIsUpdateAvatar(false);
+                setIsChangePW(false);
                 setUrlImage(user.avatar);
               }}
               id="buttonStyle2"
@@ -248,7 +288,23 @@ export default function Profile(props) {
               Cancel
             </Button>
           </div>
-        )}
+        ) : isChangePW ? (
+          <div className={clsx(style.btnGroup)}>
+            <Button
+              id="buttonStyle2"
+              onClick={() => {
+                setIsUpdate(false);
+                setIsUpdateAvatar(false);
+                setIsChangePW(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button id="buttonStyle1" onClick={() => handlechangePassword()}>
+              Change Password
+            </Button>
+          </div>
+        ) : null}
       </Modal.Footer>
     </Modal>
   );

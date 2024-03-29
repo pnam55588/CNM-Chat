@@ -34,6 +34,11 @@
       }
       .grid_container {
         display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px; /* Khoảng cách giữa các ô */
+      }
+      .grid_container_video {
+        display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 10px; /* Khoảng cách giữa các ô */
       }
@@ -46,6 +51,9 @@
           width: 100%; /* Chiều rộng của hình ảnh là 100% của ô con (grid-item) */
           height: 100%; /* Chiều cao của hình ảnh là 100% của ô con (grid-item) */
           object-fit: cover; /* Bảo đảm hình ảnh không bị méo khi thay đổi kích thước */
+        }
+        video {
+          width: 100%;
         }
       }
     }

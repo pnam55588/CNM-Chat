@@ -7,7 +7,6 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: #f9fafc;
   span {
     text-align: center;
     position: relative !important;
@@ -45,6 +44,21 @@
     background-color: #dcdcff;
     border: none;
     color: black;
+  }
+  .changePW{
+    font-size: 15px;
+    height: fit-content;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    width: 90%;
+    margin: 0%;
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .changePW:hover{
+    color: #7679ee;
   }
 }
 .modalFooter {

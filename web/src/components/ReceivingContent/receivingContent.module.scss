@@ -53,13 +53,15 @@
     }
     .fileWrap {
       display: flex;
-      justify-content: center;
       align-items: center;
       :nth-child(1) {
         color: #7679ee;
         font-size: 5rem;
         margin-right: 3%;
         word-break: break-all;
+      }
+      video{
+        width: 100%;
       }
     }
     @media screen and (max-width: 1200px) {

@@ -15,7 +15,12 @@ export default function ReceivingContent({ data, sender }) {
       </div>
       <div className={clsx(style.content)}>
         <p>{data?.text}</p>
-        <div className={clsx(style.grid_container, data.images?.length>=2? style.more2:'')}>
+        <div
+          className={clsx(
+            style.grid_container,
+            data.images?.length >= 2 ? style.more2 : ""
+          )}
+        >
           {data.images?.map((item, index) => (
             <div key={index} className={clsx(style.grid_item)}>
               <Image src={item} alt={`Image ${index}`} />
@@ -30,15 +35,19 @@ export default function ReceivingContent({ data, sender }) {
         ) : null}
         {data.video ? (
           <div className={clsx(style.fileWrap)}>
-            <FaFileVideo />
-            <a href={data.video}>{data.video}</a>
+            <video controls>
+              <source
+                src={data.video}
+                type="video/mp4"
+              />
+            </video>
           </div>
         ) : null}
-        {
-          data.location ? (
-            <iframe src={`https://www.google.com/maps/embed/v1/place?key=${KEY}&q=${data.location.latitude},${data.location.longitude}`}></iframe>
-          ):null
-        }
+        {data.location ? (
+          <iframe
+            src={`https://www.google.com/maps/embed/v1/place?key=${KEY}&q=${data.location.latitude},${data.location.longitude}`}
+          ></iframe>
+        ) : null}
         <p className={clsx(style.time)}>{moment(data.createdAt).calendar()}</p>
       </div>
     </div>
