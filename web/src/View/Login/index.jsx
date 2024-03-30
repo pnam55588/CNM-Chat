@@ -9,6 +9,9 @@ import Swal from "sweetalert2";
 import {checkPhoneValid, setUserStorage } from "../../Utils";
 import Loading from "../../components/Loading";
 
+import auth from "../../firebase/setup";
+import { RecaptchaVerifier, signInWithPhoneNumber} from "firebase/auth";
+
 export default function Login() {
   const navigate = useNavigate();
 
@@ -18,7 +21,47 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false)
 
+  const [comfirmation, setComfirmation] = useState(null);
+  const [otp, setOtp] = useState('');
+  const [isVerifyOtp, setIsVerifyOtp] = useState(false);
+
+  const sendOtp = async () => {
+    try {
+        let phoneNumber = "+84" + phone;
+        const recapcha = new RecaptchaVerifier(auth, "recaptcha", {});
+        const comfirm = await signInWithPhoneNumber(auth, phoneNumber, recapcha);
+        setComfirmation(comfirm);
+    }catch (error) {
+        Swal.fire({
+            icon: "error",
+            text: "Invalid phone number. Please re-enter!!!",
+        });
+    }
+  }
+  const verifyOtp = async () => { 
+      try {
+        setLoading(true)
+          await comfirmation.confirm(otp);
+          setIsVerifyOtp(true)
+        setLoading(false)
+      }catch (error) {
+        setLoading(false)
+          Swal.fire({
+              icon: "error",
+              text: "Invalid OTP. Please re-enter!!!",
+          });
+      }
+  }
+
   const handleLogin = async () => {
+    if(!isVerifyOtp){
+      Swal.fire({
+        icon: "error",
+        text: "Please verify OTP",
+      });
+      return;
+    }
+
     if (checkPhoneValid(phone)) {
       let data = {
         phone: phone,
@@ -108,6 +151,22 @@ export default function Login() {
           }}
           placeholder="Password"
         />
+        {/* verify phone */}
+        <Button id="buttonStyle1" Button onClick={sendOtp} style={{marginBottom:5}}>Send OTP</Button>
+        <div id="recaptcha"></div>
+        <Form.Control 
+                id="inputText-01"
+                type="text" 
+                placeholder="OTP" 
+                onChange={(e)=>setOtp(e.target.value)}
+            />
+        {
+        isVerifyOtp? 
+        <Button id="buttonStyle1" onClick={verifyOtp} style={{marginBottom:5}} disabled={true}>Verified</Button> :
+        <Button id="buttonStyle1" onClick={verifyOtp} style={{marginBottom:5}}>Verify</Button>
+        // :<Button id="buttonStyle1" onClick={verifyOtp} style={{marginBottom:5}} disabled={true}>Verified</Button>
+        }
+
         <Button id="buttonStyle3" onClick={() => handleLogin()}>
           Login
         </Button>
