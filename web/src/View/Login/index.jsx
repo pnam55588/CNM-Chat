@@ -154,7 +154,7 @@ export default function Login() {
       </div>
       <ModalAuth
         show={isVerifyOtp}
-        onHide={() => setIsVerifyOtp(false)}
+        // onHide={() => setIsVerifyOtp(false)}
         verifyOtp={verifyOtp}
         setOtp={setOtp}
       />
