@@ -1,15 +1,28 @@
 import clsx from "clsx";
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import style from "./receivingContent.module.scss";
 import { Image } from "react-bootstrap";
 import moment from "moment";
-import { FaFileAlt, FaFileVideo } from "react-icons/fa";
+import { FaFileAlt } from "react-icons/fa";
+import ModalImage from "../../View/Modal/ModalImage";
 
 export default function ReceivingContent({ data, sender }) {
   const senderName = sender.name;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState(null);
   const KEY = "AIzaSyC3r4cYivNbIducKrIS_ebFyZDTKrb5DrA";
+  const showImage = (imageUrl) => {
+    const imageContent = <Image src={imageUrl } alt="Image" style={{width:'100%'}}/>;
+    setModalContent(imageContent);
+    setIsModalOpen(true);
+  };
   return (
     <div className={clsx(style.receivingContent)}>
+      <ModalImage 
+        modalContent={modalContent}
+        show={isModalOpen}
+        onHide={()=>setIsModalOpen(false)}
+      />
       <div className={clsx(style.name)}>
         {senderName.charAt(0).toUpperCase()}
       </div>
@@ -23,7 +36,7 @@ export default function ReceivingContent({ data, sender }) {
         >
           {data.images?.map((item, index) => (
             <div key={index} className={clsx(style.grid_item)}>
-              <Image src={item} alt={`Image ${index}`} />
+              <Image src={item} alt={`Image ${index}`} onClick={()=>showImage(item)}/>
             </div>
           ))}
         </div>

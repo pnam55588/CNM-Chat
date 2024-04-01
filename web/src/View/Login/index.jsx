@@ -72,6 +72,7 @@ export default function Login() {
         } else {
           setUserStorage(result.data);
           sendOtp();
+          // navigate("/chat-app/chat");
           setLoading(false);
         }
       } catch (error) {
@@ -154,7 +155,6 @@ export default function Login() {
       </div>
       <ModalAuth
         show={isVerifyOtp}
-        // onHide={() => setIsVerifyOtp(false)}
         verifyOtp={verifyOtp}
         setOtp={setOtp}
       />

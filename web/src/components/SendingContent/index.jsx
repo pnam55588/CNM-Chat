@@ -5,6 +5,7 @@ import moment from "moment";
 import { Dropdown, Image } from "react-bootstrap";
 import { FaFileAlt, FaFileVideo } from "react-icons/fa";
 import { CiMenuKebab } from "react-icons/ci";
+import ModalImage from "../../View/Modal/ModalImage";
 
 const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
   <a
@@ -22,6 +23,8 @@ const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
 
 export default function SendingContent({ data }) {
   const [fileStyle, setFileStyle] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState(null);
   const KEY = "AIzaSyC3r4cYivNbIducKrIS_ebFyZDTKrb5DrA";
   useEffect(() => {
     if (data.file) {
@@ -32,14 +35,24 @@ export default function SendingContent({ data }) {
       setFileStyle(storeName);
     }
   }, [data.file]);
+  const showImage = (imageUrl) => {
+    const imageContent = <Image src={imageUrl } alt="Image" style={{width:'100%'}}/>;
+    setModalContent(imageContent);
+    setIsModalOpen(true);
+  };
   return (
     <div className={clsx(style.sendingContent)}>
+      <ModalImage 
+        modalContent={modalContent}
+        show={isModalOpen}
+        onHide={()=>setIsModalOpen(false)}
+      />
       <div className={clsx(style.content)}>
         <p>{data.text}</p>
         <div className={clsx(style.grid_container, data.images?.length>=2? style.more2:'')}>
           {data.images?.map((item, index) => (
             <div key={index} className={clsx(style.grid_item)}>
-              <Image src={item} alt={`Image ${index}`} />
+              <Image src={item} alt={`Image ${index}`} onClick={()=>showImage(item)}/>
             </div>
           ))}
         </div>
