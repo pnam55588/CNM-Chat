@@ -28,7 +28,7 @@ router.post('/createConversation', async (req, res) => {
             users: users,
         });
         const newConversation = await conversation.save();
-        const con = await Conversation.findById(newConversation._id).populate('users', 'name avatar');
+        const con = await Conversation.findById(newConversation._id).populate('users', 'name avatar isOnline');
         await User.updateOne({ _id: req.body.userId }, { $push: { conversations: newConversation._id } });
         await User.updateOne({ _id: req.body.recipientId }, { $push: { conversations: newConversation._id } });
         res.status(200).json(con);
@@ -43,7 +43,7 @@ router.post('/createConversation', async (req, res) => {
 
 router.get('/getConversations/:userId', async (req, res) => {
     try {
-        const conversations = await Conversation.find({ users: req.params.userId }).populate('users', 'name avatar');
+        const conversations = await Conversation.find({ users: req.params.userId }).populate('users', 'name avatar isOnline');
         res.status(200).json(conversations);
     } catch (err) {
         res.status(400).json(err);
@@ -51,7 +51,7 @@ router.get('/getConversations/:userId', async (req, res) => {
 });
 router.get('/:conversationId', async(req,res)=>{
     try {
-        const conversation = await Conversation.findById({_id: req.params.conversationId}).populate('users', 'name avatar');
+        const conversation = await Conversation.findById({_id: req.params.conversationId}).populate('users', 'name avatar isOnline');
         res.status(200).json(conversation)
     } catch (error) {
         console.log(error);

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router";
 import { IoLogoSnapchat } from "react-icons/io";
 import { BsChatSquareText } from "react-icons/bs";
 import { RiFolderUserLine } from "react-icons/ri";
@@ -15,7 +14,6 @@ import { disconnectSocket} from "../../Utils/socket";
 export default function MenuMain() {
   const menuActive = useSelector((state) => state.menuActive.active);
   const dispatch = useDispatch();
-  const navigate = useNavigate()
 
   const [modalShow, setModalShow] = useState(false);
   return (

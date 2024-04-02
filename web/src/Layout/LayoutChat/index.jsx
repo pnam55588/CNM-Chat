@@ -10,14 +10,7 @@ import Chat from "../../View/Chat";
 import Friends from "../../View/Friends";
 import Invitation from "../../View/Invitation";
 import { getUserStorage } from "../../Utils";
-import {
-  disconnectSocket,
-  // getMessageSocket,
-  getReceiveNewConverstionsocket,
-  // getUsersOnline,
-  initiateSocket,
-  socket,
-} from "../../Utils/socket";
+import { initiateSocket, socket } from "../../Utils/socket";
 import {
   getAllConversations,
   handleNewConversation,
@@ -32,7 +25,6 @@ import { handleSetCurrentMessage } from "../../features/Message/messageSlice";
 export default function LayoutChat() {
   const menuActive = useSelector((state) => state.menuActive.active);
   const tabActive = useSelector((state) => state.menuActive.tab);
-  const usersOnline = useSelector((state) => state.userReducer.usersOnline);
   const allConversations = useSelector(
     (state) => state.conversationReducer.allConversation
   );
@@ -42,51 +34,29 @@ export default function LayoutChat() {
   useEffect(() => {
     if (user._id) {
       initiateSocket(user._id);
-      // handleUsersOnline();
-      // handleGetMessageSocket();
-      handleNewConverstionsocket();
     }
   }, [user._id]);
 
-  // const handleUsersOnline = async () => {
-  //   await getUsersOnline()
-  //     .then((result) => {
-  //       dispatch(handleGetUsersOnline(result));
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
-  const handleNewConverstionsocket = async () => {
-    await getReceiveNewConverstionsocket()
-      .then((result) => {
-        dispatch(handleNewConversation(result));
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-  // const handleGetMessageSocket = async () => {
-  //   await getMessageSocket()
-  //     .then((result) => {
-  //       dispatch(handleSetCurrentMessage(result));
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
-
   useEffect(() => {
+    if (socket === null) return;
     socket.on("receiveMessage", (res) => {
       dispatch(handleSetCurrentMessage(res));
     });
     socket.on("usersOnline", (res) => {
       dispatch(handleGetUsersOnline(res));
     });
+    socket.on("receiveNewConversation", (res) => {
+      dispatch(handleNewConversation(res));
+    });
     getConversations();
     getAllContacts();
     getBlocked();
-  }, []);
+    return () => {
+      socket.off("receiveMessage");
+      socket.off("usersOnline");
+      socket.off("receiveNewConversation");
+    };
+  }, [socket]);
 
   const getConversations = async () => {
     try {

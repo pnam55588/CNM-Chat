@@ -34,6 +34,7 @@ export default function CardChat({ data }) {
     const recipient = data.users.find((user) => user._id !== userId);
     setIsOnline(Object.keys(usersOnline).includes(recipient._id));
     setUserRecipient(recipient);
+    console.log(recipient);
   }, [data]);
 
   useEffect(() => {

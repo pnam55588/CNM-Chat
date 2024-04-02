@@ -16,7 +16,6 @@ import ModalAuth from "../Modal/ModalAuth";
 export default function Login() {
   const navigate = useNavigate();
 
-  const [isLoginEmail, setIsLoginEmail] = useState(false);
   const [isLoginPhone, setIsLoginPhone] = useState(false);
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -99,14 +98,14 @@ export default function Login() {
         <div
           className={clsx(
             Style.wrap,
-            !isLoginEmail || isLoginPhone ? Style.action : ""
+             !isLoginPhone ? Style.action : ""
           )}
         >
           {/* <Button id="buttonStyle3">Login with email</Button> */}
           <Button
             id="buttonStyle3"
             onClick={() => {
-              setIsLoginEmail(!isLoginEmail);
+              setIsLoginPhone(!isLoginPhone);
             }}
           >
             Login with phone
@@ -122,13 +121,13 @@ export default function Login() {
           </Button>
         </div>
         <div
-          className={clsx(Style.wrapEmail, isLoginEmail ? Style.action : "")}
+          className={clsx(Style.wrapEmail, isLoginPhone ? Style.action : "")}
         >
           <FaArrowLeftLong
             size={35}
             className={clsx(Style.iconArrow)}
             onClick={() => {
-              setIsLoginEmail(!isLoginEmail);
+              setIsLoginPhone(!isLoginPhone);
             }}
           />
           <Form.Control
