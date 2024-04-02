@@ -12,9 +12,9 @@ import Invitation from "../../View/Invitation";
 import { getUserStorage } from "../../Utils";
 import {
   disconnectSocket,
-  getMessageSocket,
+  // getMessageSocket,
   getReceiveNewConverstionsocket,
-  getUsersOnline,
+  // getUsersOnline,
   initiateSocket,
   socket,
 } from "../../Utils/socket";
@@ -42,21 +42,21 @@ export default function LayoutChat() {
   useEffect(() => {
     if (user._id) {
       initiateSocket(user._id);
-      handleUsersOnline();
-      handleGetMessageSocket();
+      // handleUsersOnline();
+      // handleGetMessageSocket();
       handleNewConverstionsocket();
     }
   }, [user._id]);
 
-  const handleUsersOnline = async () => {
-    await getUsersOnline()
-      .then((result) => {
-        dispatch(handleGetUsersOnline(result));
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+  // const handleUsersOnline = async () => {
+  //   await getUsersOnline()
+  //     .then((result) => {
+  //       dispatch(handleGetUsersOnline(result));
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
   const handleNewConverstionsocket = async () => {
     await getReceiveNewConverstionsocket()
       .then((result) => {
@@ -66,17 +66,23 @@ export default function LayoutChat() {
         console.log(err);
       });
   };
-  const handleGetMessageSocket = async () => {
-    await getMessageSocket()
-      .then((result) => {
-        dispatch(handleSetCurrentMessage(result));
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+  // const handleGetMessageSocket = async () => {
+  //   await getMessageSocket()
+  //     .then((result) => {
+  //       dispatch(handleSetCurrentMessage(result));
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
 
   useEffect(() => {
+    socket.on("receiveMessage", (res) => {
+      dispatch(handleSetCurrentMessage(res));
+    });
+    socket.on("usersOnline", (res) => {
+      dispatch(handleGetUsersOnline(res));
+    });
     getConversations();
     getAllContacts();
     getBlocked();

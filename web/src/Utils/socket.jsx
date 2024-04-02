@@ -8,36 +8,36 @@ const initiateSocket = (userId) => {
     query: { userId },
   });
 };
-const getUsersOnline = () => {
-  return new Promise((resolve, reject) => {
-    if (socket) {
-      socket.on("usersOnline", (res) => {
-        resolve(res);
-      });
-    } else {
-      reject(new Error("Socket is not available."));
-    }
-  });
-};
+// const getUsersOnline = () => {
+//   return new Promise((resolve, reject) => {
+//     if (socket) {
+//       socket.on("usersOnline", (res) => {
+//         resolve(res);
+//       });
+//     } else {
+//       reject(new Error("Socket is not available."));
+//     }
+//   });
+// };
 const sendMessageSocket = (message) => {
   if (socket) {
     socket.emit("sendMessage", message);
   }
 };
-const getMessageSocket = () => {
-  return new Promise((resolve, reject) => {
-    if (socket) {
-      socket.on("receiveMessage", (res) => {
-        resolve(res);
-      });
-    } else {
-      reject(new Error("Socket is not available."));
-    }
-    return()=>{
-      socket.off('receiveMessage')
-    }
-  });
-};
+// const getMessageSocket = () => {
+//   return new Promise((resolve, reject) => {
+//     if (socket) {
+//       socket.on("receiveMessage", (res) => {
+//         resolve(res);
+//       });
+//     } else {
+//       reject(new Error("Socket is not available."));
+//     }
+//     return()=>{
+//       socket.off('receiveMessage')
+//     }
+//   });
+// };
 const newConversationSocket=(conversation, message)=>{
   if(socket) {
     socket.emit('newConversation', conversation, message)
@@ -65,9 +65,9 @@ const disconnectSocket = () => {
 export {
   socket,
   disconnectSocket,
-  getMessageSocket,
+  // getMessageSocket,
   sendMessageSocket,
-  getUsersOnline,
+  // getUsersOnline,
   initiateSocket,
   newConversationSocket,
   getReceiveNewConverstionsocket,
