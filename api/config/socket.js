@@ -8,6 +8,14 @@ let io = null;
 module.exports = function (server) {
     io = new Server(server, { cors: { origin: '*' } });
     const users = {};
+    updateUserOnline= async(userId) => {
+        const userUpdate = await User.findOneAndUpdate({ _id: userId }, { isOnline: true }, { new: true });
+        console.log(userUpdate);
+    }
+    updateUserOffline= async(userId) => {
+        const userUpdate = await User.findOneAndUpdate({ _id: userId }, { isOnline: false }, { new: true });
+        console.log(userUpdate);
+    }
 
     io.on('connection', (socket) => {
         const userId = socket.handshake.query.userId;
@@ -15,6 +23,8 @@ module.exports = function (server) {
         if(userId){
             users[userId] = socket.id;
             socket.join(userId);
+            //set user online
+            updateUserOnline(userId);
         }
         io.emit('usersOnline', users);
         io.emit('userOnline', userId);
@@ -26,17 +36,10 @@ module.exports = function (server) {
                 // get avatar and name of message.user
                 const user = await User.findById(message.user, 'name avatar');
                 console.log(user);
-                // const newMessage = {
-                //     user: user,
-                //     text: message.text,
-                //     images: message.images,
-                //     conversationId: message.conversationId,
-                //     createdAt: new Date(),
-                // }
                 const newMessage = {...message, user: user}
                 message.receiverIds.forEach(receiverId => {
                     if (users[receiverId])  {
-                        message.receiverId = receiverId;
+                        // message.receiverId = receiverId;
                         socket.to(users[receiverId]).emit('receiveMessage', newMessage);
                     }
                 });
@@ -45,11 +48,6 @@ module.exports = function (server) {
         socket.on('newConversation', async (conversation, message) => { // message = {message, receiverIds}, conversation and message is return from api
             if(!conversation.users || conversation.users.length === 0) return;
             const userSend = await User.findById(message.user, 'name avatar');
-            // const newMessage = new Message({
-            //     conversationId: conversation._id,
-            //     user: userSend,
-            //     text: message.text,
-            // });
             const newMessage = {...message, user: userSend}
             message.receiverIds?.forEach(userId => {
                 if (users[userId]) {
@@ -64,6 +62,7 @@ module.exports = function (server) {
         socket.on('disconnect', () => {
             delete users[userId];
             io.emit('usersOnline', users);
+            updateUserOffline(userId);
         });
     });
 }
