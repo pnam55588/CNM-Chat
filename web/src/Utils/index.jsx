@@ -13,6 +13,14 @@ export const checkPhoneValid = (phone) =>{
   }return true
 }
 
+export const checkPassword = (password) =>{
+  console.log(password);
+  var filter = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[^\W_]{6,}$/;
+  if(!filter.test(password)){
+    return false
+  }return true
+}
+
 export const getUserStorage = () =>{
   return JSON.parse(localStorage.getItem('user'))
 }

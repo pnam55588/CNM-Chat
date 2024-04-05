@@ -6,12 +6,10 @@ import { useNavigate } from "react-router";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { postApiNoneToken } from "../../API";
 import Swal from "sweetalert2";
-import { checkPhoneValid, setUserStorage } from "../../Utils";
+import { checkPassword, checkPhoneValid, setUserStorage } from "../../Utils";
 import Loading from "../../components/Loading";
 
-import auth from "../../firebase/setup";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
-import ModalAuth from "../Modal/ModalAuth";
+
 
 export default function Login() {
   const navigate = useNavigate();
@@ -20,39 +18,19 @@ export default function Login() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [comfirmation, setComfirmation] = useState(null);
-  const [otp, setOtp] = useState("");
-  const [isVerifyOtp, setIsVerifyOtp] = useState(false);
+  const [passwordErr, setPasswordErr] = useState("");
 
-  const sendOtp = async () => {
-    try {
-      let phoneNumber = "+84" + phone;
-      const recapcha = new RecaptchaVerifier(auth, "recaptcha", {});
-      const comfirm = await signInWithPhoneNumber(auth, phoneNumber, recapcha);
-      setComfirmation(comfirm);
-      setIsVerifyOtp(true)
-    } catch (error) {
-      console.log(error);
-      Swal.fire({
-        icon: "error",
-        text: "Invalid phone number. Please re-enter!!!",
-      });
+  const handeleCheckPassword = (e) => {
+    if (checkPassword(e.target.value)) {
+      setPassword(e.target.value);
+      setPasswordErr('')
+    } else {
+      setPasswordErr(
+        "Password must contain at least 6 characters, 1 uppercase letter, 1 lowercase letter and no special characters."
+      );
     }
   };
-  const verifyOtp = async () => {
-    try {
-      setLoading(true);
-      await comfirmation.confirm(otp);
-      navigate("/chat-app/chat");
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      Swal.fire({
-        icon: "error",
-        text: "Invalid OTP. Please re-enter!!!",
-      });
-    }
-  };
+  
 
   const handleLogin = async () => {
     if (checkPhoneValid(phone)) {
@@ -70,8 +48,7 @@ export default function Login() {
           });
         } else {
           setUserStorage(result.data);
-          sendOtp();
-          // navigate("/chat-app/chat");
+          navigate("/chat-app/chat");
           setLoading(false);
         }
       } catch (error) {
@@ -142,21 +119,17 @@ export default function Login() {
             id="inputText-01"
             type="password"
             onChange={(e) => {
-              setPassword(e.target.value);
+              handeleCheckPassword(e)
             }}
             placeholder="Password"
           />
-          <div id="recaptcha"></div>
+          {passwordErr && <div style={{ color: "red", width:'23%', marginBottom:'2%' }}>{passwordErr}</div>}
           <Button id="buttonStyle3" onClick={() => handleLogin()}>
             Login
           </Button>
         </div>
       </div>
-      <ModalAuth
-        show={isVerifyOtp}
-        verifyOtp={verifyOtp}
-        setOtp={setOtp}
-      />
+      
     </>
   );
 }
