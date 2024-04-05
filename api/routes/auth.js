@@ -9,35 +9,33 @@ router.post('/register', async (req, res) => {
     const { error } = registerValidation(req.body);
     if (error) return res.json({ error: error.details[0].message + 'debug' });
 
-    // const checkEmailExist = await User.findOne({ email: req.body.email });
-    // if(checkEmailExist) return res.json({ error: 'Email already exists' });
     const checkPhoneExist = await User.findOne({ phone: req.body.phone });
     if(checkPhoneExist) return res.json({ error: 'Phone already exists' });
 
+    const checkIdExist = await User.findById(req.body.phone);
+    if(checkIdExist) return res.json({ error: 'Id already exists' });
+
+
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(req.body.password, salt);
-
-    const user = new User({ 
-        name: req.body.name,
-        phone: req.body.phone,
-        password: hashPassword,
-    })
-
     try{
-        const newUser = await user.save();
-        await res.send(newUser);
+        const user = new User({
+            _id: req.body.phone, 
+            name: req.body.name,
+            phone: req.body.phone,
+            password: hashPassword,
+        })
+        const saveUser = await user.save();
+        const token = jwt.sign({_id:saveUser._id}, process.env.TOKEN_SECRET, { expiresIn: '1h' });
+        res.header('auth-token', token).json({ token: token, user: saveUser });
     }catch(err){
-        await res.status(400).send(err);
+        res.status(400).send(err);
     }
-
 });   
 
 router.post('/login', async (req, res) => {
     const { error } = loginValidation(req.body);
     if (error) return res.status(422).json({ error: error.details[0].message });
-
-    // const user = await User.findOne({ email: req.body.email });
-    // if(!user) return res.status(422).json({ error: 'Email or password is wrong' });
 
     const user = await User.findOne({ phone: req.body.phone });
     if(!user) return res.status(422).json({ error: 'Phone or password is wrong' });

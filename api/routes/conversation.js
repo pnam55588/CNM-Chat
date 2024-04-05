@@ -3,7 +3,7 @@ const { verifyToken } = require('../middlewares/verifyToken');
 const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
 const User = require('../models/User');
-const {uploadImage, uploadVideo, uploadFile} = require('../config/multer');
+const { uploadImage, uploadVideo, uploadFile } = require('../config/multer');
 const s3 = require('../config/s3');
 
 router.post('/createConversation', async (req, res) => {
@@ -20,7 +20,7 @@ router.post('/createConversation', async (req, res) => {
 
         // check if a conversation already exists between the two users, check isGroup = false
         // const checkExists = await Conversation.findOne({ users: { $all: [req.body.userId, req.body.recipientId] } });
-        const checkExists = await Conversation.findOne({isGroup: {$ne: true} ,users: { $all: [req.body.userId, req.body.recipientId] } });
+        const checkExists = await Conversation.findOne({ isGroup: { $ne: true }, users: { $all: [req.body.userId, req.body.recipientId] } });
         if (checkExists) return res.status(400).json("Conversation already exists");
 
         const users = [req.body.userId, req.body.recipientId]//nguoi login va lien lac
@@ -49,9 +49,9 @@ router.get('/getConversations/:userId', async (req, res) => {
         res.status(400).json(err);
     }
 });
-router.get('/:conversationId', async(req,res)=>{
+router.get('/:conversationId', async (req, res) => {
     try {
-        const conversation = await Conversation.findById({_id: req.params.conversationId}).populate('users', 'name avatar isOnline');
+        const conversation = await Conversation.findById({ _id: req.params.conversationId }).populate('users', 'name avatar isOnline');
         res.status(200).json(conversation)
     } catch (error) {
         console.log(error);
@@ -64,8 +64,8 @@ router.get('/getMessages/:conversationId', async (req, res) => {
         const conversation = await Conversation.findById(conversationId);
         if (!conversation) return res.status(400).json("Conversation not found");
         // get messages from a conversation and populate the user field
-        const messages = await Message 
-            .find({ conversationId: req.params.conversationId }) 
+        const messages = await Message
+            .find({ conversationId: req.params.conversationId })
             .populate('user', 'name avatar');
         res.status(200).json(messages);
     } catch (err) {
@@ -101,7 +101,7 @@ router.delete('/removeMessageNoUser', async (req, res) => {
 });
 router.get('/test/query', async (req, res) => {
     try {
-        const checkExists = await Conversation.findOne({isGroup: {$ne: true} ,users: { $all: [req.body.userId, req.body.recipientId] } });
+        const checkExists = await Conversation.findOne({ isGroup: { $ne: true }, users: { $all: [req.body.userId, req.body.recipientId] } });
         res.status(200).json(checkExists);
     } catch (err) {
         res.status(400).json(err);
@@ -149,7 +149,7 @@ router.put('/addMembers', async (req, res) => { //req.body = {conversationId, us
     try {
         const conversation = await Conversation.findById(conversationId);
         if (!conversation) return res.status(400).json("Conversation not found");
-        for(let userId of userIds) {
+        for (let userId of userIds) {
             if (conversation.users.includes(userId)) return res.status(400).json("User already in the group");
             const user = await User.findById(userId);
             if (!user) return res.status(400).json("User not found");
@@ -229,7 +229,7 @@ router.put('/changeGroupName', async (req, res) => { //req.body = {conversationI
         res.status(400).json(err);
     }
 });
-router.put('/changeGroupImage/:conversationId', uploadImage.single('file') ,async (req, res) => { //req.body = {conversationId, image}
+router.put('/changeGroupImage/:conversationId', uploadImage.single('file'), async (req, res) => { //req.body = {conversationId, image}
     const { conversationId } = req.params;
     const file = req.file;
     if (!conversationId) return res.status(400).json("conversationId is required");
@@ -255,7 +255,7 @@ router.post('/sendImages', uploadImage.array('files', 50), async (req, res) => {
     if (!conversation) return res.status(400).json("Conversation not found");
     const findUser = await User.findById(user);
     if (!findUser) return res.status(400).json("User not found");
-    if(conversation.users.indexOf(user) === -1) return res.status(400).json("User not in the conversation");
+    if (conversation.users.indexOf(user) === -1) return res.status(400).json("User not in the conversation");
     if (!files) return res.status(400).json("No file uploaded.");
 
     const results = await s3.uploadMultipleToS3(files);
@@ -265,7 +265,7 @@ router.post('/sendImages', uploadImage.array('files', 50), async (req, res) => {
         user: user,
         images: images,
     });
-    const newMessage=  await message.save();
+    const newMessage = await message.save();
     res.status(200).json(newMessage);
 });
 router.post('/sendVideo', uploadVideo.single('file'), async (req, res) => {
@@ -278,7 +278,7 @@ router.post('/sendVideo', uploadVideo.single('file'), async (req, res) => {
     if (!conversation) return res.status(400).json("Conversation not found");
     const findUser = await User.findById(user);
     if (!findUser) return res.status(400).json("User not found");
-    if(conversation.users.indexOf(user) === -1) return res.status(400).json("User not in the conversation");
+    if (conversation.users.indexOf(user) === -1) return res.status(400).json("User not in the conversation");
 
     const result = await s3.uploadToS3(file);
     const message = new Message({
@@ -286,7 +286,7 @@ router.post('/sendVideo', uploadVideo.single('file'), async (req, res) => {
         user: user,
         video: result.Location,
     });
-    const newMessage  = await message.save();
+    const newMessage = await message.save();
     res.status(200).json(newMessage);
 });
 router.post('/sendFile', uploadFile.single('file'), async (req, res) => {
@@ -299,7 +299,7 @@ router.post('/sendFile', uploadFile.single('file'), async (req, res) => {
     if (!conversation) return res.status(400).json("Conversation not found");
     const findUser = await User.findById(user);
     if (!findUser) return res.status(400).json("User not found");
-    if(conversation.users.indexOf(user) === -1) return res.status(400).json("User not in the conversation");
+    if (conversation.users.indexOf(user) === -1) return res.status(400).json("User not in the conversation");
 
     const result = await s3.uploadToS3(file);
     const message = new Message({
@@ -307,7 +307,7 @@ router.post('/sendFile', uploadFile.single('file'), async (req, res) => {
         user: user,
         file: result.Location,
     });
-    const newMessage =  await message.save();
+    const newMessage = await message.save();
     res.status(200).json(newMessage);
 });
 
@@ -319,8 +319,8 @@ router.post('/sendLocation', async (req, res) => { // location = {latitude, long
     if (!conversation) return res.status(400).json("Conversation not found");
     const findUser = await User.findById(user);
     if (!findUser) return res.status(400).json("User not found");
-    if(conversation.users.indexOf(user) === -1) return res.status(400).json("User not in the conversation");
-    
+    if (conversation.users.indexOf(user) === -1) return res.status(400).json("User not in the conversation");
+
     if (!location) return res.status(400).json("location is required");
     const { latitude, longitude } = location;
     if (!latitude) return res.status(400).json("latitude is required");
@@ -336,5 +336,33 @@ router.post('/sendLocation', async (req, res) => { // location = {latitude, long
     res.status(200).json(newMessage);
 });
 
+router.post('/removeMessage/:messageId', async (req, res) => {
+    try {
+        const message = await Message.findById(req.params.messageId);
+        if (!message) return res.status(400).json("Message not found");
+        await Message.deleteOne({ _id: req.params.messageId });
+        res.status(200).json("Message deleted successfully");
+    } catch (err) {
+        res.status(400).json(err);
+    }
+});
+
+router.post('/activeConversation', async (req, res) => {
+    try {
+        const { conversationId, userId } = req.body;
+        if (!conversationId) return res.status(400).json("conversationId is required");
+        if (!userId) return res.status(400).json("userId is required");
+        const conversation = await Conversation.findById(conversationId);
+        if (!conversation) return res.status(400).json("Conversation not found");
+        if (conversation.connect.active) return res.status(400).json("Conversation already active");
+        if(conversation.users.indexOf(userId) === -1) return res.status(400).json("User not in the conversation");
+        if(conversation.connect.receiverId !== userId) return res.status(400).json("User not receiver");
+        
+        await Conversation.updateOne({ _id: conversationId }, { 'connect.active': true });
+        res.status(200).json("Conversation active successfully");
+    } catch (err) {
+        res.status(400).json(err);
+    }
+});
 
 module.exports = router;

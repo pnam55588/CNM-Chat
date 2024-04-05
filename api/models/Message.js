@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const MessageSchema = new mongoose.Schema({
   conversationId: mongoose.Types.ObjectId,
-  user: {type: mongoose.Types.ObjectId, ref: 'User'},
+  user: {type: String, ref: 'User'},
   text: String,
   images: [{type: String}],
   video: String,

@@ -1,19 +1,18 @@
 const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema({
-    name: String,
+    _id: String,
+    name: {type: String, default: 'no name'},
     avatar: String,
     dateOfBirth: Date,
     gender: {type: String, default: 'male'},
-    phone: String,
-    // email: String,
+    phone: {type: String, unique: true},
     password: String,
-    status: {type: String, default: 'active'},
     isOnline: { type: Boolean, default: false },
-    pendingRequests: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
-    contacts: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
-    blocked: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
-    blockedFrom: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
+    pendingRequests: [{ type: String, ref: 'User' }],
+    contacts: [{ type: String, ref: 'User' }],
+    blocked: [{ type: String, ref: 'User' }],
+    blockedFrom: [{ type: String, ref: 'User' }],
     createdAt: { type: Date, default: new Date() },
     conversations: [{ type: mongoose.Types.ObjectId, ref: 'Conversation' }],
 })

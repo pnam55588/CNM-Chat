@@ -47,7 +47,6 @@ router.get('/search', async (req, res) => {
                 phone: user.phone,
                 dateOfBirth: user.dateOfBirth,
                 gender: user.gender,
-                // email: user.email,
                 isOnline: user.isOnline
             }
         })
@@ -179,18 +178,13 @@ router.get('/:id', verifyToken, async (req, res) => {
 });
 
 router.put('/:id', verifyToken, async (req, res) => {
-    const { name, gender, dateOfBirth, password } = req.body;
+    const { name, gender, dateOfBirth } = req.body;
     const { error } = updateValidation(req.body);
     if (error) return res.status(400).send(error.details[0].message);
     const query = {};
     if (name) query.name = name;
     if (gender) query.gender = gender;
     if (dateOfBirth) query.dateOfBirth = dateOfBirth;
-    if (password) {
-        const salt = await bcrypt.genSalt(10);
-        const hashPassword = await bcrypt.hash(password, salt);
-        query.password = hashPassword;
-    }
     User.findByIdAndUpdate(req.params.id, query, { new: true }).then(function (user) {
         if (!user) return res.status(404).send('User not found');
         res.json(user);
@@ -208,6 +202,26 @@ router.post('/uploadAvatar/:id', uploadImage.single('file'), async (req, res) =>
     res.status(200).send(user);
 });
 
+router.put('changePassword/:id', verifyToken, async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+
+    const { error } = updateValidation(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
+    if (!oldPassword || !newPassword) return res.status(400).send('Bad request');
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).send('User not found');
+
+    const checkPassword = bcrypt.compare(oldPassword, user.password);
+    if (!checkPassword) return res.status(400).send('Wrong password');
+
+
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(newPassword, salt);
+    user.password = hashPassword;
+    await user.save();
+    res.status(200).send('Password changed');
+});
 
 
 module.exports = router;

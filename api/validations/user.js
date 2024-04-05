@@ -6,7 +6,7 @@ const updateValidation = (data) => {
         // phone: Joi.string().pattern(new RegExp('^[0-9]{10}$')),
         dateOfBirth: Joi.date(),
         gender: Joi.string().pattern(new RegExp('^(male|female)$')),
-        password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,20}$')),
+        password: Joi.string().pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[a-zA-Z0-9]{6,}$')),
     });
     return rule.validate(data);
 }

@@ -8,47 +8,51 @@ let io = null;
 module.exports = function (server) {
     io = new Server(server, { cors: { origin: '*' } });
     const users = {};
-    updateUserOnline= async(userId) => {
+    updateUserOnline = async (userId) => {
         const userUpdate = await User.findOneAndUpdate({ _id: userId }, { isOnline: true }, { new: true });
         console.log(userUpdate);
     }
-    updateUserOffline= async(userId) => {
+    updateUserOffline = async (userId) => {
         const userUpdate = await User.findOneAndUpdate({ _id: userId }, { isOnline: false }, { new: true });
         console.log(userUpdate);
     }
 
     io.on('connection', (socket) => {
         const userId = socket.handshake.query.userId;
-        // when a user connects, save the socket id to the user id, send online status to all users
-        if(userId){
+        if (userId) {
             users[userId] = socket.id;
             socket.join(userId);
-            //set user online
             updateUserOnline(userId);
         }
         io.emit('usersOnline', users);
         io.emit('userOnline', userId);
+        
+        socket.on('removeMessage', (messageId, receiverIds) => {
+            receiverIds.forEach(receiverId => {
+                if (users[receiverId]) {
+                    socket.to(users[receiverId]).emit('receiveRemoveMessage', messageId);
+                }
+            });
+        });
 
-        // Hàm này lắng nghe khi một client gửi tin nhắn
         socket.on('sendMessage', async (message) => { // message = {message, receiverIds}, message is return from api
             // Gửi tin nhắn đến tất cả người nhận online
             if (message.receiverIds.length > 0) {
                 // get avatar and name of message.user
                 const user = await User.findById(message.user, 'name avatar');
                 console.log(user);
-                const newMessage = {...message, user: user}
+                const newMessage = { ...message, user: user }
                 message.receiverIds.forEach(receiverId => {
-                    if (users[receiverId])  {
-                        // message.receiverId = receiverId;
+                    if (users[receiverId]) {
                         socket.to(users[receiverId]).emit('receiveMessage', newMessage);
                     }
                 });
             }
         });
         socket.on('newConversation', async (conversation, message) => { // message = {message, receiverIds}, conversation and message is return from api
-            if(!conversation.users || conversation.users.length === 0) return;
+            if (!conversation.users || conversation.users.length === 0) return;
             const userSend = await User.findById(message.user, 'name avatar');
-            const newMessage = {...message, user: userSend}
+            const newMessage = { ...message, user: userSend }
             message.receiverIds?.forEach(userId => {
                 if (users[userId]) {
                     console.log(userId);
