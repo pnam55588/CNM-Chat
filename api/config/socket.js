@@ -27,10 +27,10 @@ module.exports = function (server) {
         io.emit('usersOnline', users);
         io.emit('userOnline', userId);
         
-        socket.on('removeMessage', (messageId, receiverIds) => {
-            receiverIds.forEach(receiverId => {
+        socket.on('removeMessage', (message) => { // message = {message, receiverIds}, message is return from api
+            message.receiverIds.forEach(receiverId => {
                 if (users[receiverId]) {
-                    socket.to(users[receiverId]).emit('receiveRemoveMessage', messageId);
+                    socket.to(users[receiverId]).emit('receiveRemoveMessage', message);
                 }
             });
         });

@@ -202,7 +202,7 @@ router.post('/uploadAvatar/:id', uploadImage.single('file'), async (req, res) =>
     res.status(200).send(user);
 });
 
-router.put('changePassword/:id', verifyToken, async (req, res) => {
+router.put('/changePassword/:id', verifyToken, async (req, res) => {
     const { oldPassword, newPassword } = req.body;
 
     const { error } = updateValidation(req.body);
@@ -221,6 +221,13 @@ router.put('changePassword/:id', verifyToken, async (req, res) => {
     user.password = hashPassword;
     await user.save();
     res.status(200).send('Password changed');
+});
+
+router.delete('/:id', verifyToken, async (req, res) => { // id is phone
+    User.findByIdAndRemove(req.params.id).then(function (user) {
+        if (!user) return res.status(404).send('User not found');
+        res.json(user);
+    })
 });
 
 
