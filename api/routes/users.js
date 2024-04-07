@@ -204,8 +204,11 @@ router.post('/uploadAvatar/:id', uploadImage.single('file'), async (req, res) =>
 
 router.put('/changePassword/:id', verifyToken, async (req, res) => {
     const { oldPassword, newPassword } = req.body;
+    const param = {
+        password: newPassword
+    }
 
-    const { error } = updateValidation(req.body);
+    const { error } = updateValidation(param);
     if (error) return res.status(400).send(error.details[0].message);
 
     if (!oldPassword || !newPassword) return res.status(400).send('Bad request');
