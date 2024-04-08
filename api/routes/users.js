@@ -215,8 +215,9 @@ router.put('/changePassword/:id', verifyToken, async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).send('User not found');
 
-    const checkPassword = bcrypt.compare(oldPassword, user.password);
+    const checkPassword = bcrypt.compareSync(oldPassword, user.password);
     if (!checkPassword) return res.status(400).send('Wrong password');
+    console.log(checkPassword);
 
 
     const salt = await bcrypt.genSalt(10);
