@@ -228,7 +228,7 @@ router.put('/changePassword/:id', verifyToken, async (req, res) => {
 });
 
 router.delete('/:id', verifyToken, async (req, res) => { // id is phone
-    User.findByIdAndRemove(req.params.id).then(function (user) {
+    User.findByIdAndDelete(req.params.id).then(function (user) {
         if (!user) return res.status(404).send('User not found');
         res.json(user);
     })
