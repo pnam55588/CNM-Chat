@@ -15,7 +15,7 @@ import welcome from "./../../image/welcome_v2.jpg";
 import { postApiWithToken } from "../../API";
 import { getUserStorage } from "../../Utils";
 import { getCurrentMessage } from "../../features/Message/messageSlice";
-import { newConversationSocket, sendMessageSocket } from "../../Utils/socket";
+import { newConversationSocket, sendMessageSocket, socket } from "../../Utils/socket";
 import { FaFileImage, FaLocationDot } from "react-icons/fa6";
 import ModalChandeGroupName from "../Modal/ModalChangeGroupName";
 import Loading from "../../components/Loading";

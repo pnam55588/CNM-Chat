@@ -20,13 +20,19 @@ import {
   getContacts,
   handleGetUsersOnline,
 } from "../../features/User/userSlice";
-import { handleSetCurrentMessage } from "../../features/Message/messageSlice";
+import {
+  getCurrentMessage,
+  handleSetCurrentMessage,
+} from "../../features/Message/messageSlice";
 
 export default function LayoutChat() {
   const menuActive = useSelector((state) => state.menuActive.active);
   const tabActive = useSelector((state) => state.menuActive.tab);
   const allConversations = useSelector(
     (state) => state.conversationReducer.allConversation
+  );
+  const selectedConversation = useSelector(
+    (state) => state.conversationReducer.selectedConversation
   );
   const dispatch = useDispatch();
   const user = getUserStorage().user;
@@ -48,6 +54,9 @@ export default function LayoutChat() {
     socket.on("receiveNewConversation", (res) => {
       dispatch(handleNewConversation(res));
     });
+    socket.on("receiveRemoveMessage", () => {
+      getMessageByConvercation();
+    });
     getConversations();
     getAllContacts();
     getBlocked();
@@ -55,6 +64,7 @@ export default function LayoutChat() {
       socket.off("receiveMessage");
       socket.off("usersOnline");
       socket.off("receiveNewConversation");
+      socket.off("receiveRemoveMessage");
     };
   }, [socket]);
 
@@ -77,6 +87,14 @@ export default function LayoutChat() {
   const getBlocked = async () => {
     try {
       await dispatch(getBlocks(`/users/${getUserStorage().user._id}`));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getMessageByConvercation = async () => {
+    try {
+      await dispatch(getCurrentMessage(selectedConversation._id));
     } catch (error) {
       console.log(error);
     }

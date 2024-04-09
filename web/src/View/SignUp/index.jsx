@@ -25,7 +25,7 @@ export default function SignUp() {
 
   const sendOtp = async () => {
     try {
-      let phoneNumber = "+84" + phone;
+      let phoneNumber = "+1" + '6505550333';
       const recapcha = new RecaptchaVerifier(auth, "recaptcha", {});
       const comfirm = await signInWithPhoneNumber(auth, phoneNumber, recapcha);
       setComfirmation(comfirm);
@@ -41,7 +41,7 @@ export default function SignUp() {
   const verifyOtp = async () => {
     try {
       await comfirmation.confirm(otp);
-      navigate("/chat-app/login");
+      navigate("/chat-app/chat");
     } catch (error) {
       Swal.fire({
         icon: "error",

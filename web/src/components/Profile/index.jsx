@@ -4,7 +4,7 @@ import clsx from "clsx";
 import style from "./profile.module.scss";
 import { MdCameraAlt } from "react-icons/md";
 import { CiEdit } from "react-icons/ci";
-import { getUserStorage } from "../../Utils";
+import { checkPassword, getUserStorage } from "../../Utils";
 import { getApiWithToken, postApiWithToken, putApiWithToken } from "../../API";
 import Swal from "sweetalert2";
 import moment from "moment";
@@ -22,10 +22,10 @@ export default function Profile(props) {
   const [inputDoB, setInputDoB] = useState();
   const [inputAvatar, setInputAvatar] = useState();
   const [newPW, setNewPW] = useState();
+  const [oldPW, setOldPW] = useState()
 
   const uploadImage = async () => {
     const selectedFile = inputFileReference.current.files[0];
-    console.log(selectedFile);
     setInputAvatar(selectedFile);
     const url = URL.createObjectURL(selectedFile);
     await setUrlImage(url);
@@ -56,28 +56,39 @@ export default function Profile(props) {
   };
 
   const handlechangePassword = async () => {
-    const data = {
-      name: inputName,
-      gender: inputGender,
-      dateOfBirth: moment(inputDoB).format("YYYY-MM-DD"),
-      password: newPW,
-    };
-    try {
-      const result = await putApiWithToken(
-        `/users/${getUserStorage().user._id}`,
-        data
-      );
-      if (result.status === 200) {
-        setUser(result.data);
-        setIsChangePW(false);
-        setIsUpdate(false);
+    if (checkPassword(newPW)) {
+      const data = {
+        oldPassword: oldPW,
+        newPassword: newPW,
+      };
+      try {
+        const result = await putApiWithToken(
+          `/users/changePassword/${getUserStorage().user._id}`,
+          data
+        );
+        if (result.status === 200) {
+          setUser(result.data);
+          setIsChangePW(false);
+          setIsUpdate(false);
+          Swal.fire({
+            icon: "success",
+            text: "Successfully change password",
+          });
+          window.location.href='/chat-app/login'
+        }
+      } catch (error) {
+        console.log(error);
         Swal.fire({
-          icon: "success",
-          text: "Successfully change password",
-        });
+          icon:'error',
+          title: error.response
+        })
       }
-    } catch (error) {
-      console.log(error);
+    } else {
+      Swal.fire({
+        icon: "warning",
+        title:
+          "Password must contain at least 6 characters, 1 uppercase letter, 1 lowercase letter and no special characters.",
+      });
     }
   };
 
@@ -89,15 +100,13 @@ export default function Profile(props) {
         `/users/uploadAvatar/${user._id}`,
         formData
       );
-      if (result.status === 200) {
-        setUser(result.data);
-        setIsUpdate(false);
-        setIsUpdateAvatar(false);
-        Swal.fire({
-          icon: "success",
-          text: "Successfully updated avatar information",
-        });
-      }
+      setUser(result.data);
+      setIsUpdate(false);
+      setIsUpdateAvatar(false);
+      Swal.fire({
+        icon: "success",
+        text: "Successfully updated avatar information",
+      });
     } catch (error) {
       console.log(error);
     }
@@ -241,6 +250,20 @@ export default function Profile(props) {
       ) : isChangePW && !isUpdateAvatar ? (
         <div className={style.modalBody}>
           <h5 className="m-3">Change Password</h5>
+          <Form.Label style={{ float: "left", width: "90%" }}>
+            Old Password
+          </Form.Label>
+          <Form.Control
+            id="inputText-02"
+            type="password"
+            placeholder="Old password"
+            name="Old password"
+            value={oldPW}
+            onChange={(e)=>setOldPW(e.target.value)}
+          />
+          <Form.Label style={{ float: "left", width: "90%" }}>
+            New Password
+          </Form.Label>
           <Form.Control
             id="inputText-02"
             type="password"

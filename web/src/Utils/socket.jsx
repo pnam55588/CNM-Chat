@@ -3,7 +3,7 @@ let socket;
 const baseURL = "http://localhost:3300";
 const initiateSocket = (userId) => {
   socket = io(baseURL, {
-    path:"",
+    path: "",
     transports: ["websocket"],
     query: { userId },
   });
@@ -13,11 +13,16 @@ const sendMessageSocket = (message) => {
     socket.emit("sendMessage", message);
   }
 };
-const newConversationSocket=(conversation, message)=>{
-  if(socket) {
-    socket.emit('newConversation', conversation, message)
+const newConversationSocket = (conversation, message) => {
+  if (socket) {
+    socket.emit("newConversation", conversation, message);
   }
-}
+};
+const removeMessageSocket = (receiverId) => {
+  if (socket) {
+    socket.emit("removeMessage", receiverId);
+  }
+};
 const disconnectSocket = () => {
   if (socket) {
     socket.disconnect();
@@ -29,4 +34,5 @@ export {
   sendMessageSocket,
   initiateSocket,
   newConversationSocket,
+  removeMessageSocket,
 };
