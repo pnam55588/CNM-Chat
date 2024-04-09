@@ -53,6 +53,11 @@ export default function SendingContent({ data }) {
     setModalContent(imageContent);
     setIsModalOpen(true);
   };
+  const showVideo = (videoUrl) => {
+    const videoContent = <video controls width={460}><source src={videoUrl} type="video/mp4" /></video>;
+    setModalContent(videoContent);
+    setIsModalOpen(true);
+  };
   const handleRemoveMess = async () => {
     try {
       const result = await postApiWithToken(
@@ -61,6 +66,7 @@ export default function SendingContent({ data }) {
       if (result.status === 200) {
         dispatch(getCurrentMessage(selectedConversation._id))
         removeMessageSocket({
+          ...data,
           receiverIds: selectedConversation.users
             .filter((user) => user._id !== getUserStorage().user._id)
             .map((user) => user._id),
@@ -96,7 +102,7 @@ export default function SendingContent({ data }) {
           ))}
         </div>
         {data.video ? (
-          <div className={clsx(style.file)}>
+          <div className={clsx(style.file)} onClick={()=>showVideo(data.video)}>
             <video controls>
               <source src={data.video} type="video/mp4" />
             </video>

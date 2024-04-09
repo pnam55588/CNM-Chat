@@ -54,8 +54,9 @@ export default function LayoutChat() {
     socket.on("receiveNewConversation", (res) => {
       dispatch(handleNewConversation(res));
     });
-    socket.on("receiveRemoveMessage", () => {
-      getMessageByConvercation();
+    socket.on("receiveRemoveMessage", (res) => {
+      console.log("message removed",res);
+      dispatch(getCurrentMessage(res.conversationId))
     });
     getConversations();
     getAllContacts();
