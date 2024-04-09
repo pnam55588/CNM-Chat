@@ -347,22 +347,46 @@ router.post('/removeMessage/:messageId', async (req, res) => {
     }
 });
 
-router.post('/activeConversation', async (req, res) => {
-    try {
-        const { conversationId, userId } = req.body;
-        if (!conversationId) return res.status(400).json("conversationId is required");
-        if (!userId) return res.status(400).json("userId is required");
-        const conversation = await Conversation.findById(conversationId);
-        if (!conversation) return res.status(400).json("Conversation not found");
-        if (conversation.connect.active) return res.status(400).json("Conversation already active");
-        if(conversation.users.indexOf(userId) === -1) return res.status(400).json("User not in the conversation");
-        if(conversation.connect.receiverId !== userId) return res.status(400).json("User not receiver");
+// router.post('/activeConversation', async (req, res) => {
+//     try {
+//         const { conversationId, userId } = req.body;
+//         if (!conversationId) return res.status(400).json("conversationId is required");
+//         if (!userId) return res.status(400).json("userId is required");
+//         const conversation = await Conversation.findById(conversationId);
+//         if (!conversation) return res.status(400).json("Conversation not found");
+//         if (conversation.connect.active) return res.status(400).json("Conversation already active");
+//         if(conversation.users.indexOf(userId) === -1) return res.status(400).json("User not in the conversation");
+//         if(conversation.connect.receiverId !== userId) return res.status(400).json("User not receiver");
         
-        await Conversation.updateOne({ _id: conversationId }, { 'connect.active': true });
-        res.status(200).json("Conversation active successfully");
-    } catch (err) {
+//         await Conversation.updateOne({ _id: conversationId }, { 'connect.active': true });
+//         res.status(200).json("Conversation active successfully");
+//     } catch (err) {
+//         res.status(400).json(err);
+//     }
+// });
+
+router.post("/forwardMessage", async (req, res) => { // req.body = {message, conversationForwardId}
+    try{
+        const {message, conversationForwardId} = req.body;
+        if(!conversationForwardId) return res.status(400).json("conversationForwardId is required");
+        const conversation = await Conversation.findById(conversationForwardId);
+        if(!conversation) return res.status(400).json("Conversation not found");
+        if(conversation.users.indexOf(message.user) === -1) return res.status(400).json("User not in the conversation");
+
+        const newMessage = new Message({
+            conversationId: conversationForwardId,
+            user: message.user || message.user.id,
+            text: message.text || null,
+            images: message.images || null,
+            video: message.video || null,
+            file: message.file || null,
+            location: message.location || null
+        });
+        const savedMessage = await newMessage.save();
+        res.status(200).json(savedMessage);
+    }catch(err){
         res.status(400).json(err);
     }
-});
+})
 
 module.exports = router;
