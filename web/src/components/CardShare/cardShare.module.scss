@@ -1,0 +1,28 @@
+.cardChat{
+    width: 100%;
+    height: 80px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding:0% 3%;
+    border: none;
+    background: #F9FAFC;
+    .cardImage{
+        width: 12%;
+        height: 70%;
+        background-color: #d1d4e3;
+    }
+    .cardBody{
+        width: 75%;
+        padding: 35px 18px 18px 18px;
+        .cardTitle{
+            display: flex;
+            justify-content: space-between;
+            
+        }
+    }
+}
+.cardChat:hover{
+    background: #EEEEF8;
+    cursor: pointer;
+}

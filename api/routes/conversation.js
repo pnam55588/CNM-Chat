@@ -371,7 +371,7 @@ router.post("/forwardMessage", async (req, res) => { // req.body = {message, con
         if(!conversationForwardId) return res.status(400).json("conversationForwardId is required");
         const conversation = await Conversation.findById(conversationForwardId);
         if(!conversation) return res.status(400).json("Conversation not found");
-        if(conversation.users.indexOf(message.user) === -1) return res.status(400).json("User not in the conversation");
+        // if(conversation.users.indexOf(message.user._id) === -1) return res.status(400).json("User not in the conversation");
 
         const newMessage = new Message({
             conversationId: conversationForwardId,

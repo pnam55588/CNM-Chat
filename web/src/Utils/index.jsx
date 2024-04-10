@@ -14,7 +14,6 @@ export const checkPhoneValid = (phone) =>{
 }
 
 export const checkPassword = (password) =>{
-  console.log(password);
   var filter = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[^\W_]{6,}$/;
   if(!filter.test(password)){
     return false

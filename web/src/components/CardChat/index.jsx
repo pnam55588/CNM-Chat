@@ -101,12 +101,12 @@ export default function CardChat({ data }) {
         src={
           data.isGroup
             ? "https://static.vecteezy.com/system/resources/previews/010/154/511/non_2x/people-icon-sign-symbol-design-free-png.png"
+            : userRecipient.avatar
+            ? userRecipient.avatar
             : "https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
         }
       />
-      {userRecipient.isOnline || isOnline ? (
-        <div className={clsx(style.online)}></div>
-      ) : null}
+      {isOnline ? <div className={clsx(style.online)}></div> : null}
       <Card.Body className={clsx(style.cardBody)}>
         <Card.Title className={clsx(style.cardTitle)}>
           {data.isGroup ? data.name : userRecipient.name}
