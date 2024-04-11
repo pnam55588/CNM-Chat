@@ -18,8 +18,10 @@ router.post('/createConversation', async (req, res) => {
         let recipient = await User.findById(req.body.recipientId);
         if (!recipient) return res.status(400).json("Recipient not found");
 
+        //check 2 user is friend
+        if (user.contacts.indexOf(req.body.recipientId) === -1) return res.status(400).json("You are not friend with this user");
+
         // check if a conversation already exists between the two users, check isGroup = false
-        // const checkExists = await Conversation.findOne({ users: { $all: [req.body.userId, req.body.recipientId] } });
         const checkExists = await Conversation.findOne({ isGroup: { $ne: true }, users: { $all: [req.body.userId, req.body.recipientId] } });
         if (checkExists) return res.status(400).json("Conversation already exists");
 
