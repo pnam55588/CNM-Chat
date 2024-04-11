@@ -25,7 +25,7 @@ export default function SignUp() {
 
   const sendOtp = async () => {
     try {
-      let phoneNumber = "+1" + '6505550333';
+      let phoneNumber = "+84" + phone;
       const recapcha = new RecaptchaVerifier(auth, "recaptcha", {});
       const comfirm = await signInWithPhoneNumber(auth, phoneNumber, recapcha);
       setComfirmation(comfirm);

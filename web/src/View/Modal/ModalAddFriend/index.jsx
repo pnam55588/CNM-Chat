@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import React, { useState } from "react";
-import { Form, InputGroup } from "react-bootstrap";
+import { Form, InputGroup, Image } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { LuUserPlus2 } from "react-icons/lu";
@@ -9,6 +9,8 @@ import CardUserSearch from "../../../components/CardUserSearch";
 import { CiSearch } from "react-icons/ci";
 import { getApiWithToken } from "../../../API";
 import { checkPhoneValid } from "../../../Utils";
+import Swal from "sweetalert2";
+import search from "./../../../image/search.jpg";
 
 export default function ModalAddFriend(props) {
   const [inputSearch, setInputSearch] = useState("");
@@ -22,6 +24,11 @@ export default function ModalAddFriend(props) {
         })
         .catch((err) => {
           console.log(err);
+          setListSearch([]);
+          Swal.fire({
+            icon: "warning",
+            title: err.response.data,
+          });
         });
     } else {
       getApiWithToken(`/users/search?name=${inputSearch}`)
@@ -30,6 +37,11 @@ export default function ModalAddFriend(props) {
         })
         .catch((err) => {
           console.log(err);
+          setListSearch([]);
+          Swal.fire({
+            icon: "warning",
+            title: err.response.data,
+          });
         });
     }
   };
@@ -63,14 +75,22 @@ export default function ModalAddFriend(props) {
           />
         </InputGroup>
         <div id="scroll-style-01" className={clsx(style.list)}>
-          {listSearch.map((item, index) => (
-            <CardUserSearch key={index} data={item} />
-          ))}
+          {listSearch.length > 0 ? (
+            listSearch.map((item, index) => (
+              <CardUserSearch key={index} data={item} />
+            ))
+          ) : (
+            <Image style={{ width: "100%", height: "100%" }} src={search} />
+          )}
         </div>
       </Modal.Body>
       <Modal.Footer>
-        <Button id="buttonStyle2" onClick={props.onHide}>Close</Button>
-        <Button id="buttonStyle1" onClick={()=>handleSearch()}>Search</Button>
+        <Button id="buttonStyle2" onClick={props.onHide}>
+          Close
+        </Button>
+        <Button id="buttonStyle1" onClick={() => handleSearch()}>
+          Search
+        </Button>
       </Modal.Footer>
     </Modal>
   );
