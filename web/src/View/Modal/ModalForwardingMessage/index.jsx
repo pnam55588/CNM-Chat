@@ -25,7 +25,15 @@ export default function ModalForwardingMessage(props) {
   const handleForwardingMess = async () => {
     try {
       const dt = {
-        message: props.shareContent,
+        message: {
+          conversationId: props.shareContent.conversationId,
+          user: getUserStorage().user,
+          text: props.shareContent.text || null,
+          images: props.shareContent.images || null,
+          video: props.shareContent.video || null,
+          file: props.shareContent.file || null,
+          location: props.shareContent.location || null,
+        },
         conversationForwardId: select._id,
       };
       const result = await postApiWithToken(`/conversation/forwardMessage`, dt);
@@ -34,7 +42,15 @@ export default function ModalForwardingMessage(props) {
         await dispatch(getRecipient(`/users/${userRecipient_id}`));
         await dispatch(getCurrentMessage(select._id));
         sendMessageSocket({
-          ...props.shareContent,
+          ...{
+            conversationId: props.shareContent.conversationId,
+            user: getUserStorage().user,
+            text: props.shareContent.text || null,
+            images: props.shareContent.images || null,
+            video: props.shareContent.video || null,
+            file: props.shareContent.file || null,
+            location: props.shareContent.location || null,
+          },
           receiverIds: select.users
             .filter((user) => user._id !== getUserStorage().user._id)
             .map((user) => user._id),
@@ -111,20 +127,32 @@ export default function ModalForwardingMessage(props) {
                 ))}
               </div>
             ) : props.shareContent.video ? (
-              <video style={{
-                height: "100px",
-                width: "100%",
-              }} controls>
+              <video
+                style={{
+                  height: "100px",
+                  width: "100%",
+                }}
+                controls
+              >
                 <source src={props.shareContent.video} type="video/mp4" />
               </video>
             ) : props.shareContent.file ? (
-              <div style={{display:'flex', justifyContent:'center', alignItems:'center'}}>
-              <FaFileAlt size={90}/>
-              <a style={{fontSize:'14px', padding:'0 4%'}} href={props.shareContent.file}>
-                {props.shareContent.file}
-              </a>
-            </div>
-            ):null}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <FaFileAlt size={90} />
+                <a
+                  style={{ fontSize: "14px", padding: "0 4%" }}
+                  href={props.shareContent.file}
+                >
+                  {props.shareContent.file}
+                </a>
+              </div>
+            ) : null}
           </Form.Group>
         </div>
       </Modal.Body>

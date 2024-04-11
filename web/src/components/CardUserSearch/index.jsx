@@ -13,6 +13,7 @@ export default function CardUser({ data }) {
 
   const handleInvitation = (receiverId) => {
     const senderId = getUserStorage().user._id;
+    console.log(receiverId);
     let data = {
       senderId: senderId,
       receiverId: receiverId,
