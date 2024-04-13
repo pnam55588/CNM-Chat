@@ -126,7 +126,7 @@ router.post('/createGroup', async (req, res) => { //req.body = {userId, groupNam
     if (!userIds) return res.status(400).json("userId is required");
     if (!groupName) return res.status(400).json("groupName is required");
     // check admin not in userIds
-    if (userIds.includes(adminId)) return res.status(400).json("Admin can't be in the group");
+    if (userIds.includes(adminId)) return res.status(400).json("Admin should not be in userIds");
     try {
         const adminUser = await User.findById(adminId);
         if (!adminUser) return res.status(400).json("admin not found");
@@ -157,27 +157,32 @@ router.put('/addMembers', async (req, res) => { //req.body = {conversationId, us
             if (!user) return res.status(400).json("User not found");
             await Conversation.updateOne({ _id: conversationId }, { $push: { users: userId } });
         }
-        return res.status(200).json("Members added successfully");
+        const updatedConversation = await Conversation.findById(conversationId).populate('users', 'name avatar isOnline');
+        return res.status(200).json(updatedConversation);
     } catch (err) {
         res.status(400).json(err);
     }
 });
 router.put('/removeMember', async (req, res) => { //req.body = {conversationId, userId}
-    const { conversationId, userId } = req.body;
+    const { conversationId, userId, adminId } = req.body;
     if (!conversationId) return res.status(400).json("conversationId is required");
     if (!userId) return res.status(400).json("userId is required");
+    if (!adminId) return res.status(400).json("adminId is required");
     try {
         const conversation = await Conversation.findById(conversationId);
         if (!conversation) return res.status(400).json("Conversation not found");
         if (!conversation.users.includes(userId)) return res.status(400).json("User not in the group");
         if (conversation.admin == userId) return res.status(400).json("Admin can't be removed");
+        if (conversation.admin != adminId) return res.status(400).json("You are not admin of this group");
         await Conversation.updateOne({ _id: conversationId }, { $pull: { users: userId } });
         await User.updateOne({ _id: userId }, { $pull: { conversations: conversationId } });
-        res.status(200).json("Member removed successfully");
+        const updatedConversation = await Conversation.findById(conversationId).populate('users', 'name avatar isOnline');
+        res.status(200).json(updatedConversation);
     } catch (err) {
         res.status(400).json(err);
     }
 });
+// this for test
 router.delete('/deleteConversation/:conversationId', async (req, res) => {
     try {
         const conversation = await Conversation.findById(req.params.conversationId);
@@ -190,6 +195,7 @@ router.delete('/deleteConversation/:conversationId', async (req, res) => {
         res.status(400).json(err);
     }
 });
+//-----------------------------Group Chat--------------------------------
 router.put('/muteConversation', async (req, res) => { //req.body = {conversationId, userId}
     const { conversationId, userId } = req.body;
     if (!conversationId) return res.status(400).json("conversationId is required");
@@ -226,7 +232,8 @@ router.put('/changeGroupName', async (req, res) => { //req.body = {conversationI
         const conversation = await Conversation.findById(conversationId);
         if (!conversation) return res.status(400).json("Conversation not found");
         await Conversation.updateOne({ _id: conversationId }, { name: name });
-        res.status(200).json("Group name changed successfully");
+        const updatedConversation = await Conversation.findById(conversationId).populate('users', 'name avatar isOnline');
+        res.status(200).json(updatedConversation);
     } catch (err) {
         res.status(400).json(err);
     }
@@ -242,7 +249,8 @@ router.put('/changeGroupImage/:conversationId', uploadImage.single('file'), asyn
         const conversation = await Conversation.findById(conversationId);
         if (!conversation) return res.status(400).json("Conversation not found");
         await Conversation.updateOne({ _id: conversationId }, { image: imageUrl });
-        res.status(200).json(imageUrl);
+        const updatedConversation = await Conversation.findById(conversationId).populate('users', 'name avatar isOnline');
+        res.status(200).json(updatedConversation);
     } catch (err) {
         res.status(400).json(err);
     }
@@ -349,35 +357,17 @@ router.post('/removeMessage/:messageId', async (req, res) => {
     }
 });
 
-// router.post('/activeConversation', async (req, res) => {
-//     try {
-//         const { conversationId, userId } = req.body;
-//         if (!conversationId) return res.status(400).json("conversationId is required");
-//         if (!userId) return res.status(400).json("userId is required");
-//         const conversation = await Conversation.findById(conversationId);
-//         if (!conversation) return res.status(400).json("Conversation not found");
-//         if (conversation.connect.active) return res.status(400).json("Conversation already active");
-//         if(conversation.users.indexOf(userId) === -1) return res.status(400).json("User not in the conversation");
-//         if(conversation.connect.receiverId !== userId) return res.status(400).json("User not receiver");
-        
-//         await Conversation.updateOne({ _id: conversationId }, { 'connect.active': true });
-//         res.status(200).json("Conversation active successfully");
-//     } catch (err) {
-//         res.status(400).json(err);
-//     }
-// });
-
-router.post("/forwardMessage", async (req, res) => { // req.body = {message, conversationForwardId}
+router.post("/forwardMessage", async (req, res) => { // message return from api, conversationForwardId, userid forward this message
     try{
-        const {message, conversationForwardId} = req.body;
+        const {message, conversationForwardId, userId} = req.body;
         if(!conversationForwardId) return res.status(400).json("conversationForwardId is required");
+        if(!userId) return res.status(400).json("userId is required");
         const conversation = await Conversation.findById(conversationForwardId);
         if(!conversation) return res.status(400).json("Conversation not found");
-        // if(conversation.users.indexOf(message.user._id) === -1) return res.status(400).json("User not in the conversation");
 
         const newMessage = new Message({
             conversationId: conversationForwardId,
-            user: message.user || message.user.id,
+            user: userId,
             text: message.text || null,
             images: message.images || null,
             video: message.video || null,
@@ -390,5 +380,59 @@ router.post("/forwardMessage", async (req, res) => { // req.body = {message, con
         res.status(400).json(err);
     }
 })
+
+// out group
+router.post('/outGroup', async (req, res) => {
+    const { conversationId, userId } = req.body;
+    if (!conversationId) return res.status(400).json("conversationId is required");
+    if (!userId) return res.status(400).json("userId is required");
+    try {
+        const conversation = await Conversation.findById(conversationId);
+        if (!conversation) return res.status(400).json("Conversation not found");
+        if (!conversation.users.includes(userId)) return res.status(400).json("User not in the group");
+        if (conversation.admin == userId) return res.status(400).json("Admin can't out the group");
+        await User.updateOne({ _id: userId }, { $pull: { conversations: conversationId } });
+        await Conversation.updateOne({ _id: conversationId }, { $pull: { users: userId }});
+        // return conversation updated
+        const updatedConversation = await Conversation.findById(conversationId).populate('users', 'name avatar isOnline');
+        res.status(200).json(updatedConversation);
+    } catch (err) {
+        res.status(400).json(err);
+    }
+});
+// disband group
+router.delete('/disbandGroup', async (req, res) => {
+    const { adminId, conversationId } = req.body;
+    if (!conversationId) return res.status(400).json("conversationId is required");
+    try {
+        const conversation = await Conversation.findById(conversationId);
+        if (!conversation) return res.status(400).json("Conversation not found");
+        if (conversation.admin != adminId) return res.status(400).json("You are not admin of this group");
+        await Message.deleteMany({ conversationId: conversationId });
+        await User.updateMany({ conversations: conversationId }, { $pull: { conversations: conversationId } });
+        await Conversation.deleteOne({ _id: conversationId });
+        res.status(200).json("Group disband successfully");
+    } catch (err) {
+        res.status(400).json(err);
+    }
+});
+// change admin
+router.put('/changeGroupAdmin', async (req, res) => {
+    const { conversationId, adminId, userId } = req.body;
+    if (!conversationId) return res.status(400).json("conversationId is required");
+    if (!adminId) return res.status(400).json("adminId is required");
+    if (!userId) return res.status(400).json("userId is required");
+    try {
+        const conversation = await Conversation.findById(conversationId);
+        if (!conversation) return res.status(400).json("Conversation not found");
+        if (conversation.admin != adminId) return res.status(400).json("You are not admin of this group");
+        if (!conversation.users.includes(userId)) return res.status(400).json("User not in the group");
+        await Conversation.updateOne({ _id: conversationId }, { admin: userId });
+        const updatedConversation = await Conversation.findById(conversationId).populate('users', 'name avatar isOnline');
+        res.status(200).json(updatedConversation);
+    } catch (err) {
+        res.status(400).json(err);
+    }
+});
 
 module.exports = router;

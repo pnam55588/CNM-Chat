@@ -9,10 +9,6 @@ const ConversationSchema = new mongoose.Schema({
   admin: {type: String, ref: 'User'},
   createdAt: {type: Date, default: new Date()},
   mutedBy: [{type: mongoose.Types.ObjectId}],
-  connect: {
-    receiverId: {type: String, ref: 'User'},
-    active: {type: Boolean, default: false},
-  }
 });
 
 module.exports = mongoose.model('Conversation', ConversationSchema);

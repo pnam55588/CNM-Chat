@@ -26,7 +26,59 @@ module.exports = function (server) {
         }
         io.emit('usersOnline', users);
         io.emit('userOnline', userId);
-        
+
+        socket.on('updateGroup', (conversation, receiverIds) => { // conversation return from api
+            receiverIds.forEach(receiverId => {
+                if (users[receiverId]) {
+                    socket.to(users[receiverId]).emit('receiveUpdateGroup', conversation);
+                }
+            });
+        });
+
+        socket.on('userOutGroup', (userId, groupId, receiverIds) => {
+            receiverIds.forEach(receiverId => {
+                if (users[receiverId]) {
+                    socket.to(users[receiverId]).emit('receiveUserOutGroup', { userId, groupId });
+                }
+            });
+        });
+        socket.on('userJoinGroup', (userId, groupId, receiverIds) => {
+            receiverIds.forEach(receiverId => {
+                if (users[receiverId]) {
+                    socket.to(users[receiverId]).emit('receiveUserJoinGroup', { userId, groupId });
+                }
+            });
+        });
+        socket.on("changeGroupName", (groupId, groupName, receiverIds) => {
+            receiverIds.forEach(receiverId => {
+                if (users[receiverId]) {
+                    socket.to(users[receiverId]).emit('receiveChangeGroupName', { groupId, groupName });
+                }
+            });
+        });
+        socket.on("changeGroupAvatar", (groupId, groupAvatar, receiverIds) => {
+            receiverIds.forEach(receiverId => {
+                if (users[receiverId]) {
+                    socket.to(users[receiverId]).emit('receiveChangeGroupAvatar', { groupId, groupAvatar });
+                }
+            });
+        });
+        socket.on('changeGroupAdmin', (groupId, adminId, receiverIds) => {
+            receiverIds.forEach(receiverId => {
+                if (users[receiverId]) {
+                    socket.to(users[receiverId]).emit('receiveChangeGroupAdmin', { groupId, adminId });
+                }
+            });
+        });
+        socket.on('disbandGroup', (groupId, receiverIds) => {
+            receiverIds.forEach(receiverId => {
+                if (users[receiverId]) {
+                    socket.to(users[receiverId]).emit('receiveDisbandGroup', groupId);
+                }
+            });
+        });
+
+
         socket.on('removeMessage', (message) => { // message = {message, receiverIds}, message is return from api
             message.receiverIds.forEach(receiverId => {
                 if (users[receiverId]) {
