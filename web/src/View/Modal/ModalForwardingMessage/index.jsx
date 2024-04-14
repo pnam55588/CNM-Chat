@@ -35,6 +35,7 @@ export default function ModalForwardingMessage(props) {
           location: props.shareContent.location || null,
         },
         conversationForwardId: select._id,
+        userId: getUserStorage().user
       };
       const result = await postApiWithToken(`/conversation/forwardMessage`, dt);
       if (result.status === 200) {

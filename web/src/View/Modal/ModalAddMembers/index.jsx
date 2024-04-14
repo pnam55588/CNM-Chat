@@ -7,12 +7,17 @@ import { useSelector, useDispatch } from "react-redux";
 import { getApiWithToken, putApiWithToken } from "../../../API";
 import Swal from "sweetalert2";
 import { selectConversation } from "../../../features/Conversations/conversationsSlice";
+import { newConversationSocket, updateGroup } from "../../../Utils/socket";
+import { getUserStorage } from "../../../Utils";
 
 export default function ModalAddMembers(props) {
   const dispatch = useDispatch();
   const contacts = useSelector((state) => state.userReducer.contacts);
   const [selectContacts, setSelectContacts] = useState([]);
   const [listRender, setListRender] = useState([]);
+  const selectedConversation = useSelector(
+    (state) => state.conversationReducer.selectedConversation
+  );
 
   const handleSelectContacts = (item) => {
     if (selectContacts.includes(item)) {
@@ -25,28 +30,25 @@ export default function ModalAddMembers(props) {
 
   const handleAddMembers = async () => {
     const dt = {
-      conversationId: props.conversationId,
+      conversationId: props.conversation._id,
       userIds: selectContacts,
     };
     try {
       const result = await putApiWithToken("/conversation/addMembers", dt);
       if (result.status === 200) {
-        Swal.fire({
-          icon: "success",
-          text: result.data,
-        });
         try {
-          const rs = await getApiWithToken(
-            `/conversation/${props.conversationId}`
+          props.onHide();
+          await dispatch(selectConversation(result.data));
+          Swal.fire({
+            icon:'success',
+            title:'Add member success'
+          })
+          updateGroup(
+            result.data,
+            props.conversation.users
+              .filter((user) => user._id !== getUserStorage().user._id)
+              .map((user) => user._id)
           );
-          if (rs.status === 200) {
-            await dispatch(selectConversation(rs.data));
-            props.onHide();
-          }
-          selectContacts.map(contact => {
-            props.handleNotiAddMember(`${contact.name} is invited to the group`);
-            return null;
-          });
         } catch (error) {
           console.log(error);
         }
@@ -66,6 +68,7 @@ export default function ModalAddMembers(props) {
         const rs = contacts?.filter(
           (item) => !props.members.find((item2) => item._id === item2._id)
         );
+        console.log(rs);
         setListRender(rs);
       };
       fetchData();

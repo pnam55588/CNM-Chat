@@ -6,7 +6,16 @@ import { getApiWithToken, postApiWithToken } from "../../API";
 import { getUserStorage } from "../../Utils";
 import Swal from "sweetalert2";
 import { useDispatch } from "react-redux";
-import { getContacts, getPenddingRequests } from "../../features/User/userSlice";
+import {
+  getContacts,
+  getPenddingRequests,
+} from "../../features/User/userSlice";
+import {
+  getAllConversations,
+  getRecipient,
+  selectConversation,
+} from "../../features/Conversations/conversationsSlice";
+import { selectMenu } from "../../features/Menu/menuSlice";
 
 export default function CardReceivedInvitation({ data }) {
   const [user, setUser] = useState({});
@@ -28,7 +37,21 @@ export default function CardReceivedInvitation({ data }) {
           await dispatch(
             getPenddingRequests(`/users/${getUserStorage().user._id}`)
           );
-          await dispatch(getContacts(getUserStorage().user._id))
+          await dispatch(getContacts(getUserStorage().user._id));
+          const dt2 = {
+            userId: getUserStorage().user._id,
+            recipientId: data,
+          };
+          const newConversation = await postApiWithToken(
+            "/conversation/createConversation",
+            dt2
+          );
+          if (newConversation.status === 200) {
+            await dispatch(getAllConversations(getUserStorage().user._id));
+            await dispatch(selectMenu("allChats"));
+            await dispatch(selectConversation(data));
+            await dispatch(getRecipient(`/users/${data}`));
+          }
         } catch (error) {
           console.log(error);
         }

@@ -14,6 +14,7 @@ import { initiateSocket, socket } from "../../Utils/socket";
 import {
   getAllConversations,
   handleNewConversation,
+  selectConversation,
 } from "../../features/Conversations/conversationsSlice";
 import {
   getBlocks,
@@ -55,9 +56,12 @@ export default function LayoutChat() {
       dispatch(handleNewConversation(res));
     });
     socket.on("receiveRemoveMessage", (res) => {
-      console.log("message removed",res);
       dispatch(getCurrentMessage(res.conversationId))
     });
+    socket.on("receiveUpdateGroup", (res)=>{
+      getConversations();
+      dispatch(selectConversation(res))
+    })
     getConversations();
     getAllContacts();
     getBlocked();
@@ -66,6 +70,7 @@ export default function LayoutChat() {
       socket.off("usersOnline");
       socket.off("receiveNewConversation");
       socket.off("receiveRemoveMessage");
+      socket.off("receiveUpdateGroup")
     };
   }, [socket]);
 
@@ -93,13 +98,6 @@ export default function LayoutChat() {
     }
   };
 
-  const getMessageByConvercation = async () => {
-    try {
-      await dispatch(getCurrentMessage(selectedConversation._id));
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   return (
     <div className={clsx(style.mainWrap)}>

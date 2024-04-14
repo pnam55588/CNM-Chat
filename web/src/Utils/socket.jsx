@@ -23,6 +23,11 @@ const removeMessageSocket = (receiverId) => {
     socket.emit("removeMessage", receiverId);
   }
 };
+const updateGroup = (conversation, receiverId)=>{
+  if(socket){
+    socket.emit("updateGroup", conversation, receiverId)
+  }
+}
 const disconnectSocket = () => {
   if (socket) {
     socket.disconnect();
@@ -35,4 +40,5 @@ export {
   initiateSocket,
   newConversationSocket,
   removeMessageSocket,
+  updateGroup
 };
