@@ -34,7 +34,6 @@ export default function CardChat({ data }) {
     const recipient = data.users.find((user) => user._id !== userId);
     setIsOnline(Object.keys(usersOnline).includes(recipient._id));
     setUserRecipient(recipient);
-    console.log(recipient);
   }, [data]);
 
   useEffect(() => {
@@ -100,10 +99,10 @@ export default function CardChat({ data }) {
         className={clsx(style.cardImage)}
         src={
           data.isGroup
-            ? "https://static.vecteezy.com/system/resources/previews/010/154/511/non_2x/people-icon-sign-symbol-design-free-png.png"
-            : userRecipient.avatar
-            ? userRecipient.avatar
-            : "https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
+            ? data.image ||
+              "https://static.vecteezy.com/system/resources/previews/010/154/511/non_2x/people-icon-sign-symbol-design-free-png.png"
+            : userRecipient.avatar ||
+              "https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
         }
       />
       {isOnline ? <div className={clsx(style.online)}></div> : null}

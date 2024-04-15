@@ -273,7 +273,7 @@ export default function Chat() {
           <div style={{ width: openChatInfo ? "70%" : "100%" }}>
             <div className={clsx(style.recipient)}>
               <div className={clsx(style.name)}>
-                {selectedConversation.isGroup ? (
+                {selectedConversation?.isGroup ? (
                   <div className="d-flex align-items-center">
                     <h4>{selectedConversation.name}</h4>
                     <CiEdit
@@ -326,7 +326,7 @@ export default function Chat() {
                     );
                   }
                 })}
-                {selectedConversation.isGroup && notiAddMember ? (
+                {selectedConversation?.isGroup && notiAddMember ? (
                   <p className={clsx(style.notiAddMember)}>{notiAddMember}</p>
                 ) : null}
               </div>

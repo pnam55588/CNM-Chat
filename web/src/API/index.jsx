@@ -57,6 +57,7 @@ export const putApiWithToken = (url, data) => {
   return api.put(url, data, {
     headers: {
       "auth-token": `${token}`,
+
     },
   });
 };

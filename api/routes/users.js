@@ -14,7 +14,7 @@ router.get('/', verifyToken, async (req, res) => {
     })
 });
 router.get('/:id/contacts', verifyToken, async (req, res) => {
-    User.findById(req.params.id).populate('contacts', '_id name isOnline')
+    User.findById(req.params.id).populate('contacts', '_id name isOnline avatar')
         .then(function (user) {
             if (!user) return res.status(404).send('User not found');
             const contacts = user.contacts.map((contact) => {

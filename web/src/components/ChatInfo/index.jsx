@@ -1,22 +1,29 @@
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import style from "./chatInfo.module.scss";
-import { Accordion, Button, Col, Container, Image, Row } from "react-bootstrap";
+import { Accordion, Button, Image } from "react-bootstrap";
 import { TbPhoto } from "react-icons/tb";
-import { MdGroups, MdPhotoCameraFront } from "react-icons/md";
-import { FaFileLines, FaFileVideo } from "react-icons/fa6";
+import { MdCameraAlt, MdGroups, MdPhotoCameraFront } from "react-icons/md";
+import { FaFileLines } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { FaFileAlt, FaSignOutAlt } from "react-icons/fa";
 import { LuUserPlus2 } from "react-icons/lu";
 import ModalAddMembers from "../../View/Modal/ModalAddMembers";
 import { getUserStorage } from "../../Utils";
 import { RiChatDeleteFill } from "react-icons/ri";
-import { deleteApiWithToken } from "../../API";
+import {
+  deleteApiWithToken,
+  postApiWithToken,
+  putApiWithToken,
+} from "../../API";
 import Swal from "sweetalert2";
 import {
   getAllConversations,
   selectConversation,
 } from "../../features/Conversations/conversationsSlice";
+import { updateGroup } from "../../Utils/socket";
+import { IoMdClose } from "react-icons/io";
+import ModalChandeGroupName from "../../View/Modal/ModalChangeGroupName";
 
 export default function ChatInfo(props) {
   const [members, setMembers] = useState([]);
@@ -24,6 +31,7 @@ export default function ChatInfo(props) {
   const [files, setFiles] = useState([]);
   const [images, setImages] = useState([]);
   const [video, setVideo] = useState([]);
+  const [openChangeImg, setOpenChangeImg] = useState(false);
 
   const dispatch = useDispatch();
   const selectedConversation = useSelector(
@@ -32,8 +40,9 @@ export default function ChatInfo(props) {
   const currentMessage = useSelector(
     (state) => state.messageReducer.currentMessage
   );
+  const isAdmin = selectedConversation?.admin === getUserStorage().user._id;
   useEffect(() => {
-    if (selectedConversation.isGroup) {
+    if (selectedConversation?.isGroup) {
       setMembers(selectedConversation.users);
     }
   }, [selectedConversation]);
@@ -68,20 +77,99 @@ export default function ChatInfo(props) {
       if (result.status === 200) {
         await dispatch(getAllConversations(getUserStorage().user._id));
         await dispatch(selectConversation(null));
-        props.onHide();
         Swal.fire({
           icon: "success",
-          text: result.data,
+          text: "Delete group success",
         });
+        updateGroup(
+          result.data,
+          selectedConversation.users
+            .filter((user) => user._id !== getUserStorage().user._id)
+            .map((user) => user._id)
+        );
       }
     } catch (error) {
       console.log(error);
     }
   };
 
+  const handleRemoveMember = async (value) => {
+    try {
+      const dt = {
+        conversationId: selectedConversation._id,
+        userId: value,
+        adminId: getUserStorage().user._id,
+      };
+      const result = await putApiWithToken("/conversation/removeMember", dt);
+      if (result.status === 200) {
+        await dispatch(selectConversation(result.data));
+        Swal.fire({
+          icon: "success",
+          text: "Remove member success",
+        });
+        updateGroup(
+          result.data,
+          selectedConversation.users
+            .filter((user) => user._id !== getUserStorage().user._id)
+            .map((user) => user._id)
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleOutGroup = async () => {
+    try {
+      const dt = {
+        conversationId: selectedConversation._id,
+        userId: getUserStorage().user._id,
+      };
+      const result = await postApiWithToken("/conversation/outGroup", dt);
+      if (result.status === 200) {
+        await dispatch(getAllConversations(getUserStorage().user._id));
+        await dispatch(selectConversation(null));
+        Swal.fire({
+          icon: "success",
+          text: "Out group success",
+        });
+        updateGroup(
+          result.data,
+          selectedConversation.users
+            .filter((user) => user._id !== getUserStorage().user._id)
+            .map((user) => user._id)
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      Swal.fire({
+        icon: "error",
+        text: error.response.data,
+      });
+    }
+  };
+
   return (
     <div className={clsx(style.chatinfo)}>
       <h2>Chat Info</h2>
+      {selectedConversation?.isGroup ? (
+        <div className={style.imageWrap}>
+          <Image
+            className={style.imageGroup}
+            src={
+              selectedConversation.image
+                ? selectedConversation.image
+                : "https://static.vecteezy.com/system/resources/previews/010/154/511/non_2x/people-icon-sign-symbol-design-free-png.png"
+            }
+          />
+          <Button
+            className={style.btnCamera}
+            onClick={() => setOpenChangeImg(true)}
+          >
+            <MdCameraAlt size={25} />
+          </Button>
+        </div>
+      ) : null}
       <Accordion className={clsx(style.Accordion)}>
         <Accordion.Item eventKey="0">
           <Accordion.Header>
@@ -141,7 +229,7 @@ export default function ChatInfo(props) {
             ))}
           </Accordion.Body>
         </Accordion.Item>
-        {selectedConversation.isGroup ? (
+        {selectedConversation?.isGroup ? (
           <Accordion.Item eventKey="4">
             <Accordion.Header>
               <span>
@@ -159,18 +247,25 @@ export default function ChatInfo(props) {
                 <LuUserPlus2 size={30} /> Add Members
               </Button>
               {members?.map((item, index) => (
-                <div className={clsx(style.cardF)} key={index}>
-                  <Image
-                    className={clsx(style.cardImgF)}
-                    src={
-                      item.avatar
-                        ? item.avatar
-                        : "https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
-                    }
-                  />
-                  <p>{item.name}</p>
-                  {item._id === selectedConversation?.admin ? (
-                    <p className={clsx(style.admin)}>(Admin)</p>
+                <div className={style.cardWrap}>
+                  <div className={clsx(style.cardF)} key={index}>
+                    <Image
+                      className={clsx(style.cardImgF)}
+                      src={
+                        item.avatar
+                          ? item.avatar
+                          : "https://static.vecteezy.com/system/resources/previews/020/911/740/original/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png"
+                      }
+                    />
+                    <p>{item.name}</p>
+                    {item._id === selectedConversation?.admin ? (
+                      <p className={clsx(style.admin)}>(Admin)</p>
+                    ) : item._id === getUserStorage().user._id ? (
+                      <p className={clsx(style.admin)}>(Me)</p>
+                    ) : null}
+                  </div>
+                  {isAdmin && item._id !== selectedConversation?.admin ? (
+                    <IoMdClose onClick={() => handleRemoveMember(item._id)} />
                   ) : null}
                 </div>
               ))}
@@ -178,13 +273,16 @@ export default function ChatInfo(props) {
           </Accordion.Item>
         ) : null}
       </Accordion>
-      {selectedConversation.isGroup &&
+      {selectedConversation?.isGroup &&
       selectedConversation.admin !== getUserStorage().user._id ? (
-        <span className={clsx(style.leaveGroup)}>
+        <span
+          className={clsx(style.leaveGroup)}
+          onClick={() => handleOutGroup()}
+        >
           <FaSignOutAlt size={25} />
           Leave group
         </span>
-      ) : selectedConversation.isGroup &&
+      ) : selectedConversation?.isGroup &&
         selectedConversation.admin === getUserStorage().user._id ? (
         <span
           className={clsx(style.leaveGroup)}
@@ -198,8 +296,15 @@ export default function ChatInfo(props) {
         show={openAddMembers}
         onHide={() => setOpenAddMembers(false)}
         members={members}
-        conversationId={selectedConversation._id}
+        conversation={selectedConversation}
         handleNotiAddMember={props.handleNotiAddMember}
+      />
+      <ModalChandeGroupName
+        show={openChangeImg}
+        onHide={() => setOpenChangeImg(false)}
+        changeGroupImage={true}
+        imageGroup = {selectedConversation.image}
+        conversationId={selectedConversation._id}
       />
     </div>
   );
