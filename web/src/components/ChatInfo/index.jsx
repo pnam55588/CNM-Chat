@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import style from "./chatInfo.module.scss";
-import { Accordion, Button, Image } from "react-bootstrap";
+import { Accordion, Button, Dropdown, Image } from "react-bootstrap";
 import { TbPhoto } from "react-icons/tb";
 import { MdCameraAlt, MdGroups, MdPhotoCameraFront } from "react-icons/md";
 import { FaFileLines } from "react-icons/fa6";
@@ -22,8 +22,22 @@ import {
   selectConversation,
 } from "../../features/Conversations/conversationsSlice";
 import { updateGroup } from "../../Utils/socket";
-import { IoMdClose } from "react-icons/io";
 import ModalChandeGroupName from "../../View/Modal/ModalChangeGroupName";
+import { TfiLayoutMenuSeparated } from "react-icons/tfi";
+
+const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
+  <a
+    href=""
+    ref={ref}
+    onClick={(e) => {
+      e.preventDefault();
+      onClick(e);
+    }}
+  >
+    {children}
+    <TfiLayoutMenuSeparated />
+  </a>
+));
 
 export default function ChatInfo(props) {
   const [members, setMembers] = useState([]);
@@ -118,6 +132,32 @@ export default function ChatInfo(props) {
       console.log(error);
     }
   };
+
+  const handleChangeAdmin = async (id) =>{
+    try {
+      const dt = {
+        conversationId: selectedConversation._id,
+        adminId: selectedConversation.admin,
+        userId: id
+      }
+      const result = await putApiWithToken("/conversation/changeGroupAdmin", dt)
+      if(result.status===200){
+        await dispatch(selectConversation(result.data));
+        Swal.fire({
+          icon:'success',
+          title: "Change admin success"
+        })
+        updateGroup(
+          result.data,
+          selectedConversation.users
+            .filter((user) => user._id !== getUserStorage().user._id)
+            .map((user) => user._id)
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const handleOutGroup = async () => {
     try {
@@ -265,7 +305,18 @@ export default function ChatInfo(props) {
                     ) : null}
                   </div>
                   {isAdmin && item._id !== selectedConversation?.admin ? (
-                    <IoMdClose onClick={() => handleRemoveMember(item._id)} />
+                    // <IoMdClose onClick={() => handleRemoveMember(item._id)} />
+                    <Dropdown className={style.menu}>
+                      <Dropdown.Toggle as={CustomToggle} />
+                      <Dropdown.Menu size="sm" title="">
+                        <Dropdown.Item
+                          onClick={() => handleRemoveMember(item._id)}
+                        >
+                          Delete
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={()=>handleChangeAdmin(item._id)}>Change admin</Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
                   ) : null}
                 </div>
               ))}
@@ -303,7 +354,7 @@ export default function ChatInfo(props) {
         show={openChangeImg}
         onHide={() => setOpenChangeImg(false)}
         changeGroupImage={true}
-        imageGroup = {selectedConversation.image}
+        imageGroup={selectedConversation.image}
         conversationId={selectedConversation._id}
       />
     </div>

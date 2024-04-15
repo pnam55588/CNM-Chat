@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getApiWithToken, putApiWithToken } from "../../../API";
 import Swal from "sweetalert2";
 import { selectConversation } from "../../../features/Conversations/conversationsSlice";
-import { newConversationSocket, updateGroup } from "../../../Utils/socket";
+import { newConversationSocket, newGroup, updateGroup } from "../../../Utils/socket";
 import { getUserStorage } from "../../../Utils";
 
 export default function ModalAddMembers(props) {
@@ -43,6 +43,10 @@ export default function ModalAddMembers(props) {
             icon:'success',
             title:'Add member success'
           })
+          newGroup(
+            result.data,
+            selectContacts.map(user=>user._id)
+          )
           updateGroup(
             result.data,
             props.conversation.users

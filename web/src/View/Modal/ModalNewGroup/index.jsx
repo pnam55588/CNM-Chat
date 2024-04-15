@@ -14,6 +14,7 @@ import {
 } from "../../../features/Conversations/conversationsSlice";
 import { selectMenu } from "../../../features/Menu/menuSlice";
 import Swal from "sweetalert2";
+import { newGroup } from "../../../Utils/socket";
 
 export default function ModalNewGroup(props) {
   const inputFileReference = useRef(null);
@@ -50,14 +51,20 @@ export default function ModalNewGroup(props) {
         await dispatch(getAllConversations(getUserStorage().user._id));
         await dispatch(selectMenu("allChats"));
         await dispatch(selectConversation(result.data._id));
+        newGroup(
+          result.data,
+          result.data.users
+            .filter((user) => user._id !== getUserStorage().user._id)
+            .map((user) => user._id)
+        );
         props.onHide();
       }
     } catch (error) {
       console.log(error);
       Swal.fire({
-        icon:'error',
-        text: error.response.data
-      })
+        icon: "error",
+        text: error.response.data,
+      });
     }
   };
 
@@ -175,7 +182,7 @@ export default function ModalNewGroup(props) {
         </Button>
         <Button
           disabled={
-            (inputNameGroup.trim().length === 0 && selectContacts.length < 2)
+            inputNameGroup.trim().length === 0 && selectContacts.length < 2
               ? "disabled"
               : ""
           }

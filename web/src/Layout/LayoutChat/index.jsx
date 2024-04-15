@@ -62,6 +62,9 @@ export default function LayoutChat() {
       getConversations();
       dispatch(selectConversation(res))
     })
+    socket.on("receiveNewGroup", res =>{
+      dispatch(handleNewConversation(res))
+    })
     getConversations();
     getAllContacts();
     getBlocked();
@@ -71,6 +74,7 @@ export default function LayoutChat() {
       socket.off("receiveNewConversation");
       socket.off("receiveRemoveMessage");
       socket.off("receiveUpdateGroup")
+      socket.off("receiveNewGroup")
     };
   }, [socket]);
 

@@ -103,17 +103,16 @@
           font-size: 0.7rem;
         }
       }
-      :nth-child(2) {
-        cursor: pointer;
-        padding: 2px;
-        font-size: 30px;
-      }
-      :nth-child(2):hover {
-        background-color: #a2a2d1;
+      .menu{
+        display: none;
       }
     }
     .cardWrap:hover {
       background: #eeeef8;
+      .menu{
+        display: block;
+        margin-right: 10px;
+      }
     }
   }
   .leaveGroup {
