@@ -27,10 +27,19 @@ module.exports = function (server) {
         io.emit('usersOnline', users);
         io.emit('userOnline', userId);
 
+        
         socket.on('updateGroup', (conversation, receiverIds) => { // conversation return from api
             receiverIds.forEach(receiverId => {
                 if (users[receiverId]) {
                     socket.to(users[receiverId]).emit('receiveUpdateGroup', conversation);
+                }
+            });
+        });
+
+        socket.on('newGroup', (conversation, receiverIds) => {
+            receiverIds.forEach(receiverId => {
+                if (users[receiverId]) {
+                    socket.to(users[receiverId]).emit('receiveNewGroup', conversation);
                 }
             });
         });
