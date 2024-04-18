@@ -32,7 +32,7 @@ export default function CardChat({ data }) {
     const userId = getUserStorage().user._id;
     getLastMessage();
     const recipient = data.users.find((user) => user._id !== userId);
-    setIsOnline(Object.keys(usersOnline).includes(recipient._id));
+    setIsOnline(recipient? Object.keys(usersOnline).includes(recipient._id): false);
     setUserRecipient(recipient);
   }, [data]);
 
