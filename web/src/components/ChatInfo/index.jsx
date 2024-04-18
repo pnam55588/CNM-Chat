@@ -84,94 +84,94 @@ export default function ChatInfo(props) {
   }, [currentMessage]);
 
   const handleDeleteConversation = async () => {
-    try {
-      const result = await deleteApiWithToken(
-        `/conversation/deleteConversation/${selectedConversation._id}`
-      );
-      if (result.status === 200) {
-        await dispatch(getAllConversations(getUserStorage().user._id));
-        await dispatch(selectConversation(null));
-        Swal.fire({
-          icon: "success",
-          text: "Delete group success",
-        });
-        updateGroup(
-          result.data,
-          selectedConversation.users
-            .filter((user) => user._id !== getUserStorage().user._id)
-            .map((user) => user._id)
-        );
+    Swal.fire({
+      icon: "question",
+      title: "Do you want to delete this group conversation?",
+      showDenyButton: true,
+      confirmButtonText: "Yes",
+      denyButtonText: "No",
+    }).then(async (rs) => {
+      if (rs.isConfirmed) {
+        try {
+          const result = await deleteApiWithToken(
+            `/conversation/deleteConversation/${selectedConversation._id}`
+          );
+          if (result.status === 200) {
+            await dispatch(getAllConversations(getUserStorage().user._id));
+            await dispatch(selectConversation(null));
+            Swal.fire({
+              icon: "success",
+              text: "Delete group success",
+            });
+            updateGroup(
+              result.data,
+              selectedConversation.users
+                .filter((user) => user._id !== getUserStorage().user._id)
+                .map((user) => user._id)
+            );
+          }
+        } catch (error) {
+          console.log(error);
+        }
       }
-    } catch (error) {
-      console.log(error);
-    }
+    });
   };
 
   const handleRemoveMember = async (value) => {
-    try {
-      const dt = {
-        conversationId: selectedConversation._id,
-        userId: value,
-        adminId: getUserStorage().user._id,
-      };
-      const result = await putApiWithToken("/conversation/removeMember", dt);
-      if (result.status === 200) {
-        await dispatch(selectConversation(result.data));
-        Swal.fire({
-          icon: "success",
-          text: "Remove member success",
-        });
-        updateGroup(
-          result.data,
-          selectedConversation.users
-            .filter((user) => user._id !== getUserStorage().user._id)
-            .map((user) => user._id)
-        );
+    Swal.fire({
+      icon: "question",
+      showDenyButton: true,
+      title: "Do you want to delete this member from the group?",
+      confirmButtonText: "Yes",
+      denyButtonText: `No`,
+    }).then(async (rs) => {
+      if (rs.isConfirmed) {
+        try {
+          const dt = {
+            conversationId: selectedConversation._id,
+            userId: value,
+            adminId: getUserStorage().user._id,
+          };
+          const result = await putApiWithToken(
+            "/conversation/removeMember",
+            dt
+          );
+          if (result.status === 200) {
+            await dispatch(selectConversation(result.data));
+            Swal.fire({
+              icon: "success",
+              text: "Remove member success",
+            });
+            updateGroup(
+              result.data,
+              selectedConversation.users
+                .filter((user) => user._id !== getUserStorage().user._id)
+                .map((user) => user._id)
+            );
+          }
+        } catch (error) {
+          console.log(error);
+        }
       }
-    } catch (error) {
-      console.log(error);
-    }
+    });
   };
 
-  const handleChangeAdmin = async (id) =>{
+  const handleChangeAdmin = async (id) => {
     try {
       const dt = {
         conversationId: selectedConversation._id,
         adminId: selectedConversation.admin,
-        userId: id
-      }
-      const result = await putApiWithToken("/conversation/changeGroupAdmin", dt)
-      if(result.status===200){
+        userId: id,
+      };
+      const result = await putApiWithToken(
+        "/conversation/changeGroupAdmin",
+        dt
+      );
+      if (result.status === 200) {
         await dispatch(selectConversation(result.data));
         Swal.fire({
-          icon:'success',
-          title: "Change admin success"
-        })
-        updateGroup(
-          result.data,
-          selectedConversation.users
-            .filter((user) => user._id !== getUserStorage().user._id)
-            .map((user) => user._id)
-        );
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  const handleOutGroup = async () => {
-    try {
-      const dt = {
-        conversationId: selectedConversation._id,
-        userId: getUserStorage().user._id,
-      };
-      const result = await postApiWithToken("/conversation/outGroup", dt);
-      if (result.status === 200) {
-        await dispatch(getAllConversations(getUserStorage().user._id));
-        await dispatch(selectConversation(null));
-        Swal.fire({
           icon: "success",
-          text: "Out group success",
+          title: "Change admin success",
         });
         updateGroup(
           result.data,
@@ -182,11 +182,47 @@ export default function ChatInfo(props) {
       }
     } catch (error) {
       console.log(error);
-      Swal.fire({
-        icon: "error",
-        text: error.response.data,
-      });
     }
+  };
+
+  const handleOutGroup = async () => {
+    Swal.fire({
+      icon: "question",
+      title: "Do you want to leave this group conversation?",
+      showDenyButton: true,
+      confirmButtonText: "Yes",
+      denyButtonText: "No",
+    }).then(async (rs) => {
+      if (rs.isConfirmed) {
+        try {
+          const dt = {
+            conversationId: selectedConversation._id,
+            userId: getUserStorage().user._id,
+          };
+          const result = await postApiWithToken("/conversation/outGroup", dt);
+          if (result.status === 200) {
+            await dispatch(getAllConversations(getUserStorage().user._id));
+            await dispatch(selectConversation(null));
+            Swal.fire({
+              icon: "success",
+              text: "Out group success",
+            });
+            updateGroup(
+              result.data,
+              selectedConversation.users
+                .filter((user) => user._id !== getUserStorage().user._id)
+                .map((user) => user._id)
+            );
+          }
+        } catch (error) {
+          console.log(error);
+          Swal.fire({
+            icon: "error",
+            text: error.response.data,
+          });
+        }
+      }
+    });
   };
 
   return (
@@ -314,7 +350,11 @@ export default function ChatInfo(props) {
                         >
                           Delete
                         </Dropdown.Item>
-                        <Dropdown.Item onClick={()=>handleChangeAdmin(item._id)}>Change admin</Dropdown.Item>
+                        <Dropdown.Item
+                          onClick={() => handleChangeAdmin(item._id)}
+                        >
+                          Change admin
+                        </Dropdown.Item>
                       </Dropdown.Menu>
                     </Dropdown>
                   ) : null}

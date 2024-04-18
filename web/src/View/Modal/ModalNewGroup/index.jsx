@@ -182,7 +182,7 @@ export default function ModalNewGroup(props) {
         </Button>
         <Button
           disabled={
-            inputNameGroup.trim().length === 0 && selectContacts.length < 2
+            inputNameGroup.trim().length === 0 || selectContacts.length < 2
               ? "disabled"
               : ""
           }
