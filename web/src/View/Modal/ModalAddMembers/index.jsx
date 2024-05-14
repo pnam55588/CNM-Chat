@@ -4,10 +4,10 @@ import { Button, Col, Form, Image, Modal, Row } from "react-bootstrap";
 import { AiOutlineUsergroupAdd } from "react-icons/ai";
 import style from "./modalAddMembers.module.scss";
 import { useSelector, useDispatch } from "react-redux";
-import { getApiWithToken, putApiWithToken } from "../../../API";
+import {putApiWithToken } from "../../../API";
 import Swal from "sweetalert2";
-import { selectConversation } from "../../../features/Conversations/conversationsSlice";
-import { newConversationSocket, newGroup, updateGroup } from "../../../Utils/socket";
+import { selectConversation, setNotification } from "../../../features/Conversations/conversationsSlice";
+import {newGroup, updateGroup } from "../../../Utils/socket";
 import { getUserStorage } from "../../../Utils";
 
 export default function ModalAddMembers(props) {
@@ -15,10 +15,6 @@ export default function ModalAddMembers(props) {
   const contacts = useSelector((state) => state.userReducer.contacts);
   const [selectContacts, setSelectContacts] = useState([]);
   const [listRender, setListRender] = useState([]);
-  const selectedConversation = useSelector(
-    (state) => state.conversationReducer.selectedConversation
-  );
-
   const handleSelectContacts = (item) => {
     if (selectContacts.includes(item)) {
       const update = selectContacts.filter((i) => i !== item);
@@ -51,8 +47,10 @@ export default function ModalAddMembers(props) {
             result.data,
             props.conversation.users
               .filter((user) => user._id !== getUserStorage().user._id)
-              .map((user) => user._id)
+              .map((user) => user._id),
+            `${selectContacts.map(user=>user.name)} join group`
           );
+          dispatch(setNotification(`${selectContacts.map(user=>user.name)} join group`))
         } catch (error) {
           console.log(error);
         }

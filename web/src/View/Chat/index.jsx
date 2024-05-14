@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import style from "./chat.module.scss";
-import { IoCallOutline } from "react-icons/io5";
+import { IoCallOutline, IoClose } from "react-icons/io5";
 import { CiEdit, CiMenuKebab } from "react-icons/ci";
 import { Button, Image } from "react-bootstrap";
 import { IoIosSend } from "react-icons/io";
@@ -15,13 +15,17 @@ import welcome from "./../../image/welcome_v2.jpg";
 import { postApiWithToken } from "../../API";
 import { getUserStorage } from "../../Utils";
 import { getCurrentMessage } from "../../features/Message/messageSlice";
-import { newConversationSocket, sendMessageSocket, socket } from "../../Utils/socket";
+import {
+  newConversationSocket,
+  sendMessageSocket
+} from "../../Utils/socket";
 import { FaFileImage, FaLocationDot } from "react-icons/fa6";
 import ModalChandeGroupName from "../Modal/ModalChangeGroupName";
 import Loading from "../../components/Loading";
 import { RiVideoUploadFill } from "react-icons/ri";
 import { LuAlertCircle } from "react-icons/lu";
 import { getBlocks } from "../../features/User/userSlice";
+import { setNotification } from "../../features/Conversations/conversationsSlice";
 
 export default function Chat() {
   const [openChatInfo, setOpenChatInfo] = useState(false);
@@ -43,11 +47,11 @@ export default function Chat() {
   const selectedConversation = useSelector(
     (state) => state.conversationReducer.selectedConversation
   );
-  const allConversation = useSelector(
-    (state) => state.conversationReducer.allConversation
-  );
   const recipient = useSelector(
     (state) => state.conversationReducer.userRecipient
+  );
+  const notification = useSelector(
+    (state) => state.conversationReducer.notification
   );
   const currentMessage = useSelector(
     (state) => state.messageReducer.currentMessage
@@ -248,7 +252,7 @@ export default function Chat() {
         receiverId: recipient._id,
       };
       const result = await postApiWithToken("/users/unblock", dt);
-      if(result.status===200){
+      if (result.status === 200) {
         await dispatch(getBlocks(`/users/${getUserStorage().user._id}`));
       }
     } catch (error) {
@@ -308,9 +312,21 @@ export default function Chat() {
                 />
               </div>
             </div>
+
             <div className={clsx(style.chatFrame)}>
               {loading ? <Loading /> : null}
+              
               <div id="scroll-style-01" className={clsx(style.conversation)}>
+              {selectedConversation?.isGroup && notification ? (
+                <div className={style.notify}>
+                  <div><strong>Notification: </strong>{notification}</div>
+                  <IoClose
+                    onClick={() => {
+                      dispatch(setNotification(null));
+                    }}
+                  />
+                </div>
+              ) : null}
                 {currentMessage?.map((item, index) => {
                   if (item.user._id === getUserStorage().user._id) {
                     return (
@@ -333,7 +349,7 @@ export default function Chat() {
               {isBlocked ? (
                 <div className={clsx(style.blockWrap)}>
                   <LuAlertCircle size={25} /> Bỏ chặn để gửi tin nhắn tới người
-                  này. <span onClick={()=>handleUnBlock()}>Bỏ chặn</span>
+                  này. <span onClick={() => handleUnBlock()}>Bỏ chặn</span>
                 </div>
               ) : (
                 <div className={clsx(style.inputWrap)}>

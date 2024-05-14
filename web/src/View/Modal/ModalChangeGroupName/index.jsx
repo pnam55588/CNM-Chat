@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import {
   getAllConversations,
   selectConversation,
+  setNotification,
 } from "../../../features/Conversations/conversationsSlice";
 import { getUserStorage } from "../../../Utils";
 import { updateGroup } from "../../../Utils/socket";
@@ -40,7 +41,17 @@ export default function ModalChandeGroupName(props) {
             result.data,
             result.data.users
               .filter((user) => user._id !== getUserStorage().user._id)
-              .map((user) => user._id)
+              .map((user) => user._id),
+            `${
+              getUserStorage().user.name
+            } change name group to '${inputNameGroup}'`
+          );
+          dispatch(
+            setNotification(
+              `${
+                getUserStorage().user.name
+              } change name group to '${inputNameGroup}'`
+            )
           );
           props.onHide();
           Swal.fire({
@@ -73,7 +84,13 @@ export default function ModalChandeGroupName(props) {
             result.data,
             result.data.users
               .filter((user) => user._id !== getUserStorage().user._id)
-              .map((user) => user._id)
+              .map((user) => user._id),
+            `${getUserStorage().user.name} change avatar of group`
+          );
+          dispatch(
+            setNotification(
+              `${getUserStorage().user.name} change avatar of group`
+            )
           );
           props.onHide();
           Swal.fire({

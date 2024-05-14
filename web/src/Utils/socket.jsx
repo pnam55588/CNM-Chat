@@ -23,9 +23,9 @@ const removeMessageSocket = (receiverId) => {
     socket.emit("removeMessage", receiverId);
   }
 };
-const updateGroup = (conversation, receiverId) => {
+const updateGroup = (conversation, receiverId, message) => {
   if (socket) {
-    socket.emit("updateGroup", conversation, receiverId);
+    socket.emit("updateGroup", conversation, receiverId, message);
   }
 };
 const newGroup = (conversation, receiverId) => {

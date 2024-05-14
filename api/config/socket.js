@@ -28,10 +28,10 @@ module.exports = function (server) {
         io.emit('userOnline', userId);
 
         
-        socket.on('updateGroup', (conversation, receiverIds) => { // conversation return from api
+        socket.on('updateGroup', (conversation, receiverIds, message) => { // conversation return from api
             receiverIds.forEach(receiverId => {
                 if (users[receiverId]) {
-                    socket.to(users[receiverId]).emit('receiveUpdateGroup', conversation);
+                    socket.to(users[receiverId]).emit('receiveUpdateGroup', {conversation, message});
                 }
             });
         });

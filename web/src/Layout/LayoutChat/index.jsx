@@ -15,6 +15,7 @@ import {
   getAllConversations,
   handleNewConversation,
   selectConversation,
+  setNotification,
 } from "../../features/Conversations/conversationsSlice";
 import {
   getBlocks,
@@ -60,9 +61,11 @@ export default function LayoutChat() {
     });
     socket.on("receiveUpdateGroup", (res)=>{
       getConversations();
-      dispatch(selectConversation(res))
+      dispatch(selectConversation(res.conversation))
+      dispatch(setNotification(res.message))
     })
     socket.on("receiveNewGroup", res =>{
+      getConversations()
       dispatch(handleNewConversation(res))
     })
     getConversations();

@@ -20,6 +20,7 @@ import Swal from "sweetalert2";
 import {
   getAllConversations,
   selectConversation,
+  setNotification,
 } from "../../features/Conversations/conversationsSlice";
 import { updateGroup } from "../../Utils/socket";
 import ModalChandeGroupName from "../../View/Modal/ModalChangeGroupName";
@@ -117,7 +118,7 @@ export default function ChatInfo(props) {
     });
   };
 
-  const handleRemoveMember = async (value) => {
+  const handleRemoveMember = async (value, name) => {
     Swal.fire({
       icon: "question",
       showDenyButton: true,
@@ -146,8 +147,10 @@ export default function ChatInfo(props) {
               result.data,
               selectedConversation.users
                 .filter((user) => user._id !== getUserStorage().user._id)
-                .map((user) => user._id)
+                .map((user) => user._id),
+              `Remove member ${name}`
             );
+            dispatch(setNotification(`Remove member ${name}`))
           }
         } catch (error) {
           console.log(error);
@@ -156,7 +159,7 @@ export default function ChatInfo(props) {
     });
   };
 
-  const handleChangeAdmin = async (id) => {
+  const handleChangeAdmin = async (id, name) => {
     try {
       const dt = {
         conversationId: selectedConversation._id,
@@ -177,8 +180,10 @@ export default function ChatInfo(props) {
           result.data,
           selectedConversation.users
             .filter((user) => user._id !== getUserStorage().user._id)
-            .map((user) => user._id)
+            .map((user) => user._id),
+          `Admin change to ${name}`
         );
+        dispatch(setNotification(`Admin change to ${name}`))
       }
     } catch (error) {
       console.log(error);
@@ -211,7 +216,8 @@ export default function ChatInfo(props) {
               result.data,
               selectedConversation.users
                 .filter((user) => user._id !== getUserStorage().user._id)
-                .map((user) => user._id)
+                .map((user) => user._id),
+              `${getUserStorage().user.name} out group`
             );
           }
         } catch (error) {
@@ -346,12 +352,12 @@ export default function ChatInfo(props) {
                       <Dropdown.Toggle as={CustomToggle} />
                       <Dropdown.Menu size="sm" title="">
                         <Dropdown.Item
-                          onClick={() => handleRemoveMember(item._id)}
+                          onClick={() => handleRemoveMember(item._id, item.name)}
                         >
                           Delete
                         </Dropdown.Item>
                         <Dropdown.Item
-                          onClick={() => handleChangeAdmin(item._id)}
+                          onClick={() => handleChangeAdmin(item._id, item.name)}
                         >
                           Change admin
                         </Dropdown.Item>
