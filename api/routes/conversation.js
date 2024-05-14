@@ -158,7 +158,7 @@ router.put('/addMembers', async (req, res) => { //req.body = {conversationId, us
             await Conversation.updateOne({ _id: conversationId }, { $push: { users: userId } });
         }
         const updatedConversation = await Conversation.findById(conversationId).populate('users', 'name avatar isOnline');
-        return res.status(200).json(updatedConversation);
+        return res.status(200).json({...updatedConversation, notify: "New members added"});
     } catch (err) {
         res.status(400).json(err);
     }
@@ -177,7 +177,8 @@ router.put('/removeMember', async (req, res) => { //req.body = {conversationId, 
         await Conversation.updateOne({ _id: conversationId }, { $pull: { users: userId } });
         await User.updateOne({ _id: userId }, { $pull: { conversations: conversationId } });
         const updatedConversation = await Conversation.findById(conversationId).populate('users', 'name avatar isOnline');
-        res.status(200).json(updatedConversation);
+        const userRemoved = await User.findById(userId, 'name');
+        res.status(200).json({...updatedConversation, notify: userRemoved.name +" removed"});
     } catch (err) {
         res.status(400).json(err);
     }
@@ -233,7 +234,7 @@ router.put('/changeGroupName', async (req, res) => { //req.body = {conversationI
         if (!conversation) return res.status(400).json("Conversation not found");
         await Conversation.updateOne({ _id: conversationId }, { name: name });
         const updatedConversation = await Conversation.findById(conversationId).populate('users', 'name avatar isOnline');
-        res.status(200).json(updatedConversation);
+        res.status(200).json({...updatedConversation, notify: "Group name changed to " + name});
     } catch (err) {
         res.status(400).json(err);
     }
@@ -250,7 +251,7 @@ router.put('/changeGroupImage/:conversationId', uploadImage.single('file'), asyn
         if (!conversation) return res.status(400).json("Conversation not found");
         await Conversation.updateOne({ _id: conversationId }, { image: imageUrl });
         const updatedConversation = await Conversation.findById(conversationId).populate('users', 'name avatar isOnline');
-        res.status(200).json(updatedConversation);
+        res.status(200).json({...updatedConversation, notify: "Group image changed"});
     } catch (err) {
         res.status(400).json(err);
     }
@@ -395,7 +396,8 @@ router.post('/outGroup', async (req, res) => {
         await Conversation.updateOne({ _id: conversationId }, { $pull: { users: userId }});
         // return conversation updated
         const updatedConversation = await Conversation.findById(conversationId).populate('users', 'name avatar isOnline');
-        res.status(200).json(updatedConversation);
+        const userOuted = await User.findById(userId, 'name');
+        res.status(200).json({...updatedConversation, notify: userOuted.name +" out the group"});
     } catch (err) {
         res.status(400).json(err);
     }
@@ -429,7 +431,8 @@ router.put('/changeGroupAdmin', async (req, res) => {
         if (!conversation.users.includes(userId)) return res.status(400).json("User not in the group");
         await Conversation.updateOne({ _id: conversationId }, { admin: userId });
         const updatedConversation = await Conversation.findById(conversationId).populate('users', 'name avatar isOnline');
-        res.status(200).json(updatedConversation);
+        const newAdmin = await User.findById(userId, 'name');
+        res.status(200).json({...updatedConversation, notify: "Admin changed to " + newAdmin.name});
     } catch (err) {
         res.status(400).json(err);
     }
