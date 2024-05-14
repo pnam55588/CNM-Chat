@@ -40,42 +40,46 @@ module.exports = function (server) {
             receiverIds.forEach(receiverId => {
                 if (users[receiverId]) {
                     socket.to(users[receiverId]).emit('receiveNewGroup', conversation);
+                    console.log('NEW GROUP SOCKET');
                 }
             });
         });
 
-        socket.on('userOutGroup', (userId, groupId, receiverIds) => {
+        socket.on('userOutGroup', async (userId, groupId, receiverIds) => { 
+            const user = await User.findById(userId, 'name');
             receiverIds.forEach(receiverId => {
                 if (users[receiverId]) {
-                    socket.to(users[receiverId]).emit('receiveUserOutGroup', { userId, groupId });
+                    socket.to(users[receiverId]).emit('receiveUserOutGroup', { userId, groupId, message: user.name+' out group'});
                 }
             });
         });
-        socket.on('userJoinGroup', (userId, groupId, receiverIds) => {
+        socket.on('userJoinGroup', async(userId, groupId, receiverIds) => {
+            const user = await User.findById(userId, 'name');
             receiverIds.forEach(receiverId => {
                 if (users[receiverId]) {
-                    socket.to(users[receiverId]).emit('receiveUserJoinGroup', { userId, groupId });
+                    socket.to(users[receiverId]).emit('receiveUserJoinGroup', { userId, groupId, message: user.name+' join group'});
                 }
             });
         });
         socket.on("changeGroupName", (groupId, groupName, receiverIds) => {
             receiverIds.forEach(receiverId => {
                 if (users[receiverId]) {
-                    socket.to(users[receiverId]).emit('receiveChangeGroupName', { groupId, groupName });
+                    socket.to(users[receiverId]).emit('receiveChangeGroupName', { groupId, groupName, message: 'Group name changed to '+groupName});
                 }
             });
         });
         socket.on("changeGroupAvatar", (groupId, groupAvatar, receiverIds) => {
             receiverIds.forEach(receiverId => {
                 if (users[receiverId]) {
-                    socket.to(users[receiverId]).emit('receiveChangeGroupAvatar', { groupId, groupAvatar });
+                    socket.to(users[receiverId]).emit('receiveChangeGroupAvatar', { groupId, groupAvatar, message: 'Group avatar changed'});
                 }
             });
         });
         socket.on('changeGroupAdmin', (groupId, adminId, receiverIds) => {
+            const userAdmin = User.findById(adminId, 'name');
             receiverIds.forEach(receiverId => {
                 if (users[receiverId]) {
-                    socket.to(users[receiverId]).emit('receiveChangeGroupAdmin', { groupId, adminId });
+                    socket.to(users[receiverId]).emit('receiveChangeGroupAdmin', { groupId, adminId, message: 'Admin changed to '+userAdmin.name});
                 }
             });
         });
@@ -114,6 +118,7 @@ module.exports = function (server) {
             if (!conversation.users || conversation.users.length === 0) return;
             const userSend = await User.findById(message.user, 'name avatar');
             const newMessage = { ...message, user: userSend }
+            console.log("NEW CONVERSATION SOCKET");
             message.receiverIds?.forEach(userId => {
                 if (users[userId]) {
                     console.log(userId);
