@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "nodemon app.js"
   },
   "dependencies": {
     "aws-sdk": "^2.1555.0",

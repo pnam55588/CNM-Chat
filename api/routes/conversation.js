@@ -83,8 +83,12 @@ router.post('/sendMessage', async (req, res) => { //req.body = {conversationId, 
             conversationId: req.body.conversationId,
             user: req.body.user, // có cần đổi thành object id không ? 
             text: req.body.text,
+            createdAt: new Date(),
         });
+        console.log(message);
+        console.log("new message");
         const newMessage = await message.save();
+        console.log(newMessage);
         res.status(200).json(newMessage);
     } catch (err) {
         res.status(400).json(err);
@@ -275,6 +279,7 @@ router.post('/sendImages', uploadImage.array('files', 50), async (req, res) => {
         conversationId: conversationId,
         user: user,
         images: images,
+        createdAt: new Date(),
     });
     const newMessage = await message.save();
     res.status(200).json(newMessage);
@@ -296,6 +301,7 @@ router.post('/sendVideo', uploadVideo.single('file'), async (req, res) => {
         conversationId: conversationId,
         user: user,
         video: result.Location,
+        createdAt: new Date(),
     });
     const newMessage = await message.save();
     res.status(200).json(newMessage);
@@ -317,6 +323,7 @@ router.post('/sendFile', uploadFile.single('file'), async (req, res) => {
         conversationId: conversationId,
         user: user,
         file: result.Location,
+        createdAt: new Date(),
     });
     const newMessage = await message.save();
     res.status(200).json(newMessage);
@@ -342,6 +349,7 @@ router.post('/sendLocation', async (req, res) => { // location = {latitude, long
         conversationId: conversationId,
         user: user,
         location: location,
+        createdAt: new Date(),
     });
     const newMessage = await message.save();
     res.status(200).json(newMessage);
@@ -373,7 +381,8 @@ router.post("/forwardMessage", async (req, res) => { // message return from api,
             images: message.images || null,
             video: message.video || null,
             file: message.file || null,
-            location: message.location || null
+            location: message.location || null,
+            createdAt: new Date(),
         });
         const savedMessage = await newMessage.save();
         res.status(200).json(savedMessage);

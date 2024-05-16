@@ -13,15 +13,19 @@ const multer = require('multer');
 const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
 const conversationRouter = require('./routes/conversation');
-
 const { createServer } = require('http');
-const socket = require('./config/socket');
-const PORT = process.env.PORT || 3300
 const app = express();
-const server = createServer(app);
 
-server.listen(PORT, () => {console.log(`listening on *:${PORT}`);});
+const server = createServer(app);
+const socket = require('./config/socket');
+server.listen(3300, () => {console.log(`listening on *:${3300}`);});
 socket(server);
+
+const server2 = createServer(app);
+app.set('port', 3000);
+server2.listen(3000, () => {
+  console.log('rest api server listening on port ' + 3000);
+});
 
 dotenv.config();
 mongoose.connect(
