@@ -95,7 +95,7 @@ export default function ModalAddMembers(props) {
           <Row>
             <Col
               id="scroll-style-01"
-              style={{ overflow: "auto", height: "30rem" }}
+              style={{ overflow: "auto", height: "25em" }}
               lg={12}
               md={12}
             >

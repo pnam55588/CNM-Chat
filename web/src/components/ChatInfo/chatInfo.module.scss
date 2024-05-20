@@ -30,8 +30,10 @@
   }
   .Accordion {
     padding-top: 5%;
+    height: 75%;
+    overflow: auto;
     .accordionBoby {
-      max-height: 20rem;
+      min-height: 10em !important;
       height: fit-content;
       overflow: auto;
       .addMembers {

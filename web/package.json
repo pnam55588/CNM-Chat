@@ -39,7 +39,6 @@
       "react-app/jest"
     ]
   },
-  "homepage": "/chat-app/login",
   "browserslist": {
     "production": [
       ">0.2%",

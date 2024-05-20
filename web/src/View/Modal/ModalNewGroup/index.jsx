@@ -111,7 +111,7 @@ export default function ModalNewGroup(props) {
           <Row>
             <Col
               id="scroll-style-01"
-              style={{ overflow: "auto", height: "30rem" }}
+              style={{ overflow: "auto", height: "25em" }}
               lg={6}
               md={6}
             >

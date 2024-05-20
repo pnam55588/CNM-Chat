@@ -2,7 +2,8 @@ import axios from "axios";
 import { getUserStorage } from "../Utils";
 
 var api = axios.create({
-  baseURL: "http://localhost:3000/api",
+  baseURL: "http://3.0.21.232:3000/api",
+  // baseURL: 'http://localhost:3000/api'
 });
 
 // api.interceptors.response.use(

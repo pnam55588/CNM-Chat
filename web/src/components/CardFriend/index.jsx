@@ -7,7 +7,7 @@ import { CiMenuKebab } from "react-icons/ci";
 import ModalOtherUser from "../../View/Modal/ModalOtherUser";
 import { getUserStorage } from "../../Utils";
 import { useDispatch, useSelector } from "react-redux";
-import { getBlocks } from "../../features/User/userSlice";
+import { getBlocks, getContacts } from "../../features/User/userSlice";
 import Swal from "sweetalert2";
 import { selectMenu } from "../../features/Menu/menuSlice";
 import { getAllConversations } from "../../features/Conversations/conversationsSlice";
@@ -82,6 +82,25 @@ export default function CardFriend({ data, tab }) {
     }
   };
 
+  const handleDeleteFriend = async () => {
+    try {
+      const dt = {
+        userId: getUserStorage().user._id,
+        friendId: data._id,
+      };
+      const result = await postApiWithToken(`/users/deleteFriend`, dt);
+      if (result.status === 200) {
+        dispatch(getContacts(getUserStorage().user._id));
+        Swal.fire({
+          icon: "success",
+          text: result.data,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className={clsx(style.cardF)}>
       <div
@@ -107,7 +126,9 @@ export default function CardFriend({ data, tab }) {
               UnBlock
             </Dropdown.Item>
           )}
-          <Dropdown.Item>Delete friendship</Dropdown.Item>
+          <Dropdown.Item onClick={() => handleDeleteFriend()}>
+            Delete friendship
+          </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
       <ModalOtherUser show={show} onHide={handleClose} user={data} />
