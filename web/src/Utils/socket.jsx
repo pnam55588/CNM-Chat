@@ -1,6 +1,6 @@
 import io from "socket.io-client";
 let socket;
-const baseURL = "http://localhost:3300";
+const baseURL = "http://13.229.233.234:3300";
 const initiateSocket = (userId) => {
   socket = io(baseURL, {
     path: "",
