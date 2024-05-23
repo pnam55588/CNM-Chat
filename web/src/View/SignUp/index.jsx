@@ -41,7 +41,29 @@ export default function SignUp() {
   const verifyOtp = async () => {
     try {
       await comfirmation.confirm(otp);
-      navigate("/chat-app/chat");
+      let data = {
+        phone: phone,
+        name: name,
+        password: password,
+      };
+      try {
+        const result = await postApiNoneToken("/auth/register", data);
+        if (result.data.error) {
+          Swal.fire({
+            icon: "error",
+            text: result.data.error,
+          });
+        } else {
+          setUserStorage(result.data);
+          navigate("/chat-app/chat");
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          text: error.request.data,
+        });
+      }
+      // navigate("/chat-app/chat");
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -78,29 +100,7 @@ export default function SignUp() {
 
   const handleSignUp = async () => {
     if (checkPhoneValid(phone)) {
-      let data = {
-        phone: phone,
-        name: name,
-        password: password,
-      };
-      try {
-        const result = await postApiNoneToken("/auth/register", data);
-        if (result.data.error) {
-          Swal.fire({
-            icon: "error",
-            text: result.data.error,
-          });
-        } else {
-          setUserStorage(result.data);
-          sendOtp();
-          // navigate("/chat-app/chat");
-        }
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          text: error.request.data,
-        });
-      }
+      sendOtp();
     } else {
       Swal.fire({
         icon: "error",
