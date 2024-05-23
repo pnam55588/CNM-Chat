@@ -5,7 +5,7 @@ import { getUserStorage } from '../Utils'
 export default function ProtectedRouter({children}) {
 let user = getUserStorage()
 if(!user){
-    return <Navigate to={'/chat-app/login'} replace></Navigate>
+    return <Navigate to={'/'} replace></Navigate>
 }
   return children
 }

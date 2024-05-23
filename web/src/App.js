@@ -12,7 +12,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<LayoutLogin/>}>
-          <Route path='/chat-app/login' element={<Login/>}/>
+          <Route path='/' element={<Login/>}/>
           <Route path='/chat-app/sign-up' element={<SignUp/>}/>
           <Route path='/chat-app/chat' element={<ProtectedRouter><LayoutChat/></ProtectedRouter>}>
           </Route>

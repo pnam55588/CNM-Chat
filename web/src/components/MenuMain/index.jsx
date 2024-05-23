@@ -46,7 +46,7 @@ export default function MenuMain() {
           <FaRegUser size={35} color="white" />
           Profile
         </span>
-        <a href="/chat-app/login"
+        <a href="/"
           onClick={() => {
             localStorage.removeItem("user");
             disconnectSocket()
