@@ -115,7 +115,7 @@ export default function SignUp() {
           size={35}
           className={clsx(Style.iconArrow)}
           onClick={() => {
-            navigate("/chat-app/login");
+            navigate("/");
           }}
         />
         <FaSnapchat size={150} />
