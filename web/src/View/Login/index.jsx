@@ -15,8 +15,8 @@ export default function Login() {
   const navigate = useNavigate();
 
   const [isLoginPhone, setIsLoginPhone] = useState(false);
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("0333660652");
+  const [password, setPassword] = useState("Aa12345");
   const [loading, setLoading] = useState(false);
   const [passwordErr, setPasswordErr] = useState("");
 
@@ -127,6 +127,12 @@ export default function Login() {
           <Button id="buttonStyle3" onClick={() => handleLogin()}>
             Login
           </Button>
+          <h3>
+            Accounts: <br />
+              0333660653 - Aa12345 <br />
+              0333660654 - Aa12345 <br />
+              0333660655 - Aa12345 <br />
+          </h3>
         </div>
       </div>
       

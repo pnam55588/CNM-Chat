@@ -9,23 +9,26 @@ const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const multer = require('multer');
+const { Server } = require('socket.io');
+const { createServer } = require('http');
 
 const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
 const conversationRouter = require('./routes/conversation');
-const { createServer } = require('http');
-const app = express();
-
-const server = createServer(app);
 const socket = require('./config/socket');
-server.listen(3300, () => {console.log(`listening on *:${3300}`);});
-socket(server);
 
-const server2 = createServer(app);
-app.set('port', 3000);
-server2.listen(3000, () => {
-  console.log('rest api server listening on port ' + 3000);
-});
+const app = express();
+const server = createServer(app);
+const io = new Server(server, { cors: { origin: '*' } });
+
+socket(io);
+server.listen(3000, () => {console.log(`listening on *:${3000}`);});
+
+// const server2 = createServer(app);
+// app.set('port', 3000);
+// server2.listen(3000, () => {
+//   console.log('rest api server listening on port ' + 3000);
+// });
 
 dotenv.config();
 mongoose.connect(

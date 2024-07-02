@@ -4,9 +4,9 @@ const User = require('../models/User');
 const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
 
-let io = null;
-module.exports = function (server) {
-    io = new Server(server, { cors: { origin: '*' } });
+// let io = null;
+module.exports = function (io) {
+    // io = new Server(server, { cors: { origin: '*' } });
     const users = {};
     updateUserOnline = async (userId) => {
         const userUpdate = await User.findOneAndUpdate({ _id: userId }, { isOnline: true }, { new: true });
@@ -136,4 +136,4 @@ module.exports = function (server) {
         });
     });
 }
-module.exports.io = io;
+// module.exports.io = io;
